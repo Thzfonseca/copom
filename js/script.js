@@ -15,25 +15,24 @@ function esconderLoading() {
     }
 }
 
-// Mostra o Spinner no carregamento inicial
+// Mostrar o Spinner no carregamento inicial
 document.addEventListener('DOMContentLoaded', function () {
     mostrarLoading();
 
-    // Esconde o Spinner após um pequeno delay para suavizar o carregamento
     setTimeout(() => {
         esconderLoading();
-    }, 1200); // 1.2 segundos
+    }, 1200);
 });
 
 // Sistema de Tabs do Dashboard
 function showTab(tabId) {
-    // Oculta todas as abas
+    // Esconder todas as abas
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => {
         tab.style.display = 'none';
     });
 
-    // Mostra a aba selecionada
+    // Mostrar a aba selecionada
     const selectedTab = document.getElementById(tabId);
     if (selectedTab) {
         selectedTab.style.display = 'block';
@@ -41,7 +40,7 @@ function showTab(tabId) {
         console.error(`Aba ${tabId} não encontrada.`);
     }
 
-    // Inicializa os componentes específicos da aba (se existirem)
+    // Inicializar componentes da aba, se existir
     initializeTabComponents(tabId);
 }
 
@@ -55,44 +54,23 @@ function initializeTabComponents(tabId) {
                 break;
             case 'modelos-preditivos':
                 if (typeof window.renderizarModelosPreditivos === 'function') {
-                    if (window.modelosPreditivosInstance) {
-                        window.renderizarModelosPreditivos({
-                            modelos: window.modelosPreditivosInstance.getModelosData(),
-                            proximaReuniao: window.modelosPreditivosInstance.getProximaReuniaoData(),
-                            indicadores: window.modelosPreditivosInstance.getIndicadoresData(),
-                            historicoDecisoes: window.modelosPreditivosInstance.historicoDecisoes,
-                            taxaPrevista: window.modelosPreditivosInstance.getProximaReuniaoData().taxaSelicPrevista || 0
-                        });
-                    } else {
-                        console.warn("Instância dos Modelos Preditivos não inicializada.");
-                    }
+                    window.renderizarModelosPreditivos(window.modelosPreditivos.getResultados());
                 }
                 break;
             case 'modelos-avancados':
                 if (typeof window.renderizarModelosAvancados === 'function') {
-                    if (window.modelosPreditivosInstance) {
-                        window.renderizarModelosAvancados({
-                            modelos: window.modelosPreditivosInstance.getModelosData(),
-                            proximaReuniao: window.modelosPreditivosInstance.getProximaReuniaoData(),
-                            taxaPrevista: window.modelosPreditivosInstance.getProximaReuniaoData().taxaSelicPrevista || 0
-                        });
-                    } else {
-                        console.warn("Instância dos Modelos Preditivos não inicializada.");
-                    }
+                    window.renderizarModelosAvancados(window.modelosPreditivos.getResultados());
                 }
                 break;
             case 'simulador':
                 if (typeof window.renderizarSimulador === 'function') {
-                    window.renderizarSimulador();
+                    const container = document.getElementById('simulador-content');
+                    if (container) renderizarSimulador(container);
                 }
                 break;
             case 'analise-atas':
                 if (typeof window.renderizarAnaliseAtas === 'function') {
-                    if (window.analisadorAtas) {
-                        window.renderizarAnaliseAtas(window.analisadorAtas.getResultados());
-                    } else {
-                        console.warn("Analisador de atas não inicializado.");
-                    }
+                    renderizarAnaliseAtas(window.analisadorAtas.getResultados());
                 }
                 break;
             case 'juro-neutro':
@@ -100,14 +78,14 @@ function initializeTabComponents(tabId) {
                     window.renderizarJuroNeutro();
                 }
                 break;
-            case 'focus':
-                if (typeof window.renderizarFocusAnalytics === 'function') {
-                    window.renderizarFocusAnalytics(window.dadosFocus || null);
-                }
-                break;
             case 'agenda-copom':
                 if (typeof window.renderizarAgendaCopom === 'function') {
                     window.renderizarAgendaCopom();
+                }
+                break;
+            case 'focus':
+                if (typeof window.renderizarFocusAnalytics === 'function') {
+                    window.renderizarFocusAnalytics();
                 }
                 break;
             default:
@@ -120,13 +98,13 @@ function initializeTabComponents(tabId) {
 }
 
 function displayTabError(tabId, message) {
-    const container = document.getElementById(tabId);
+    const container = document.getElementById(`${tabId}-content`);
     if (container) {
         container.innerHTML = `<div class="alert alert-danger mt-4">${message}</div>`;
     }
 }
 
-// Monitorar a navegação pelas abas via Hash na URL
+// Monitorar a navegação pelas abas via hash da URL
 window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
     showTab(hash || 'dashboard');
