@@ -8,113 +8,108 @@
   <!-- Estilos -->
   <link rel="stylesheet" href="/lib/bootstrap.min.css">
   <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+    }
+    .sidebar {
+      height: 100vh;
+      background-color: #1c1c1c;
+      padding: 20px;
+      position: fixed;
+      width: 250px;
+    }
+    .sidebar a {
+      display: block;
+      padding: 10px;
+      color: #ccc;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #333;
+      color: #fff;
+    }
+    .content {
+      margin-left: 270px;
+      padding: 20px;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .content {
+        margin-left: 0;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Spinner de Carregamento -->
-  <div id="loading-spinner" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:9999;">
-    <div class="spinner-border text-light" role="status">
-      <span class="visually-hidden">Carregando...</span>
-    </div>
+<div class="sidebar">
+  <h4 class="text-white">COPOM Dashboard</h4>
+  <small class="text-muted">Atualizado em: 19/03/2025</small>
+  <hr>
+  <a href="#dashboard" class="active">Dashboard Principal</a>
+  <a href="#modelos-preditivos">Modelos Preditivos</a>
+  <a href="#simulador">Simulador de Cenários</a>
+  <a href="#modelos-avancados">Modelos Avançados</a>
+  <a href="#analise-atas">Análise NLP de Atas</a>
+  <a href="#juro-neutro">Juro Real Neutro</a>
+  <a href="#analise-focus">Análise Focus</a>
+  <a href="#agenda-copom">Agenda COPOM</a>
+  <a href="#diagnostico">Diagnóstico do Sistema</a>
+  <hr>
+  <small class="text-muted">&copy; 2025 COPOM Dashboard<br>Desenvolvido por Manus AI</small>
+</div>
+
+<div class="content">
+  <!-- Cada aba -->
+  <div id="aba-dashboard">
+    <h2>Dashboard Principal</h2>
+    <p>Resumo dos principais indicadores econômicos.</p>
   </div>
 
-  <!-- Layout Principal -->
-  <div class="d-flex" id="wrapper">
+  <div id="aba-modelos-preditivos" style="display:none"></div>
+  <div id="aba-simulador" style="display:none"></div>
+  <div id="aba-modelos-avancados" style="display:none"></div>
+  <div id="aba-analise-atas" style="display:none"></div>
+  <div id="aba-juro-neutro" style="display:none"></div>
+  <div id="aba-analise-focus" style="display:none"></div>
+  <div id="aba-agenda-copom" style="display:none"></div>
+  <div id="aba-diagnostico" style="display:none"></div>
+</div>
 
-    <!-- Sidebar -->
-    <div class="bg-dark border-end" id="sidebar-wrapper" style="min-width: 250px;">
-      <div class="sidebar-heading text-white mt-4 ms-3">COPOM Dashboard</div>
-      <div class="list-group list-group-flush mt-4">
-        <a href="#dashboard" class="list-group-item list-group-item-action bg-dark text-white">Dashboard Principal</a>
-        <a href="#modelos-preditivos" class="list-group-item list-group-item-action bg-dark text-white">Modelos Preditivos</a>
-        <a href="#simulador" class="list-group-item list-group-item-action bg-dark text-white">Simulador de Cenários</a>
-        <a href="#modelos-avancados" class="list-group-item list-group-item-action bg-dark text-white">Modelos Avançados</a>
-        <a href="#analise-atas" class="list-group-item list-group-item-action bg-dark text-white">Análise NLP de Atas</a>
-        <a href="#juro-neutro" class="list-group-item list-group-item-action bg-dark text-white">Juro Real Neutro</a>
-        <a href="#focus" class="list-group-item list-group-item-action bg-dark text-white">Análise Focus</a>
-        <a href="#agenda-copom" class="list-group-item list-group-item-action bg-dark text-white">Agenda COPOM</a>
-        <a href="#diagnostico" class="list-group-item list-group-item-action bg-dark text-white">Diagnóstico do Sistema</a>
-      </div>
-      <div class="text-center text-secondary small mt-5 mb-3">
-        © 2025 COPOM Dashboard<br>
-        Desenvolvido por Manus AI
-      </div>
-    </div>
+<!-- Bibliotecas -->
+<script src="/lib/chart.min.js"></script>
+<script src="/lib/d3.min.js"></script>
+<script src="/lib/bootstrap.bundle.min.js"></script>
 
-    <!-- Conteúdo Principal -->
-    <div id="page-content-wrapper" class="flex-grow-1 p-4 bg-black text-white">
-
-      <!-- Abas -->
-      <div id="dashboard" class="tab-content">
-        <h1>Dashboard Principal</h1>
-        <p>Resumo dos principais indicadores econômicos.</p>
-      </div>
-
-      <div id="modelos-preditivos" class="tab-content" style="display:none;">
-        <h1>Modelos Preditivos</h1>
-        <p>Resultados dos modelos de previsão.</p>
-      </div>
-
-      <div id="simulador" class="tab-content" style="display:none;">
-        <h1>Simulador de Cenários</h1>
-        <p>Ajuste variáveis macroeconômicas para simular decisões do COPOM.</p>
-      </div>
-
-      <div id="modelos-avancados" class="tab-content" style="display:none;">
-        <h1>Modelos Avançados</h1>
-        <p>Análises baseadas em Regime Switching, Kalman, Bayesiano e outros.</p>
-      </div>
-
-      <div id="analise-atas" class="tab-content" style="display:none;">
-        <h1>Análise NLP de Atas do COPOM</h1>
-        <p>Resultados da análise de sentimento das atas.</p>
-      </div>
-
-      <div id="juro-neutro" class="tab-content" style="display:none;">
-        <h1>Juro Real Neutro</h1>
-        <p>Estimativas da taxa de juro neutra da economia brasileira.</p>
-      </div>
-
-      <div id="focus" class="tab-content" style="display:none;">
-        <h1>Análise Focus</h1>
-        <p>Expectativas do mercado para inflação, câmbio e PIB.</p>
-      </div>
-
-      <div id="agenda-copom" class="tab-content" style="display:none;">
-        <h1>Agenda COPOM</h1>
-        <p>Próximas datas de reuniões do Comitê de Política Monetária.</p>
-      </div>
-
-      <div id="diagnostico" class="tab-content" style="display:none;">
-        <h1>Diagnóstico do Sistema</h1>
-        <p>Ferramentas internas de verificação do sistema.</p>
-      </div>
-
-    </div> <!-- page-content-wrapper -->
-
-  </div> <!-- wrapper -->
-
-  <!-- Scripts -->
-  <script src="/lib/chart.min.js"></script>
-  <script src="/lib/d3.min.js"></script>
-  <script src="/lib/bootstrap.bundle.min.js"></script>
-
-  <script src="/js/monitor.js"></script>
-  <script src="/js/agenda_copom.js"></script>
-  <script src="/js/modelos_avancados.js"></script>
-  <script src="js/modelos_avancados_ui.js"></script>
-  <script src="/js/modelos_preditivos.js"></script>
-  <script src="/js/modelos_preditivos_ui.js"></script>
-  <script src="/js/modelos_preditivos_detalhes.js"></script>
-  <script src="/js/diagnostic.js"></script>
-  <script src="/js/diagnostico_completo.js"></script>
-  <script src="/js/ferramentas_diagnostico.js"></script>
-  <script src="/js/data_integrity.js"></script>
-  <script src="/js/analise_atas.js"></script>
-  <script src="/js/analise_atas_ui.js"></script>
-  <script src="/js/focus/focus_analytics.js"></script>
-  <script src="/js/simulador.js"></script>
-  <script src="/js/script.js"></script> <!-- importante deixar no final -->
+<!-- Scripts do projeto -->
+<script src="/js/monitor.js"></script>
+<script src="/js/agenda_copom.js"></script>
+<script src="/js/analise_atas.js"></script>
+<script src="/js/analise_atas_ui.js"></script>
+<script src="/js/data_integrity.js"></script>
+<script src="/js/diagnostic.js"></script>
+<script src="/js/diagnostico_completo.js"></script>
+<script src="/js/ferramentas_diagnostico.js"></script>
+<script src="/js/focus/focus_analytics.js"></script>
+<script src="/js/juro_neutro/juro_neutro.js"></script>
+<script src="/js/juro_neutro/juro_neutro_integrador.js"></script>
+<script src="/js/juro_neutro/simulador_juro_neutro.js"></script>
+<script src="/js/juro_neutro/simulador_juro_neutro_ui.js"></script>
+<script src="/js/modelos_avancados.js"></script>
+<script src="/js/modelos_avancados_ui.js"></script>
+<script src="/js/modelos_preditivos.js"></script>
+<script src="/js/modelos_preditivos_detalhes.js"></script>
+<script src="/js/modelos_preditivos_ui.js"></script>
+<script src="/js/simulador.js"></script>
+<script src="/js/script.js"></script>
 
 </body>
 </html>
