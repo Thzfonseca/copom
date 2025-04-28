@@ -15,24 +15,13 @@ function esconderLoading() {
     }
 }
 
-// Mostrar o Spinner no carregamento inicial
-document.addEventListener('DOMContentLoaded', function () {
-    mostrarLoading();
-
-    setTimeout(() => {
-        esconderLoading();
-    }, 1200);
-});
-
 // Sistema de Tabs do Dashboard
 function showTab(tabId) {
-    // Esconder todas as abas
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => {
         tab.style.display = 'none';
     });
 
-    // Mostrar a aba selecionada
     const selectedTab = document.getElementById(tabId);
     if (selectedTab) {
         selectedTab.style.display = 'block';
@@ -40,7 +29,6 @@ function showTab(tabId) {
         console.error(`Aba ${tabId} não encontrada.`);
     }
 
-    // Inicializar componentes da aba, se existir
     initializeTabComponents(tabId);
 }
 
@@ -48,29 +36,54 @@ function initializeTabComponents(tabId) {
     try {
         switch (tabId) {
             case 'dashboard':
-                if (typeof window.renderizarDashboard === 'function') {
-                    window.renderizarDashboard();
-                }
+                console.log('Dashboard selecionado.');
                 break;
             case 'modelos-preditivos':
-                if (typeof window.renderizarModelosPreditivos === 'function') {
-                    window.renderizarModelosPreditivos(window.modelosPreditivos.getResultados());
+                if (typeof window.ModelosPreditivos === 'function') {
+                    if (!window.modelosPreditivos) {
+                        window.modelosPreditivos = new ModelosPreditivos();
+                    }
+                    const resultados = {
+                        modelos: window.modelosPreditivos.getModelosData(),
+                        proximaReuniao: window.modelosPreditivos.getProximaReuniaoData(),
+                        indicadores: window.modelosPreditivos.getIndicadoresData(),
+                        historicoDecisoes: window.modelosPreditivos.historicoDecisoes,
+                        taxaPrevista: window.modelosPreditivos.getProximaReuniaoData().previsaoConsolidada.includes('Aumento')
+                            ? window.modelosPreditivos.historicoDecisoes[0].taxa + 0.25
+                            : window.modelosPreditivos.historicoDecisoes[0].taxa
+                    };
+                    window.renderizarModelosPreditivos(resultados);
                 }
                 break;
-            case 'modelos-avancados':
-                if (typeof window.renderizarModelosAvancados === 'function') {
-                    window.renderizarModelosAvancados(window.modelosPreditivos.getResultados());
+            case 'analise-atas':
+                if (typeof window.AnalisadorAtasCopom === 'function') {
+                    if (!window.analisadorAtas) {
+                        window.analisadorAtas = new AnalisadorAtasCopom();
+                    }
+                    const dados = window.analisadorAtas.getResultados();
+                    window.renderizarAnaliseAtas(dados);
                 }
                 break;
             case 'simulador':
                 if (typeof window.renderizarSimulador === 'function') {
-                    const container = document.getElementById('simulador-content');
-                    if (container) renderizarSimulador(container);
+                    const container = document.getElementById('simulador');
+                    if (container) {
+                        window.renderizarSimulador(container);
+                    }
                 }
                 break;
-            case 'analise-atas':
-                if (typeof window.renderizarAnaliseAtas === 'function') {
-                    renderizarAnaliseAtas(window.analisadorAtas.getResultados());
+            case 'modelos-avancados':
+                if (typeof window.renderizarModelosAvancados === 'function') {
+                    if (window.modelosPreditivos) {
+                        const resultados = {
+                            modelos: window.modelosPreditivos.getModelosData(),
+                            proximaReuniao: window.modelosPreditivos.getProximaReuniaoData(),
+                            taxaPrevista: window.modelosPreditivos.getProximaReuniaoData().previsaoConsolidada.includes('Aumento')
+                                ? window.modelosPreditivos.historicoDecisoes[0].taxa + 0.25
+                                : window.modelosPreditivos.historicoDecisoes[0].taxa
+                        };
+                        window.renderizarModelosAvancados(resultados);
+                    }
                 }
                 break;
             case 'juro-neutro':
@@ -78,18 +91,18 @@ function initializeTabComponents(tabId) {
                     window.renderizarJuroNeutro();
                 }
                 break;
-            case 'agenda-copom':
-                if (typeof window.renderizarAgendaCopom === 'function') {
-                    window.renderizarAgendaCopom();
-                }
-                break;
             case 'focus':
                 if (typeof window.renderizarFocusAnalytics === 'function') {
                     window.renderizarFocusAnalytics();
                 }
                 break;
+            case 'agenda-copom':
+                if (typeof window.renderizarAgendaCopom === 'function') {
+                    window.renderizarAgendaCopom();
+                }
+                break;
             default:
-                console.warn(`Nenhuma função específica para inicializar a aba ${tabId}.`);
+                console.warn(`Nenhuma função específica para a aba ${tabId}.`);
         }
     } catch (error) {
         console.error(`Erro ao inicializar componentes da aba ${tabId}:`, error);
@@ -98,20 +111,24 @@ function initializeTabComponents(tabId) {
 }
 
 function displayTabError(tabId, message) {
-    const container = document.getElementById(`${tabId}-content`);
+    const container = document.getElementById(tabId);
     if (container) {
         container.innerHTML = `<div class="alert alert-danger mt-4">${message}</div>`;
     }
 }
 
-// Monitorar a navegação pelas abas via hash da URL
+// Inicializar tab ao mudar hash
 window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
     showTab(hash || 'dashboard');
 });
 
-// Inicializar na primeira carga
+// Inicializar tudo ao carregar
 window.addEventListener('load', () => {
+    mostrarLoading();
     const initialHash = window.location.hash.substring(1);
     showTab(initialHash || 'dashboard');
+    setTimeout(() => {
+        esconderLoading();
+    }, 1000);
 });
