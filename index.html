@@ -1,79 +1,86 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>COPOM Dashboard</title>
-  
-  <link rel="stylesheet" href="lib/bootstrap.min.css">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard COPOM</title>
+
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- CSS do Simulador (novo) -->
+    <link rel="stylesheet" href="css/simulador.css">
+
+    <!-- Bibliotecas -->
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <script src="lib/bootstrap.bundle.min.js" defer></script>
+    <script src="lib/chart.min.js" defer></script>
+    <script src="lib/d3.min.js" defer></script>
+
+    <!-- JS do Projeto -->
+    <script src="js/agenda_copom.js" defer></script>
+    <script src="js/analise_atas.js" defer></script>
+    <script src="js/analise_atas_ui.js" defer></script>
+    <script src="js/data_integrity.js" defer></script>
+    <script src="js/diagnostic.js" defer></script>
+    <script src="js/diagnostico_completo.js" defer></script>
+    <script src="js/ferramentas_diagnostico.js" defer></script>
+    <script src="js/focus/focus_analytics.js" defer></script>
+    <script src="js/juro_neutro/juro_neutro.js" defer></script>
+    <script src="js/juro_neutro/juro_neutro_integrador.js" defer></script>
+    <script src="js/juro_neutro/simulador_juro_neutro.js" defer></script>
+    <script src="js/juro_neutro/simulador_juro_neutro_ui.js" defer></script>
+    <script src="js/modelos_avancados.js" defer></script>
+    <script src="js/modelos_avancados_ui.js" defer></script>
+    <script src="js/modelos_preditivos.js" defer></script>
+    <script src="js/modelos_preditivos_detalhes.js" defer></script>
+    <script src="js/modelos_preditivos_ui.js" defer></script>
+    <script src="js/monitor.js" defer></script>
+    <script src="js/simulador.js" defer></script>
+    <script src="js/script.js" defer></script>
 </head>
 
-<body class="bg-dark text-light">
-
-  <!-- Sidebar -->
-  <nav class="sidebar">
-    <div class="sidebar-header">
-      <h3>COPOM Dashboard</h3>
-    </div>
-    <ul class="nav flex-column">
-      <li class="nav-item"><a href="#dashboard" class="nav-link text-light">Dashboard</a></li>
-      <li class="nav-item"><a href="#modelos-preditivos" class="nav-link text-light">Modelos Preditivos</a></li>
-      <li class="nav-item"><a href="#analise-atas" class="nav-link text-light">Análise de Atas</a></li>
-      <li class="nav-item"><a href="#simulador" class="nav-link text-light">Simulador</a></li>
-      <li class="nav-item"><a href="#modelos-avancados" class="nav-link text-light">Modelos Avançados</a></li>
-      <li class="nav-item"><a href="#juro-neutro" class="nav-link text-light">Juro Neutro</a></li>
-      <li class="nav-item"><a href="#focus" class="nav-link text-light">Focus</a></li>
-      <li class="nav-item"><a href="#agenda-copom" class="nav-link text-light">Agenda COPOM</a></li>
-    </ul>
-  </nav>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <!-- Spinner de Loading -->
-    <div id="loading-spinner" class="loading-spinner" style="display: none;">
-      <div class="spinner-border text-light" role="status">
-        <span class="visually-hidden">Carregando...</span>
-      </div>
+<body>
+    <!-- Loader -->
+    <div id="loading-spinner" style="display: none;">
+        <div class="spinner-border text-light" role="status"></div>
     </div>
 
-    <!-- Conteúdos das abas -->
-    <div id="dashboard" class="tab-content" style="display: block;">
-      <h1>Bem-vindo ao COPOM Dashboard</h1>
-      <p>Selecione uma seção no menu para começar.</p>
-    </div>
+    <!-- Barra lateral -->
+    <nav id="sidebar">
+        <h3>Dashboard COPOM</h3>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="#dashboard">Início</a></li>
+            <li class="nav-item"><a class="nav-link" href="#modelos-avancados">Modelos Avançados</a></li>
+            <li class="nav-item"><a class="nav-link" href="#modelos-preditivos">Modelos Preditivos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#simulador">Simulador de Cenários</a></li>
+            <li class="nav-item"><a class="nav-link" href="#analise-atas">Análise de Atas</a></li>
+            <li class="nav-item"><a class="nav-link" href="#juro-neutro">Simulador Juro Neutro</a></li>
+            <li class="nav-item"><a class="nav-link" href="#focus">Análises Focus</a></li>
+            <li class="nav-item"><a class="nav-link" href="#agenda-copom">Agenda COPOM</a></li>
+        </ul>
+    </nav>
 
-    <div id="modelos-preditivos" class="tab-content" style="display: none;"></div>
-    <div id="analise-atas" class="tab-content" style="display: none;"></div>
-    <div id="simulador" class="tab-content" style="display: none;"></div>
-    <div id="modelos-avancados" class="tab-content" style="display: none;"></div>
-    <div id="juro-neutro" class="tab-content" style="display: none;"></div>
-    <div id="focus" class="tab-content" style="display: none;"></div>
-    <div id="agenda-copom" class="tab-content" style="display: none;"></div>
-  </div>
+    <!-- Conteúdo principal -->
+    <main id="main-content">
+        <section id="dashboard" class="tab-content">
+            <h1>Bem-vindo ao Painel COPOM</h1>
+            <p>Selecione uma seção no menu para começar.</p>
+        </section>
 
-  <!-- Scripts -->
-  <script src="lib/bootstrap.bundle.min.js"></script>
-  <script src="lib/chart.min.js"></script>
-  <script src="lib/d3.min.js"></script>
+        <section id="modelos-avancados" class="tab-content" style="display: none;"></section>
 
-  <script src="js/script.js"></script>
-  <script src="js/modelos_preditivos.js"></script>
-  <script src="js/modelos_preditivos_ui.js"></script>
-  <script src="js/analise_atas.js"></script>
-  <script src="js/analise_atas_ui.js"></script>
-  <script src="js/simulador.js"></script>
-  <script src="js/modelos_avancados.js"></script>
-  <script src="js/modelos_avancados_ui.js"></script>
-  <script src="js/juro_neutro/juro_neutro.js"></script>
-  <script src="js/juro_neutro/juro_neutro_integrador.js"></script>
-  <script src="js/juro_neutro/simulador_juro_neutro.js"></script>
-  <script src="js/juro_neutro/simulador_juro_neutro_ui.js"></script>
-  <script src="js/focus/focus_analytics.js"></script>
-  <script src="js/agenda_copom.js"></script>
-  <script src="js/monitor.js"></script>
-  <script src="js/diagnostic.js"></script>
-  <script src="js/ferramentas_diagnostico.js"></script>
-  <script src="js/data_integrity.js"></script>
+        <section id="modelos-preditivos" class="tab-content" style="display: none;"></section>
+
+        <section id="simulador" class="tab-content" style="display: none;"></section>
+
+        <section id="analise-atas" class="tab-content" style="display: none;"></section>
+
+        <section id="juro-neutro" class="tab-content" style="display: none;"></section>
+
+        <section id="focus" class="tab-content" style="display: none;"></section>
+
+        <section id="agenda-copom" class="tab-content" style="display: none;"></section>
+    </main>
 </body>
 </html>
