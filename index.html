@@ -3,76 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard COPOM</title>
-
-    <!-- CSS Bootstrap -->
+    <title>COPOM Dashboard</title>
     <link rel="stylesheet" href="lib/bootstrap.min.css">
-
-    <!-- Seu CSS customizado -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Spinner de Loading -->
-    <div id="loading-spinner" class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="spinner-border text-primary" role="status">
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner-border text-light" role="status">
             <span class="visually-hidden">Carregando...</span>
         </div>
     </div>
 
-    <!-- Container principal -->
-    <div id="main-container" style="display: none;">
-        <!-- Navbar simples -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">COPOM Dashboard</a>
-            </div>
-        </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block bg-dark sidebar">
+                <div class="position-sticky">
+                    <h4 class="text-light p-3">COPOM Dashboard</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link text-light" href="#dashboard" onclick="showTab('dashboard')">Dashboard Principal</a></li>
+                        <li class="nav-item"><a class="nav-link text-light" href="#modelos-avancados" onclick="showTab('modelos-avancados')">Modelos Avançados</a></li>
+                        <li class="nav-item"><a class="nav-link text-light" href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos Preditivos</a></li>
+                        <li class="nav-item"><a class="nav-link text-light" href="#simulador" onclick="showTab('simulador')">Simulador COPOM</a></li>
+                        <li class="nav-item"><a class="nav-link text-light" href="#analise-atas" onclick="showTab('analise-atas')">Análise de Atas</a></li>
+                        <li class="nav-item"><a class="nav-link text-light" href="#juro-neutro" onclick="showTab('juro-neutro')">Juro Neutro</a></li>
+                        <li class="nav-item"><a class="nav-link text-light" href="#focus" onclick="showTab('focus')">Focus</a></li>
+                        <li class="nav-item"><a class="nav-link text-light" href="#agenda-copom" onclick="showTab('agenda-copom')">Agenda COPOM</a></li>
+                    </ul>
+                </div>
+            </nav>
 
-        <!-- Menu de abas -->
-        <ul class="nav nav-tabs mt-3 px-3" id="tabs-menu">
-            <li class="nav-item"><a class="nav-link active" href="#dashboard" onclick="showTab('dashboard')">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="#modelos-avancados" onclick="showTab('modelos-avancados')">Modelos Avançados</a></li>
-            <li class="nav-item"><a class="nav-link" href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos Preditivos</a></li>
-            <li class="nav-item"><a class="nav-link" href="#simulador" onclick="showTab('simulador')">Simulador</a></li>
-            <li class="nav-item"><a class="nav-link" href="#analise-atas" onclick="showTab('analise-atas')">Análise de Atas</a></li>
-            <li class="nav-item"><a class="nav-link" href="#juro-neutro" onclick="showTab('juro-neutro')">Juro Neutro</a></li>
-            <li class="nav-item"><a class="nav-link" href="#focus" onclick="showTab('focus')">Focus</a></li>
-            <li class="nav-item"><a class="nav-link" href="#agenda-copom" onclick="showTab('agenda-copom')">Agenda COPOM</a></li>
-        </ul>
-
-        <!-- Conteúdo das abas -->
-        <div class="tab-content-container p-4">
-            <div id="dashboard" class="tab-content"> <h3>Dashboard Principal</h3> <p>Em breve!</p> </div>
-            <div id="modelos-avancados" class="tab-content" style="display: none;"></div>
-            <div id="modelos-preditivos" class="tab-content" style="display: none;"></div>
-            <div id="simulador" class="tab-content" style="display: none;"></div>
-            <div id="analise-atas" class="tab-content" style="display: none;"></div>
-            <div id="juro-neutro" class="tab-content" style="display: none;"></div>
-            <div id="focus" class="tab-content" style="display: none;"></div>
-            <div id="agenda-copom" class="tab-content" style="display: none;"></div>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div id="dashboard" class="tab-content">Carregando Dashboard Principal...</div>
+                <div id="modelos-avancados" class="tab-content" style="display: none;">Carregando Modelos Avançados...</div>
+                <div id="modelos-preditivos" class="tab-content" style="display: none;">Carregando Modelos Preditivos...</div>
+                <div id="simulador" class="tab-content" style="display: none;">Carregando Simulador COPOM...</div>
+                <div id="analise-atas" class="tab-content" style="display: none;">Carregando Análise de Atas...</div>
+                <div id="juro-neutro" class="tab-content" style="display: none;">Carregando Juro Neutro...</div>
+                <div id="focus" class="tab-content" style="display: none;">Carregando Focus...</div>
+                <div id="agenda-copom" class="tab-content" style="display: none;">Carregando Agenda COPOM...</div>
+            </main>
         </div>
     </div>
 
-    <!-- Bibliotecas JS -->
     <script src="lib/bootstrap.bundle.min.js"></script>
     <script src="lib/chart.min.js"></script>
     <script src="lib/d3.min.js"></script>
 
-    <!-- Scripts principais -->
+    <script src="js/monitor.js"></script>
+    <script src="js/ferramentas_diagnostico.js"></script>
+    <script src="js/data_integrity.js"></script>
+    <script src="js/diagnostic.js"></script>
+
+    <script src="js/agenda_copom.js"></script>
     <script src="js/analise_atas.js"></script>
     <script src="js/analise_atas_ui.js"></script>
-
-    <script src="js/modelos_avancados.js"></script>
-    <script src="js/modelos_avancados_ui.js"></script>
-
-    <script src="js/modelos_preditivos.js"></script>
-    <script src="js/modelos_preditivos_ui.js"></script>
-    <script src="js/modelos_preditivos_detalhes.js"></script>
-
-    <script src="js/simulador.js"></script>
-
-    <script src="js/monitor.js"></script>
 
     <script src="js/juro_neutro/juro_neutro.js"></script>
     <script src="js/juro_neutro/juro_neutro_integrador.js"></script>
@@ -80,15 +64,13 @@
     <script src="js/juro_neutro/simulador_juro_neutro_ui.js"></script>
 
     <script src="js/focus/focus_analytics.js"></script>
-    <script src="js/agenda_copom.js"></script>
 
-    <script src="js/ferramentas_diagnostico.js"></script>
-    <script src="js/data_integrity.js"></script>
-    <script src="js/diagnostic.js"></script>
-    <script src="js/diagnostico_completo.js"></script>
+    <script src="js/modelos_preditivos.js"></script>
+    <script src="js/modelos_preditivos_ui.js"></script>
 
-    <!-- Script final de navegação e inicialização -->
+    <script src="js/modelos_avancados.js"></script>
+    <script src="js/modelos_avancados_ui.js"></script>
+
     <script src="js/script.js"></script>
-
 </body>
 </html>

@@ -1,4 +1,4 @@
-// script.js
+// script.js atualizado
 
 // Controle do Spinner de Carregamento
 function mostrarLoading() {
@@ -19,21 +19,16 @@ function esconderLoading() {
 document.addEventListener('DOMContentLoaded', function () {
     mostrarLoading();
 
-    // Esconde o Spinner após um pequeno delay para suavizar o carregamento
     setTimeout(() => {
         esconderLoading();
-    }, 1200); // 1.2 segundos
+    }, 1000);
 });
 
 // Sistema de Tabs do Dashboard
 function showTab(tabId) {
-    // Oculta todas as abas
     const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => {
-        tab.style.display = 'none';
-    });
+    tabs.forEach(tab => tab.style.display = 'none');
 
-    // Mostra a aba selecionada
     const selectedTab = document.getElementById(tabId);
     if (selectedTab) {
         selectedTab.style.display = 'block';
@@ -41,7 +36,6 @@ function showTab(tabId) {
         console.error(`Aba ${tabId} não encontrada.`);
     }
 
-    // Inicializa os componentes específicos da aba (se existirem)
     initializeTabComponents(tabId);
 }
 
@@ -49,18 +43,31 @@ function initializeTabComponents(tabId) {
     try {
         switch (tabId) {
             case 'dashboard':
-                if (typeof window.renderizarDashboard === 'function') {
-                    window.renderizarDashboard();
+                // Nada por enquanto
+                break;
+            case 'analise-atas':
+                if (window.analisadorAtas && typeof window.renderizarAnaliseAtas === 'function') {
+                    window.renderizarAnaliseAtas(window.analisadorAtas.getResultados());
                 }
                 break;
             case 'modelos-avancados':
-                if (typeof window.renderizarModelosAvancados === 'function') {
-                    window.renderizarModelosAvancados();
+                if (window.modelosPreditivos && typeof window.renderizarModelosAvancados === 'function') {
+                    window.renderizarModelosAvancados({
+                        modelos: window.modelosPreditivos.getModelosData(),
+                        proximaReuniao: window.modelosPreditivos.getProximaReuniaoData(),
+                        taxaPrevista: window.modelosPreditivos.getProximaReuniaoData()?.taxaSelicPrevista || 0
+                    });
                 }
                 break;
             case 'modelos-preditivos':
-                if (typeof window.renderizarModelosPreditivos === 'function') {
-                    window.renderizarModelosPreditivos();
+                if (window.modelosPreditivos && typeof window.renderizarModelosPreditivos === 'function') {
+                    window.renderizarModelosPreditivos({
+                        modelos: window.modelosPreditivos.getModelosData(),
+                        proximaReuniao: window.modelosPreditivos.getProximaReuniaoData(),
+                        indicadores: window.modelosPreditivos.getIndicadoresData(),
+                        historicoDecisoes: window.modelosPreditivos.historicoDecisoes,
+                        taxaPrevista: window.modelosPreditivos.getProximaReuniaoData()?.taxaSelicPrevista || 0
+                    });
                 }
                 break;
             case 'simulador':
@@ -68,24 +75,9 @@ function initializeTabComponents(tabId) {
                     window.renderizarSimulador();
                 }
                 break;
-            case 'analise-atas':
-                if (typeof window.renderizarAnaliseAtas === 'function') {
-                    window.renderizarAnaliseAtas(window.dadosAnaliseAtas || null);
-                }
-                break;
             case 'juro-neutro':
                 if (typeof window.renderizarJuroNeutro === 'function') {
                     window.renderizarJuroNeutro();
-                }
-                break;
-            case 'focus':
-                if (typeof window.renderizarFocusAnalytics === 'function') {
-                    window.renderizarFocusAnalytics(window.dadosFocus || null);
-                }
-                break;
-            case 'agenda-copom':
-                if (typeof window.renderizarAgendaCopom === 'function') {
-                    window.renderizarAgendaCopom();
                 }
                 break;
             default:
@@ -104,14 +96,21 @@ function displayTabError(tabId, message) {
     }
 }
 
-// Monitorar a navegação pelas abas via Hash na URL
+// Monitorar navegação pela URL
 window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
     showTab(hash || 'dashboard');
 });
 
-// Inicializar na primeira carga
 window.addEventListener('load', () => {
     const initialHash = window.location.hash.substring(1);
     showTab(initialHash || 'dashboard');
+
+    // Inicializar objetos principais
+    if (typeof window.AnalisadorAtasCopom === 'function') {
+        window.analisadorAtas = new window.AnalisadorAtasCopom();
+    }
+    if (typeof window.ModelosPreditivos === 'function') {
+        window.modelosPreditivos = new window.ModelosPreditivos();
+    }
 });
