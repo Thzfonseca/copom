@@ -1,7 +1,7 @@
-// modelos_preditivos_ui.js
+// js/modelos_preditivos_ui.js
 
 (function () {
-    function renderizarModelosPreditivos(resultados) {
+    function renderizarModelosPreditivosInterno(resultados) {
         console.log('[COPOM Dashboard] Renderizando Modelos Preditivos...');
 
         const container = document.getElementById('modelos-preditivos');
@@ -10,7 +10,7 @@
             return;
         }
 
-        if (!resultados || !resultados.proximaReuniao) {
+        if (!resultados || !resultados.decisaoPrevista) {
             console.warn('Resultados dos modelos preditivos não encontrados.');
             container.innerHTML = `
                 <div class="alert alert-warning mt-4">
@@ -20,26 +20,38 @@
             return;
         }
 
-        const previsao = resultados.proximaReuniao.previsaoConsolidada;
+        const previsao = resultados.decisaoPrevista;
         const taxaPrevista = resultados.taxaPrevista?.toFixed(2) || '-';
+        const dataReferencia = resultados.dataReferencia || '-';
 
         container.innerHTML = `
             <div class="modelos-preditivos-container">
                 <h2>Modelos Preditivos</h2>
-                <p><strong>Previsão Consolidada:</strong> ${previsao || 'Indefinido'}</p>
+                <p><strong>Data de Referência:</strong> ${dataReferencia}</p>
+                <p><strong>Previsão de Decisão:</strong> ${textoDecisao(previsao)}</p>
                 <p><strong>Taxa Selic Prevista:</strong> ${taxaPrevista}%</p>
             </div>
         `;
     }
 
-    // Expor no escopo global
+    function textoDecisao(decisao) {
+        const textos = {
+            'reducao50': 'Redução de 50 pontos-base',
+            'reducao25': 'Redução de 25 pontos-base',
+            'manutencao': 'Manutenção da taxa',
+            'aumento25': 'Aumento de 25 pontos-base',
+            'aumento50': 'Aumento de 50 pontos-base'
+        };
+        return textos[decisao] || 'Indefinida';
+    }
+
+    // Expor para o global
     window.renderizarModelosPreditivos = function () {
-        if (!window.ModelosPreditivos) {
+        if (!window.modelosPreditivos) {
             console.error('[COPOM Dashboard] ModelosPreditivos ainda não carregados.');
             return;
         }
-
-        const resultados = ModelosPreditivos.getResultados();
-        renderizarModelosPreditivos(resultados);
+        const resultados = window.modelosPreditivos.getResultados();
+        renderizarModelosPreditivosInterno(resultados);
     };
 })();

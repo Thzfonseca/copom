@@ -1,4 +1,4 @@
-// simulador.js
+// js/simulador.js
 
 class SimuladorCopom {
     constructor() {
@@ -35,8 +35,10 @@ class SimuladorCopom {
                     <div class="card">
                         <h3>Variáveis Econômicas</h3>
                         ${this.renderizarSliders()}
-                        <button class="button" id="simular-btn">Simular</button>
-                        <button class="button" id="resetar-btn" style="background-color: #64748b;">Resetar</button>
+                        <div class="buttons">
+                            <button class="button" id="simular-btn">Simular</button>
+                            <button class="button" id="resetar-btn" style="background-color: #64748b;">Resetar</button>
+                        </div>
                     </div>
                     <div class="card">
                         <h3>Resultado</h3>
@@ -56,9 +58,9 @@ class SimuladorCopom {
 
     renderizarSliders() {
         return Object.entries(this.cenarioBase).map(([key, value]) => `
-            <div style="margin-bottom: 15px;">
+            <div class="slider-control">
                 <label>${this.labelVariavel(key)}: <span id="valor-${key}">${value}</span></label>
-                <input type="range" id="slider-${key}" min="0" max="10" step="0.1" value="${value}" />
+                <input type="range" id="slider-${key}" min="0" max="10" step="0.1" value="${value}">
             </div>
         `).join('');
     }
@@ -94,9 +96,7 @@ class SimuladorCopom {
             this.cenarioAtual.hiato * 0.4 +
             this.cenarioAtual.jurosEUA * 0.2
         );
-        return {
-            tendencia
-        };
+        return { tendencia };
     }
 
     atualizarTexto() {
@@ -131,9 +131,7 @@ class SimuladorCopom {
                 responsive: true,
                 plugins: {
                     legend: {
-                        labels: {
-                            color: '#e2e8f0'
-                        }
+                        labels: { color: '#e2e8f0' }
                     }
                 },
                 scales: {
@@ -157,7 +155,7 @@ class SimuladorCopom {
     }
 }
 
-// Inicialização no DOM
+// Inicializar no DOM
 document.addEventListener('DOMContentLoaded', () => {
     const simuladorContainer = document.getElementById('simulador');
     if (simuladorContainer) {

@@ -32,8 +32,8 @@ class ModelosPreditivos {
             (cambio * (cenario.cambio ?? 0)) +
             (hiato * (cenario.hiato ?? 0));
 
-        let decisao = 'manutencao';
         const ultimaTaxa = this.historicoDecisoes[0].taxa;
+        let decisao = 'manutencao';
 
         if (selicPrevista > ultimaTaxa + 0.25) {
             decisao = 'aumento25';
@@ -44,7 +44,8 @@ class ModelosPreditivos {
         return {
             taxaPrevista: selicPrevista,
             decisaoPrevista: decisao,
-            dataReferencia: "19/03/2025"
+            dataReferencia: "19/03/2025",
+            historicoDecisoes: this.historicoDecisoes
         };
     }
 
@@ -54,8 +55,11 @@ class ModelosPreditivos {
 
     atualizarCenario(novoCenario) {
         this.resultadoAtual = this.preverSelic(novoCenario);
+        return this.resultadoAtual;
     }
 }
 
-// Disponibilizar para a janela global
-window.modelosPreditivos = new ModelosPreditivos();
+// Exportar para a janela global
+if (typeof window !== 'undefined') {
+    window.modelosPreditivos = new ModelosPreditivos();
+}
