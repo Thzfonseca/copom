@@ -1,222 +1,228 @@
 /* style.css */
 
-/* ===== Geral ===== */
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Corpo principal */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #1a202c;
-  color: #e2e8f0;
-  margin: 0;
-  padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a202c;
+    color: #e2e8f0;
+    min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5 {
-  color: #f8f9fa;
+/* Navbar lateral */
+nav {
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    background-color: #2d3748;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-/* ===== Spinner de Carregamento ===== */
-.spinner-container {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #1a202c;
-  z-index: 9999;
+nav h1 {
+    color: #63b3ed;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
-.spinner {
-  border: 8px solid #e2e8f0;
-  border-top: 8px solid #3182ce;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
+nav ul {
+    list-style: none;
+    padding: 0;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+nav ul li {
+    margin-bottom: 20px;
 }
 
-/* ===== Sidebar ===== */
-.sidebar {
-  background-color: #2d3748;
-  height: 100vh;
-  padding-top: 1rem;
+nav ul li a {
+    color: #cbd5e0;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s;
 }
 
-.sidebar .nav-link {
-  color: #a0aec0;
-  font-weight: 500;
+nav ul li a:hover {
+    color: #63b3ed;
 }
 
-.sidebar .nav-link:hover {
-  color: #63b3ed;
-  background-color: #4a5568;
-  border-radius: 5px;
+/* Área principal */
+main {
+    margin-left: 260px;
+    padding: 30px;
 }
 
-/* ===== Tabs ===== */
-.tab-content {
-  margin-top: 20px;
+/* Seções gerais */
+section {
+    margin-bottom: 40px;
 }
 
-/* ===== Tabelas ===== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
+/* Títulos */
+h2, h3, h4 {
+    margin-bottom: 15px;
+    color: #f7fafc;
 }
 
-th, td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #4a5568;
-}
-
-th {
-  background-color: #2d3748;
-  color: #f8f9fa;
-}
-
-/* ===== Botões ===== */
-button, .btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-simular {
-  background-color: #3182ce;
-  color: white;
-}
-
-.btn-simular:hover {
-  background-color: #2c5282;
-}
-
-.btn-resetar {
-  background-color: #4a5568;
-  color: white;
-}
-
-.btn-resetar:hover {
-  background-color: #2d3748;
-}
-
-/* ===== Grids Gerais ===== */
-.grid {
-  display: grid;
-  gap: 15px;
-}
-
-.grid-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.grid-3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.grid-4 {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .grid-2, .grid-3, .grid-4 {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ===== Simulador ===== */
+/* Simulador */
 .simulador-container {
-  background-color: #2d3748;
-  padding: 20px;
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
-.simulador-container h2 {
-  margin-bottom: 10px;
+    background-color: #2d3748;
+    border-radius: 8px;
+    padding: 20px;
 }
 
 .simulador-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
 }
 
-@media (max-width: 992px) {
-  .simulador-layout {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 1024px) {
+    .simulador-layout {
+        grid-template-columns: 1fr;
+    }
 }
 
-/* Controles do simulador */
-.controle-item {
-  margin-bottom: 20px;
+/* Controles */
+.controles-container, .resultados-container {
+    background-color: #2d3748;
+    border-radius: 8px;
+    padding: 20px;
 }
 
-.controle-slider {
-  width: 100%;
-  margin-top: 5px;
+/* Sliders */
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #4a5568;
+    border-radius: 4px;
+    outline: none;
 }
 
-/* Cenario Cards */
-.cenario-card {
-  background-color: #4a5568;
-  padding: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3182ce;
+    cursor: pointer;
+}
+
+input[type=range]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3182ce;
+    cursor: pointer;
+}
+
+/* Botões */
+.btn-simular, .btn-resetar {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 48%;
+}
+
+.btn-simular {
+    background-color: #3182ce;
+    color: white;
+}
+
+.btn-simular:hover {
+    background-color: #2c5282;
+}
+
+.btn-resetar {
+    background-color: #718096;
+    color: white;
+}
+
+.btn-resetar:hover {
+    background-color: #4a5568;
+}
+
+/* Cards */
+.cenario-card, .controle-item {
+    background-color: #4a5568;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: background-color 0.3s;
 }
 
 .cenario-card:hover {
-  background-color: #63b3ed;
-  color: white;
+    background-color: #63b3ed;
+    color: #1a202c;
 }
 
-/* Tabelas Simulador */
-.modelos-tabela th, .modelos-tabela td {
-  text-align: center;
+/* Resultados */
+.resultados-container {
+    margin-top: 20px;
+}
+
+.comparacao-header, .comparacao-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
 .comparacao-col {
-  background-color: #4a5568;
-  padding: 10px;
-  border-radius: 6px;
+    background-color: #4a5568;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: bold;
 }
 
-/* ===== Probabilidades Gráficos ===== */
-.probabilidade-barra-container {
-  background-color: #4a5568;
-  height: 20px;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 5px;
+/* Gráfico */
+.chart-container {
+    width: 100%;
+    margin-top: 20px;
 }
 
-.probabilidade-barra {
-  height: 100%;
-  transition: width 0.5s ease;
+canvas {
+    background-color: #2d3748;
+    border-radius: 8px;
+    padding: 10px;
 }
 
-/* ===== Ajustes pequenos ===== */
-a {
-  color: #63b3ed;
+/* Tabelas */
+.modelos-tabela {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
 }
 
-a:hover {
-  color: #4299e1;
+.modelos-tabela th, .modelos-tabela td {
+    padding: 10px;
+    border-bottom: 1px solid #4a5568;
 }
 
-hr {
-  border-color: #4a5568;
+.modelos-tabela th {
+    background-color: #4a5568;
+    color: #f7fafc;
 }
 
-.alert {
-  margin-top: 20px;
+.modelos-tabela tr:hover {
+    background-color: #718096;
+}
+
+/* Pequenos ajustes */
+.data-referencia {
+    color: #a0aec0;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
 }
