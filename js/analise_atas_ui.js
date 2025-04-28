@@ -4,8 +4,8 @@
     function renderizarAnaliseAtas(dados) {
         console.log("Renderizando análise de atas...");
 
-        // Verifica se os dados e os resultados NLP existem
-        if (!dados || !dados.resultadosNLP) {
+        // Verifica se os dados e os resultados existem
+        if (!dados || !dados.resultados) {
             console.warn("Nenhum dado de análise NLP encontrado. A aba será exibida vazia.");
             const container = document.getElementById("aba-analise-atas");
             if (container) {
@@ -18,7 +18,7 @@
             return;
         }
 
-        const resultados = dados.resultadosNLP;
+        const resultados = dados.resultados;
 
         const container = document.getElementById("aba-analise-atas");
         if (!container) {
@@ -26,19 +26,19 @@
             return;
         }
 
-        // Aqui começa a montagem real da análise
+        // Montagem do conteúdo
         container.innerHTML = `
             <div class="container mt-4">
                 <h2 class="text-center">Análise NLP das Atas do COPOM</h2>
-                <p class="text-center">Dados atualizados em: ${resultados.dataAtualizacao || "Data desconhecida"}</p>
+                <p class="text-center">Dados atualizados em: ${dados.ultimaAtualizacao || "Data desconhecida"}</p>
 
                 <div class="row mt-5">
                     <div class="col-md-4">
                         <h4>Análise de Sentimento</h4>
                         <ul class="list-group">
-                            <li class="list-group-item">Hawkish: ${resultados.sentimentos?.hawkish || 0}%</li>
-                            <li class="list-group-item">Neutral: ${resultados.sentimentos?.neutral || 0}%</li>
-                            <li class="list-group-item">Dovish: ${resultados.sentimentos?.dovish || 0}%</li>
+                            <li class="list-group-item">Hawkish: ${(resultados.sentimento?.hawkish * 100).toFixed(0) || 0}%</li>
+                            <li class="list-group-item">Neutral: ${(resultados.sentimento?.neutral * 100).toFixed(0) || 0}%</li>
+                            <li class="list-group-item">Dovish: ${(resultados.sentimento?.dovish * 100).toFixed(0) || 0}%</li>
                         </ul>
                     </div>
 
@@ -55,9 +55,9 @@
                     <div class="col-md-4">
                         <h4>Tópicos Relevantes</h4>
                         <ul class="list-group">
-                            ${(resultados.topicosRelevantes || [])
+                            ${(resultados.topicos || [])
                                 .slice(0, 5)
-                                .map(topico => `<li class="list-group-item">${topico.nome} - ${topico.relevancia}%</li>`)
+                                .map(topico => `<li class="list-group-item">${topico.nome} - ${(topico.relevancia * 100).toFixed(0)}%</li>`)
                                 .join('')}
                         </ul>
                     </div>
@@ -66,7 +66,11 @@
                 <div class="row mt-5">
                     <div class="col-md-12">
                         <h4>Forward Guidance</h4>
-                        <p>${resultados.forwardGuidance || "Sem dados de Forward Guidance disponíveis."}</p>
+                        <ul class="list-group">
+                            ${(resultados.forwardGuidance || [])
+                                .map(item => `<li class="list-group-item"><strong>${item.data}:</strong> ${item.texto}</li>`)
+                                .join('')}
+                        </ul>
                     </div>
                 </div>
             </div>
