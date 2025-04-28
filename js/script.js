@@ -15,6 +15,19 @@ function esconderLoading() {
     }
 }
 
+// Mostra o Spinner no carregamento inicial
+document.addEventListener('DOMContentLoaded', function () {
+    mostrarLoading();
+
+    // Inicializar os modelos preditivos
+    window.modelosPreditivos = new ModelosPreditivos();
+    console.log('Modelos Preditivos inicializados.');
+
+    setTimeout(() => {
+        esconderLoading();
+    }, 1200); // 1.2 segundos
+});
+
 // Sistema de Tabs do Dashboard
 function showTab(tabId) {
     const tabs = document.querySelectorAll('.tab-content');
@@ -36,54 +49,32 @@ function initializeTabComponents(tabId) {
     try {
         switch (tabId) {
             case 'dashboard':
-                console.log('Dashboard selecionado.');
-                break;
-            case 'modelos-preditivos':
-                if (typeof window.ModelosPreditivos === 'function') {
-                    if (!window.modelosPreditivos) {
-                        window.modelosPreditivos = new ModelosPreditivos();
-                    }
-                    const resultados = {
-                        modelos: window.modelosPreditivos.getModelosData(),
-                        proximaReuniao: window.modelosPreditivos.getProximaReuniaoData(),
-                        indicadores: window.modelosPreditivos.getIndicadoresData(),
-                        historicoDecisoes: window.modelosPreditivos.historicoDecisoes,
-                        taxaPrevista: window.modelosPreditivos.getProximaReuniaoData().previsaoConsolidada.includes('Aumento')
-                            ? window.modelosPreditivos.historicoDecisoes[0].taxa + 0.25
-                            : window.modelosPreditivos.historicoDecisoes[0].taxa
-                    };
-                    window.renderizarModelosPreditivos(resultados);
-                }
-                break;
-            case 'analise-atas':
-                if (typeof window.AnalisadorAtasCopom === 'function') {
-                    if (!window.analisadorAtas) {
-                        window.analisadorAtas = new AnalisadorAtasCopom();
-                    }
-                    const dados = window.analisadorAtas.getResultados();
-                    window.renderizarAnaliseAtas(dados);
-                }
-                break;
-            case 'simulador':
-                if (typeof window.renderizarSimulador === 'function') {
-                    const container = document.getElementById('simulador');
-                    if (container) {
-                        window.renderizarSimulador(container);
-                    }
+                if (typeof window.renderizarDashboard === 'function') {
+                    window.renderizarDashboard();
                 }
                 break;
             case 'modelos-avancados':
                 if (typeof window.renderizarModelosAvancados === 'function') {
+                    window.renderizarModelosAvancados();
+                }
+                break;
+            case 'modelos-preditivos':
+                if (typeof window.renderizarModelosPreditivos === 'function') {
                     if (window.modelosPreditivos) {
-                        const resultados = {
-                            modelos: window.modelosPreditivos.getModelosData(),
-                            proximaReuniao: window.modelosPreditivos.getProximaReuniaoData(),
-                            taxaPrevista: window.modelosPreditivos.getProximaReuniaoData().previsaoConsolidada.includes('Aumento')
-                                ? window.modelosPreditivos.historicoDecisoes[0].taxa + 0.25
-                                : window.modelosPreditivos.historicoDecisoes[0].taxa
-                        };
-                        window.renderizarModelosAvancados(resultados);
+                        window.renderizarModelosPreditivos(window.modelosPreditivos.getResultados());
+                    } else {
+                        console.error('Modelos Preditivos não encontrados.');
                     }
+                }
+                break;
+            case 'simulador':
+                if (typeof window.renderizarSimulador === 'function') {
+                    window.renderizarSimulador();
+                }
+                break;
+            case 'analise-atas':
+                if (typeof window.renderizarAnaliseAtas === 'function') {
+                    window.renderizarAnaliseAtas(window.dadosAnaliseAtas || null);
                 }
                 break;
             case 'juro-neutro':
@@ -93,7 +84,7 @@ function initializeTabComponents(tabId) {
                 break;
             case 'focus':
                 if (typeof window.renderizarFocusAnalytics === 'function') {
-                    window.renderizarFocusAnalytics();
+                    window.renderizarFocusAnalytics(window.dadosFocus || null);
                 }
                 break;
             case 'agenda-copom':
@@ -102,7 +93,7 @@ function initializeTabComponents(tabId) {
                 }
                 break;
             default:
-                console.warn(`Nenhuma função específica para a aba ${tabId}.`);
+                console.warn(`Nenhuma função específica para inicializar a aba ${tabId}.`);
         }
     } catch (error) {
         console.error(`Erro ao inicializar componentes da aba ${tabId}:`, error);
@@ -117,18 +108,14 @@ function displayTabError(tabId, message) {
     }
 }
 
-// Inicializar tab ao mudar hash
+// Monitorar a navegação pelas abas via Hash na URL
 window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
     showTab(hash || 'dashboard');
 });
 
-// Inicializar tudo ao carregar
+// Inicializar na primeira carga
 window.addEventListener('load', () => {
-    mostrarLoading();
     const initialHash = window.location.hash.substring(1);
     showTab(initialHash || 'dashboard');
-    setTimeout(() => {
-        esconderLoading();
-    }, 1000);
 });
