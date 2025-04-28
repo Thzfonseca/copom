@@ -1,112 +1,61 @@
+// js/modelos_preditivos_ui.js
+
 /**
- * Interface dos Modelos Preditivos
- * 
- * Renderiza os modelos preditivos na tela.
+ * Renderiza a aba de Modelos Preditivos no COPOM Dashboard
+ * @param {Object} resultados - Dados retornados pelos modelos
  */
+function renderizarModelosPreditivos(resultados) {
+    console.log("[COPOM Dashboard] Renderizando Modelos Preditivos...");
 
-(function () {
-    function renderizarModelosPreditivos() {
-        console.log('Renderizando Modelos Preditivos...');
-
-        // Verifica se existem resultados
-        if (!window.modelosPreditivos || !window.modelosPreditivos.resultados) {
-            console.error('Resultados dos modelos preditivos não encontrados.');
-            return;
-        }
-
-        const resultados = window.modelosPreditivos.getResultados();
-        const container = document.getElementById('modelos-preditivos');
-
-        if (!container) {
-            console.error('Tab de modelos preditivos não encontrada');
-            return;
-        }
-
-        // Limpa o container
-        container.innerHTML = '';
-
-        // Header
-        const header = document.createElement('div');
-        header.innerHTML = `
-            <h2>Modelos Preditivos - Próxima Reunião</h2>
-            <p><strong>Data:</strong> ${resultados.proximaReuniao.data} (${resultados.proximaReuniao.reuniao})</p>
-            <p><strong>Taxa Selic prevista:</strong> ${resultados.taxaPrevista.toFixed(2)}%</p>
-            <p><strong>Previsão consolidada:</strong> ${textoDecisao(resultados.proximaReuniao.previsaoConsolidada)}</p>
-        `;
-        container.appendChild(header);
-
-        // Cards de Modelos
-        const grid = document.createElement('div');
-        grid.className = 'grid-modelos-preditivos';
-
-        Object.values(resultados.modelos).forEach(modelo => {
-            const card = document.createElement('div');
-            card.className = 'modelo-card';
-
-            card.innerHTML = `
-                <h3>${modelo.nome}</h3>
-                <p>${modelo.descricao}</p>
-                <p><strong>Previsão:</strong> ${textoDecisao(modelo.previsao)}</p>
-                <p><strong>Atualizado em:</strong> ${modelo.dataReferencia}</p>
-            `;
-
-            grid.appendChild(card);
-        });
-
-        container.appendChild(grid);
-
-        adicionarEstilos();
+    const container = document.getElementById('modelos-preditivos');
+    if (!container) {
+        console.error("Tab de modelos preditivos não encontrada.");
+        return;
     }
 
-    function textoDecisao(decisao) {
-        const textos = {
-            'reducao50': 'Redução de 50 pontos-base',
-            'reducao25': 'Redução de 25 pontos-base',
-            'manutencao': 'Manutenção da taxa',
-            'aumento25': 'Aumento de 25 pontos-base',
-            'aumento50': 'Aumento de 50 pontos-base'
-        };
-        return textos[decisao] || 'Indefinido';
-    }
+    container.innerHTML = '';
 
-    function adicionarEstilos() {
-        if (document.getElementById('estilos-modelos-preditivos')) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'modelos-wrapper';
+    wrapper.innerHTML = `
+        <h2>Modelos Preditivos</h2>
+        <p class="data-referencia">Atualizado em: ${resultados.modelos.regressaoLinear.dataReferencia}</p>
 
-        const estilo = document.createElement('style');
-        estilo.id = 'estilos-modelos-preditivos';
-        estilo.textContent = `
-            .grid-modelos-preditivos {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 20px;
-                margin-top: 20px;
-            }
+        <div class="previsao-principal">
+            <h3>Próxima Reunião (${resultados.proximaReuniao.data})</h3>
+            <p><strong>Decisão Consolidada:</strong> ${textoDecisao(resultados.proximaReuniao.previsaoConsolidada)}</p>
+            <p><strong>Taxa Selic Prevista:</strong> ${resultados.taxaPrevista.toFixed(2)}%</p>
+        </div>
 
-            .modelo-card {
-                background: #2d3748;
-                padding: 20px;
-                border-radius: 8px;
-                color: #e2e8f0;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-                transition: 0.3s;
-            }
+        <div class="modelos-grid">
+            ${Object.values(resultados.modelos).map(modelo => `
+                <div class="modelo-card">
+                    <h4>${modelo.nome}</h4>
+                    <p>${modelo.descricao}</p>
+                    <p><strong>Previsão:</strong> ${textoDecisao(modelo.previsao)}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
 
-            .modelo-card:hover {
-                background: #4a5568;
-            }
+    container.appendChild(wrapper);
+}
 
-            .modelo-card h3 {
-                margin-top: 0;
-                color: #f8f9fa;
-            }
+/**
+ * Função para traduzir código de decisão para texto
+ * @param {string} decisao
+ * @returns {string}
+ */
+function textoDecisao(decisao) {
+    const mapa = {
+        reducao50: "Redução de 50 pontos-base",
+        reducao25: "Redução de 25 pontos-base",
+        manutencao: "Manutenção da taxa",
+        aumento25: "Aumento de 25 pontos-base",
+        aumento50: "Aumento de 50 pontos-base"
+    };
+    return mapa[decisao] || "Decisão indefinida";
+}
 
-            .modelo-card p {
-                font-size: 0.9em;
-            }
-        `;
-        document.head.appendChild(estilo);
-    }
-
-    // Disponibiliza a função globalmente
-    window.renderizarModelosPreditivos = renderizarModelosPreditivos;
-})();
+// Disponibilizar no escopo global
+window.renderizarModelosPreditivos = renderizarModelosPreditivos;
