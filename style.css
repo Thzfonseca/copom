@@ -1,100 +1,222 @@
 /* style.css */
 
-/* Estilo geral */
+/* ===== Geral ===== */
 body {
-    background-color: #0d1117;
-    color: #c9d1d9;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  margin: 0;
+  padding: 0;
 }
 
-/* Navegação */
-nav {
-    background-color: #161b22;
-    padding: 10px;
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    border-bottom: 1px solid #30363d;
+h1, h2, h3, h4, h5 {
+  color: #f8f9fa;
 }
 
-nav a {
-    color: #58a6ff;
-    text-decoration: none;
-    font-weight: bold;
+/* ===== Spinner de Carregamento ===== */
+.spinner-container {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #1a202c;
+  z-index: 9999;
 }
 
-nav a:hover {
-    color: #79c0ff;
+.spinner {
+  border: 8px solid #e2e8f0;
+  border-top: 8px solid #3182ce;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
 }
 
-/* Conteúdo das abas */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  background-color: #2d3748;
+  height: 100vh;
+  padding-top: 1rem;
+}
+
+.sidebar .nav-link {
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+.sidebar .nav-link:hover {
+  color: #63b3ed;
+  background-color: #4a5568;
+  border-radius: 5px;
+}
+
+/* ===== Tabs ===== */
 .tab-content {
-    padding: 20px;
+  margin-top: 20px;
 }
 
-/* Spinner de carregamento */
-#loading-spinner {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5em;
-    color: #58a6ff;
-    z-index: 1000;
+/* ===== Tabelas ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
 }
 
-/* Estilo do simulador */
-#simulador h2 {
-    margin-bottom: 20px;
-    color: #58a6ff;
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #4a5568;
 }
 
-#simulador div {
-    margin-bottom: 15px;
+th {
+  background-color: #2d3748;
+  color: #f8f9fa;
 }
 
-#simulador label {
-    display: block;
-    margin-bottom: 5px;
+/* ===== Botões ===== */
+button, .btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-#simulador input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #30363d;
-    border-radius: 4px;
-    background-color: #161b22;
-    color: #c9d1d9;
+.btn-simular {
+  background-color: #3182ce;
+  color: white;
 }
 
-#simular-btn {
-    background-color: #238636;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
+.btn-simular:hover {
+  background-color: #2c5282;
 }
 
-#simular-btn:hover {
-    background-color: #2ea043;
+.btn-resetar {
+  background-color: #4a5568;
+  color: white;
 }
 
-/* Resultado */
-#resultado-simulacao {
-    margin-top: 30px;
-    background-color: #161b22;
-    padding: 20px;
-    border-radius: 6px;
-    border: 1px solid #30363d;
+.btn-resetar:hover {
+  background-color: #2d3748;
 }
 
-#resultado-simulacao h4 {
-    margin-top: 0;
-    color: #79c0ff;
+/* ===== Grids Gerais ===== */
+.grid {
+  display: grid;
+  gap: 15px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Simulador ===== */
+.simulador-container {
+  background-color: #2d3748;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.simulador-container h2 {
+  margin-bottom: 10px;
+}
+
+.simulador-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 992px) {
+  .simulador-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Controles do simulador */
+.controle-item {
+  margin-bottom: 20px;
+}
+
+.controle-slider {
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Cenario Cards */
+.cenario-card {
+  background-color: #4a5568;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cenario-card:hover {
+  background-color: #63b3ed;
+  color: white;
+}
+
+/* Tabelas Simulador */
+.modelos-tabela th, .modelos-tabela td {
+  text-align: center;
+}
+
+.comparacao-col {
+  background-color: #4a5568;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+/* ===== Probabilidades Gráficos ===== */
+.probabilidade-barra-container {
+  background-color: #4a5568;
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.probabilidade-barra {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+/* ===== Ajustes pequenos ===== */
+a {
+  color: #63b3ed;
+}
+
+a:hover {
+  color: #4299e1;
+}
+
+hr {
+  border-color: #4a5568;
+}
+
+.alert {
+  margin-top: 20px;
 }
