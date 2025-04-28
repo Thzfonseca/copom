@@ -1,55 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>COPOM Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Estilo -->
-  <link rel="stylesheet" href="style.css">
-  
-  <!-- Chart.js para gráficos -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COPOM Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="navbar">
-    <h1>COPOM Dashboard</h1>
-    <div class="navbar-links">
-      <a href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos</a>
-      <a href="#simulador" onclick="showTab('simulador')">Simulador</a>
-    </div>
-  </div>
+    <header>
+        <h1>COPOM Dashboard</h1>
+        <nav>
+            <a href="#dashboard" onclick="showTab('dashboard')">Dashboard</a>
+            <a href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos</a>
+            <a href="#simulador" onclick="showTab('simulador')">Simulador</a>
+        </nav>
+    </header>
 
-  <div class="container">
-    <!-- Tabs de Conteúdo -->
-    <div id="modelos-preditivos" class="tab-content">
-      <!-- Aqui será renderizado pelos scripts -->
-    </div>
+    <main>
+        <section id="dashboard" class="tab-content active">
+            <h2>Bem-vindo ao COPOM Dashboard</h2>
+            <p>Escolha uma aba acima para começar.</p>
+        </section>
 
-    <div id="simulador" class="tab-content" style="display: none;">
-      <!-- Aqui será renderizado pelos scripts -->
-    </div>
-  </div>
+        <section id="modelos-preditivos" class="tab-content">
+            <!-- Conteúdo de modelos preditivos será renderizado aqui -->
+        </section>
 
-  <!-- Scripts principais -->
-  <script src="js/modelos_preditivos.js"></script>
-  <script src="js/modelos_preditivos_ui.js"></script>
-  <script src="js/simulador.js"></script>
+        <section id="simulador" class="tab-content">
+            <!-- Conteúdo do simulador será renderizado aqui -->
+        </section>
+    </main>
 
-  <!-- Controle de navegação -->
-  <script>
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
-      });
-      const selected = document.getElementById(tabId);
-      if (selected) selected.style.display = 'block';
-    }
+    <footer>
+        &copy; 2025 COPOM Dashboard. Todos os direitos reservados.
+    </footer>
 
-    window.addEventListener('load', () => {
-      const hash = window.location.hash.replace('#', '');
-      showTab(hash || 'modelos-preditivos');
-    });
-  </script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/modelos_preditivos.js"></script>
+    <script src="js/modelos_preditivos_ui.js"></script>
+    <script src="js/simulador.js"></script>
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) selectedTab.classList.add('active');
+        }
+    </script>
 </body>
 </html>

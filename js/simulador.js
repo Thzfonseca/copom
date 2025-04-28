@@ -9,9 +9,7 @@ class SimuladorCopom {
             jurosEUA: 5.50
         };
 
-        this.cenarioAtual = { ...this.cenarioBase };
-        this.resultadoBase = null;
-        this.resultadoAtual = null;
+        this.cenarios = []; // Cenários simulados
         this.chart = null;
     }
 
@@ -20,8 +18,7 @@ class SimuladorCopom {
             console.error('Modelos preditivos não carregados.');
             return false;
         }
-        this.resultadoBase = window.modelosPreditivos.getResultados();
-        this.resultadoAtual = { ...this.resultadoBase };
+        this.baseResultado = window.modelosPreditivos.getResultados();
         return true;
     }
 
@@ -33,34 +30,30 @@ class SimuladorCopom {
                 <h2>Simulador de Cenários</h2>
                 <div class="grid grid-2">
                     <div class="card">
-                        <h3>Variáveis Econômicas</h3>
+                        <h3>Ajuste de Variáveis Econômicas</h3>
                         ${this.renderizarSliders()}
-                        <div class="buttons">
-                            <button class="button" id="simular-btn">Simular</button>
-                            <button class="button" id="resetar-btn" style="background-color: #64748b;">Resetar</button>
-                        </div>
+                        <button class="button" id="simular-btn">Adicionar Cenário</button>
+                        <button class="button" id="resetar-btn" style="background-color: #64748b;">Resetar Cenários</button>
                     </div>
                     <div class="card">
-                        <h3>Resultado</h3>
-                        <p id="resultado-texto">Simule um cenário para ver o resultado.</p>
-                        <div class="chart-container">
-                            <canvas id="resultado-chart"></canvas>
-                        </div>
+                        <h3>Projeções da Taxa Selic</h3>
+                        <canvas id="grafico-selic"></canvas>
                     </div>
                 </div>
             </div>
         `;
 
-        document.getElementById('simular-btn').addEventListener('click', () => this.simular());
-        document.getElementById('resetar-btn').addEventListener('click', () => this.resetar());
-        this.renderizarGrafico();
+        document.getElementById('simular-btn').addEventListener('click', () => this.simularCenario());
+        document.getElementById('resetar-btn').addEventListener('click', () => this.resetarCenarios());
+
+        this.inicializarGrafico();
     }
 
     renderizarSliders() {
-        return Object.entries(this.cenarioBase).map(([key, value]) => `
-            <div class="slider-control">
-                <label>${this.labelVariavel(key)}: <span id="valor-${key}">${value}</span></label>
-                <input type="range" id="slider-${key}" min="0" max="10" step="0.1" value="${value}">
+        return Object.keys(this.cenarioBase).map(key => `
+            <div class="slider-container">
+                <label>${this.labelVariavel(key)}: <span id="valor-${key}">${this.cenarioBase[key]}</span></label>
+                <input type="range" id="slider-${key}" min="0" max="10" step="0.1" value="${this.cenarioBase[key]}" />
             </div>
         `).join('');
     }
@@ -75,93 +68,86 @@ class SimuladorCopom {
         return labels[key] || key;
     }
 
-    simular() {
+    obterCenarioAtual() {
+        const cenario = {};
         Object.keys(this.cenarioBase).forEach(key => {
             const slider = document.getElementById(`slider-${key}`);
             if (slider) {
-                this.cenarioAtual[key] = parseFloat(slider.value);
+                cenario[key] = parseFloat(slider.value);
                 document.getElementById(`valor-${key}`).innerText = slider.value;
             }
         });
+        return cenario;
+    }
 
-        this.resultadoAtual = this.calcularResultadoSimulado();
+    simularCenario() {
+        const novoCenario = this.obterCenarioAtual();
+        const tendencia = this.calcularTendencia(novoCenario);
+
+        this.cenarios.push({
+            nome: `Cenário ${this.cenarios.length + 1}`,
+            taxaSelic: tendencia
+        });
+
         this.atualizarGrafico();
-        this.atualizarTexto();
     }
 
-    calcularResultadoSimulado() {
-        const tendencia = (
-            this.cenarioAtual.ipca * 0.5 +
-            this.cenarioAtual.cambio * 0.3 -
-            this.cenarioAtual.hiato * 0.4 +
-            this.cenarioAtual.jurosEUA * 0.2
-        );
-        return { tendencia };
+    calcularTendencia(cenario) {
+        // Mesma lógica do modelo simplificado
+        const { ipca, hiato, cambio, jurosEUA } = cenario;
+        return (ipca * 0.5) + (cambio * 0.3) - (hiato * 0.4) + (jurosEUA * 0.2);
     }
 
-    atualizarTexto() {
-        const texto = this.resultadoAtual.tendencia > 10
-            ? "Cenário indica aumento da Selic."
-            : this.resultadoAtual.tendencia < 5
-            ? "Cenário indica redução da Selic."
-            : "Cenário sugere manutenção da Selic.";
-        document.getElementById('resultado-texto').innerText = texto;
-    }
-
-    renderizarGrafico() {
-        const ctx = document.getElementById('resultado-chart').getContext('2d');
+    inicializarGrafico() {
+        const ctx = document.getElementById('grafico-selic').getContext('2d');
         this.chart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: ['Inflação', 'Hiato', 'Câmbio', 'Juros EUA'],
+                labels: ['Base'],
                 datasets: [
                     {
-                        label: 'Base',
-                        backgroundColor: '#3b82f6',
-                        data: Object.values(this.cenarioBase)
-                    },
-                    {
-                        label: 'Simulado',
-                        backgroundColor: '#f59e0b',
-                        data: Object.values(this.cenarioAtual)
+                        label: 'Projeções Selic (%)',
+                        data: [this.baseResultado.taxaPrevista],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'transparent',
+                        tension: 0.3,
+                        pointBackgroundColor: '#3b82f6',
                     }
                 ]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {
-                        labels: { color: '#e2e8f0' }
-                    }
+                    legend: { labels: { color: '#e2e8f0' } }
                 },
                 scales: {
                     x: { ticks: { color: '#e2e8f0' } },
-                    y: { ticks: { color: '#e2e8f0' } }
+                    y: { ticks: { color: '#e2e8f0' }, beginAtZero: true }
                 }
             }
         });
     }
 
     atualizarGrafico() {
-        if (this.chart) {
-            this.chart.data.datasets[1].data = Object.values(this.cenarioAtual);
-            this.chart.update();
-        }
+        if (!this.chart) return;
+        this.chart.data.labels = ['Base', ...this.cenarios.map(c => c.nome)];
+        this.chart.data.datasets[0].data = [this.baseResultado.taxaPrevista, ...this.cenarios.map(c => c.taxaSelic)];
+        this.chart.update();
     }
 
-    resetar() {
-        this.cenarioAtual = { ...this.cenarioBase };
-        this.simular();
+    resetarCenarios() {
+        this.cenarios = [];
+        this.atualizarGrafico();
     }
 }
 
 // Inicializar no DOM
 document.addEventListener('DOMContentLoaded', () => {
-    const simuladorContainer = document.getElementById('simulador');
-    if (simuladorContainer) {
+    const container = document.getElementById('simulador');
+    if (container) {
         const simulador = new SimuladorCopom();
         if (simulador.inicializar()) {
-            simulador.renderizar(simuladorContainer);
+            simulador.renderizar(container);
         }
     }
 });
