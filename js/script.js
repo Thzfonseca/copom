@@ -18,14 +18,9 @@ function esconderLoading() {
 // Mostra o Spinner no carregamento inicial
 document.addEventListener('DOMContentLoaded', function () {
     mostrarLoading();
-
-    // Inicializar os modelos preditivos
-    window.modelosPreditivos = new ModelosPreditivos();
-    console.log('Modelos Preditivos inicializados.');
-
     setTimeout(() => {
         esconderLoading();
-    }, 1200); // 1.2 segundos
+    }, 1200);
 });
 
 // Sistema de Tabs do Dashboard
@@ -53,18 +48,9 @@ function initializeTabComponents(tabId) {
                     window.renderizarDashboard();
                 }
                 break;
-            case 'modelos-avancados':
-                if (typeof window.renderizarModelosAvancados === 'function') {
-                    window.renderizarModelosAvancados();
-                }
-                break;
             case 'modelos-preditivos':
                 if (typeof window.renderizarModelosPreditivos === 'function') {
-                    if (window.modelosPreditivos) {
-                        window.renderizarModelosPreditivos(window.modelosPreditivos.getResultados());
-                    } else {
-                        console.error('Modelos Preditivos não encontrados.');
-                    }
+                    window.renderizarModelosPreditivos(ModelosPreditivos);
                 }
                 break;
             case 'simulador':
@@ -74,7 +60,12 @@ function initializeTabComponents(tabId) {
                 break;
             case 'analise-atas':
                 if (typeof window.renderizarAnaliseAtas === 'function') {
-                    window.renderizarAnaliseAtas(window.dadosAnaliseAtas || null);
+                    window.renderizarAnaliseAtas();
+                }
+                break;
+            case 'modelos-avancados':
+                if (typeof window.renderizarModelosAvancados === 'function') {
+                    window.renderizarModelosAvancados();
                 }
                 break;
             case 'juro-neutro':
@@ -84,7 +75,7 @@ function initializeTabComponents(tabId) {
                 break;
             case 'focus':
                 if (typeof window.renderizarFocusAnalytics === 'function') {
-                    window.renderizarFocusAnalytics(window.dadosFocus || null);
+                    window.renderizarFocusAnalytics();
                 }
                 break;
             case 'agenda-copom':
@@ -108,7 +99,7 @@ function displayTabError(tabId, message) {
     }
 }
 
-// Monitorar a navegação pelas abas via Hash na URL
+// Monitorar navegação pelas abas
 window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
     showTab(hash || 'dashboard');
