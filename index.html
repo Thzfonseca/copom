@@ -1,101 +1,145 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard COPOM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard COPOM Inteligente</title>
 
-  <!-- CSS principal -->
-  <link rel="stylesheet" href="style.css?v=2">
-
-  <!-- Bibliotecas -->
-  <script src="lib/bootstrap.bundle.min.js" defer></script>
-  <script src="lib/d3.min.js" defer></script>
-  <script src="lib/chart.min.js" defer></script>
-
-  <!-- JS principais -->
-  <script src="js/script.js" defer></script>
-
-  <!-- Módulos por página -->
-  <script src="js/agenda_copom.js" defer></script>
-  <script src="js/analise_atas.js" defer></script>
-  <script src="js/analise_atas_ui.js" defer></script>
-  <script src="js/data_integrity.js" defer></script>
-  <script src="js/diagnostic.js" defer></script>
-  <script src="js/diagnostico_completo.js" defer></script>
-  <script src="js/ferramentas_diagnostico.js" defer></script>
-  <script src="js/modelos_preditivos.js" defer></script>
-  <script src="js/modelos_preditivos_ui.js" defer></script>
-  <script src="js/modelos_avancados.js" defer></script>
-  <script src="js/modelos_avancados_ui.js" defer></script>
-  <script src="js/monitor.js" defer></script>
-  <script src="js/simulador.js" defer></script>
-
-  <!-- Pastas especiais -->
-  <script src="js/focus/focus_analytics.js" defer></script>
-  <script src="js/juro_neutro/juro_neutro.js" defer></script>
-  <script src="js/juro_neutro/juro_neutro_integrador.js" defer></script>
-  <script src="js/juro_neutro/simulador_juro_neutro.js" defer></script>
-  <script src="js/juro_neutro/simulador_juro_neutro_ui.js" defer></script>
-
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Bibliotecas -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
 
-  <!-- Spinner de carregamento -->
-  <div id="loading-spinner" class="spinner-container">
-    <div class="spinner"></div>
-  </div>
-
-  <div class="container-fluid">
-    <div class="row">
-      
-      <!-- Menu Lateral -->
-      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
-        <div class="sidebar-sticky pt-3">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link" href="#dashboard" onclick="showTab('dashboard')">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#modelos-avancados" onclick="showTab('modelos-avancados')">Modelos Avançados</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos Preditivos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#simulador" onclick="showTab('simulador')">Simulador</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#analise-atas" onclick="showTab('analise-atas')">Análise Atas</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#juro-neutro" onclick="showTab('juro-neutro')">Juro Neutro</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#focus" onclick="showTab('focus')">Focus</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#agenda-copom" onclick="showTab('agenda-copom')">Agenda COPOM</a>
-            </li>
-          </ul>
+    <!-- Spinner de Loading -->
+    <div id="loading-spinner" class="loading-spinner" style="display:none;">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Carregando...</span>
         </div>
-      </nav>
-
-      <!-- Conteúdo Principal -->
-      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-        <div id="dashboard" class="tab-content"></div>
-        <div id="modelos-avancados" class="tab-content" style="display:none;"></div>
-        <div id="modelos-preditivos" class="tab-content" style="display:none;"></div>
-        <div id="simulador" class="tab-content" style="display:none;"></div>
-        <div id="analise-atas" class="tab-content" style="display:none;"></div>
-        <div id="juro-neutro" class="tab-content" style="display:none;"></div>
-        <div id="focus" class="tab-content" style="display:none;"></div>
-        <div id="agenda-copom" class="tab-content" style="display:none;"></div>
-      </main>
-
     </div>
-  </div>
+
+    <!-- Sidebar de Navegação -->
+    <nav class="sidebar">
+        <h1>COPOM Inteligente</h1>
+        <ul class="nav-list">
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#modelos-avancados">Modelos Avançados</a></li>
+            <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
+            <li><a href="#simulador">Simulador</a></li>
+            <li><a href="#analise-atas">Análise de Atas</a></li>
+            <li><a href="#taylor-dinamico">Simulador Taylor</a></li>
+            <li><a href="#focus">Focus</a></li>
+            <li><a href="#agenda-copom">Agenda COPOM</a></li>
+        </ul>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        
+        <section id="dashboard" class="tab-content">
+            <h2>Dashboard Principal</h2>
+            <p>Resumo consolidado das análises e previsões.</p>
+        </section>
+
+        <section id="modelos-avancados" class="tab-content" style="display:none;">
+            <h2>Modelos Avançados</h2>
+            <div id="modelos-avancados"></div>
+        </section>
+
+        <section id="modelos-preditivos" class="tab-content" style="display:none;">
+            <h2>Modelos Preditivos</h2>
+            <div id="modelos-preditivos"></div>
+        </section>
+
+        <section id="simulador" class="tab-content" style="display:none;">
+            <h2>Simulador de Cenários COPOM</h2>
+            <div id="simulador"></div>
+        </section>
+
+        <section id="analise-atas" class="tab-content" style="display:none;">
+            <h2>Análise de Atas do COPOM</h2>
+            <div id="aba-analise-atas"></div>
+        </section>
+
+        <section id="taylor-dinamico" class="tab-content" style="display:none;">
+            <!-- Aqui entra o painel Taylor -->
+            <div class="painel-taylor">
+                <h2>Simulador de Regra de Taylor</h2>
+
+                <div class="inputs-taylor">
+                    <div class="input-group">
+                        <label for="inflacaoAtual">Inflação Atual (IPCA %)</label>
+                        <input type="number" id="inflacaoAtual" value="4.5" step="0.1">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="hiatoProduto">Hiato do Produto (%)</label>
+                        <input type="number" id="hiatoProduto" value="-1.0" step="0.1">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="pesoInflacao">Peso da Inflação</label>
+                        <input type="range" id="pesoInflacao" min="0" max="2" step="0.1" value="0.5">
+                        <span id="pesoInflacaoValor">0.5</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="pesoHiato">Peso do Hiato</label>
+                        <input type="range" id="pesoHiato" min="0" max="2" step="0.1" value="0.5">
+                        <span id="pesoHiatoValor">0.5</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="metaInflacao">Meta de Inflação (%)</label>
+                        <input type="number" id="metaInflacao" value="3.0" step="0.1">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="juroNeutro">Juro Real Neutro (%)</label>
+                        <input type="number" id="juroNeutro" value="4.5" step="0.1">
+                    </div>
+                </div>
+
+                <button id="calcularTaylor" class="btn-calcular">Calcular Taylor</button>
+
+                <div id="resultadoTaylor" class="resultado-taylor"></div>
+            </div>
+        </section>
+
+        <section id="focus" class="tab-content" style="display:none;">
+            <h2>Relatório Focus</h2>
+            <div id="focus-content"></div>
+        </section>
+
+        <section id="agenda-copom" class="tab-content" style="display:none;">
+            <h2>Agenda das Reuniões COPOM</h2>
+            <div id="agenda-content"></div>
+        </section>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="lib/bootstrap.bundle.min.js"></script>
+    <script src="lib/chart.min.js"></script>
+    <script src="lib/d3.min.js"></script>
+
+    <!-- Seus Scripts -->
+    <script src="js/script.js"></script>
+    <script src="js/modelos_preditivos.js"></script>
+    <script src="js/modelos_preditivos_ui.js"></script>
+    <script src="js/modelos_avancados.js"></script>
+    <script src="js/modelos_avancados_ui.js"></script>
+    <script src="js/simulador.js"></script>
+    <script src="js/analise_atas.js"></script>
+    <script src="js/analise_atas_ui.js"></script>
+    <script src="js/focus/focus_analytics.js"></script>
+    <script src="js/agenda_copom.js"></script>
+
+    <!-- Painel Taylor -->
+    <script src="js/taylor_dinamico.js"></script>
 
 </body>
 </html>
