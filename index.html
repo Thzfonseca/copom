@@ -2,67 +2,90 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COPOM Dashboard</title>
     <link rel="stylesheet" href="lib/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div id="main-container" class="container-fluid">
+<body class="bg-dark text-light">
+    <div class="container-fluid">
         <div class="row">
-            <nav id="sidebar" class="col-md-2 d-none d-md-block bg-dark sidebar">
+            <!-- Menu lateral -->
+            <nav class="col-md-2 d-none d-md-block bg-dark sidebar">
                 <div class="sidebar-sticky">
-                    <h4 class="text-white p-3">COPOM Dashboard</h4>
-                    <p class="text-light px-3">Atualizado em: 19/03/2025</p>
-                    <ul class="nav flex-column">
+                    <h5 class="text-center text-light mt-4">COPOM Dashboard</h5>
+                    <p class="text-center text-secondary" style="font-size: 0.8em;">Atualizado em: 19/03/2025</p>
+                    <ul class="nav flex-column mt-4">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#" onclick="showTab('dashboard')">Dashboard Principal</a>
+                            <a class="nav-link active text-light" href="#" onclick="showTab('dashboard')">
+                                Dashboard Principal
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showTab('modelos-preditivos')">Modelos Preditivos</a>
+                            <a class="nav-link text-light" href="#" onclick="showTab('modelos-preditivos')">
+                                Modelos Preditivos
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showTab('analise-atas')">Análise de Atas</a>
+                            <a class="nav-link text-light" href="#" onclick="showTab('analise-atas')">
+                                Análise de Atas
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showTab('modelos-avancados')">Modelos Avançados</a>
+                            <a class="nav-link text-light" href="#" onclick="showTab('modelos-avancados')">
+                                Modelos Avançados
+                            </a>
                         </li>
                     </ul>
                 </div>
             </nav>
 
+            <!-- Conteúdo principal -->
             <main role="main" class="col-md-10 ml-sm-auto col-lg-10 px-4">
                 <div id="dashboard" class="tab-content">
-                    <h2>Dashboard Principal</h2>
+                    <h2 class="mt-4">Dashboard Principal</h2>
                     <p>Resumo dos principais indicadores econômicos.</p>
                 </div>
 
                 <div id="modelos-preditivos" class="tab-content" style="display: none;">
-                    <!-- Conteúdo de Modelos Preditivos será renderizado aqui -->
+                    <div id="aba-modelos-preditivos"></div>
                 </div>
 
                 <div id="analise-atas" class="tab-content" style="display: none;">
-                    <!-- Conteúdo da Análise de Atas será renderizado aqui -->
+                    <div id="aba-analise-atas"></div>
                 </div>
 
                 <div id="modelos-avancados" class="tab-content" style="display: none;">
-                    <!-- Conteúdo dos Modelos Avançados será renderizado aqui -->
+                    <div id="aba-modelos-avancados"></div>
                 </div>
             </main>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="lib/bootstrap.bundle.min.js"></script>
     <script src="lib/chart.min.js"></script>
     <script src="lib/d3.min.js"></script>
 
-    <!-- Scripts principais -->
-    <script src="js/diagnostico_completo.js"></script>
-    <script src="js/modelos_preditivos.js"></script>
-    <script src="js/modelos_preditivos_ui.js"></script>
-    <script src="js/modelos_avancados.js"></script>
-    <script src="js/modelos_avancados_ui.js"></script>
+    <script src="js/ferramentas_diagnostico.js"></script>
+    <script src="js/diagnostic.js"></script>
+    <script src="js/data_integrity.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/monitor.js"></script>
+
     <script src="js/analise_atas.js"></script>
     <script src="js/analise_atas_ui.js"></script>
-    <script src="js/script.js"></script>
+
+    <script src="js/modelos_preditivos.js"></script>
+    <script src="js/modelos_preditivos_ui.js"></script>
+
+    <script src="js/modelos_avancados.js"></script>
+    <script src="js/modelos_avancados_ui.js"></script>
+
+    <script src="js/simulador.js"></script>
+
+    <!-- Opcional: focus e juro_neutro se necessário -->
+    <!-- <script src="js/focus/focus_analytics.js"></script> -->
+    <!-- <script src="js/juro_neutro/juro_neutro.js"></script> -->
 </body>
 </html>
