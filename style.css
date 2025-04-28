@@ -1,559 +1,100 @@
-/* Estilo inspirado em terminais Bloomberg para o dashboard do COPOM */
+/* style.css */
 
+/* Estilo geral */
 body {
-    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #121212;
-    color: #e0e0e0;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    font-size: 16px;
-    line-height: 1.5;
 }
 
-.container {
-    width: 100%;
-    max-width: 1400px;
-    padding: 0 15px;
-    margin: 0 auto;
+/* Navegação */
+nav {
+    background-color: #161b22;
+    padding: 10px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    border-bottom: 1px solid #30363d;
 }
 
-.header {
-    background-color: #1c1c1c;
-    border-bottom: 1px solid #333;
-    padding: 10px 0;
-    position: sticky;
-    top: 0;
+nav a {
+    color: #58a6ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: #79c0ff;
+}
+
+/* Conteúdo das abas */
+.tab-content {
+    padding: 20px;
+}
+
+/* Spinner de carregamento */
+#loading-spinner {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    color: #58a6ff;
     z-index: 1000;
 }
 
-.header-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-    color: #f8f8f8;
-}
-
-.header-subtitle {
-    font-size: 0.9rem;
-    margin: 0;
-    color: #aaa;
-}
-
-.market-indicators {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.indicator {
-    margin-left: 15px;
-    font-size: 0.9rem;
-    color: #aaa;
-}
-
-.value {
-    font-weight: 600;
-    color: #f8f8f8;
-}
-
-.value.positive {
-    color: #4caf50;
-}
-
-.value.negative {
-    color: #f44336;
-}
-
-.sidebar {
-    background-color: #1c1c1c;
-    border-radius: 5px;
-    padding: 15px;
-    height: 100%;
-}
-
-.menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.menu li {
-    margin-bottom: 5px;
-}
-
-.nav-link {
-    color: #aaa;
-    border-radius: 3px;
-    padding: 10px 15px;
-    margin-bottom: 5px;
-    transition: all 0.2s ease;
-    display: block;
-    text-decoration: none;
-}
-
-.nav-link:hover {
-    background-color: #333;
-    color: #f8f8f8;
-}
-
-.nav-link.active {
-    background-color: #2c2c2c;
-    color: #f8f8f8;
-    border-left: 3px solid #4caf50;
-}
-
-.content {
-    padding: 20px 0;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.bg-dark-card {
-    background-color: #1c1c1c;
-    border: 1px solid #333;
-    border-radius: 5px;
+/* Estilo do simulador */
+#simulador h2 {
     margin-bottom: 20px;
-    overflow: hidden;
+    color: #58a6ff;
 }
 
-.card-header {
-    background-color: #2c2c2c;
-    border-bottom: 1px solid #333;
-    padding: 10px 15px;
+#simulador div {
+    margin-bottom: 15px;
 }
 
-.card-title {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
+#simulador label {
+    display: block;
+    margin-bottom: 5px;
 }
 
-.card-body {
-    padding: 15px;
-}
-
-.table {
-    color: #e0e0e0;
-    font-size: 0.9rem;
+#simulador input[type="number"] {
     width: 100%;
-    border-collapse: collapse;
-}
-
-.table-dark {
-    background-color: #1c1c1c;
-    color: #e0e0e0;
-}
-
-.table-dark thead th {
-    background-color: #2c2c2c;
-    color: #f8f8f8;
-    border-bottom: 1px solid #333;
-    padding: 10px;
-    text-align: left;
-}
-
-.table-dark tbody td {
-    padding: 10px;
-    border-bottom: 1px solid #333;
-}
-
-.table-dark tbody tr:hover {
-    background-color: #2c2c2c;
-}
-
-.form-control, .form-select {
-    background-color: #2c2c2c;
-    border: 1px solid #444;
-    color: #e0e0e0;
-    padding: 8px 12px;
+    padding: 8px;
+    border: 1px solid #30363d;
     border-radius: 4px;
-    width: 100%;
-    margin-bottom: 15px;
+    background-color: #161b22;
+    color: #c9d1d9;
 }
 
-.form-control:focus, .form-select:focus {
-    background-color: #2c2c2c;
-    border-color: #666;
-    color: #e0e0e0;
-    box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
-    outline: none;
-}
-
-.btn {
-    display: inline-block;
-    font-weight: 400;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
-    user-select: none;
-    border: 1px solid transparent;
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: 0.25rem;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    cursor: pointer;
-}
-
-.btn-primary {
-    background-color: #4caf50;
-    border-color: #4caf50;
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: #3d8b40;
-    border-color: #3d8b40;
-}
-
-.btn-secondary {
-    background-color: #444;
-    border-color: #444;
-    color: #fff;
-}
-
-.btn-secondary:hover {
-    background-color: #555;
-    border-color: #555;
-}
-
-.word-cloud {
-    height: 200px;
-    background-color: #2c2c2c;
-    border-radius: 5px;
-    padding: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-}
-
-.word-cloud span {
-    display: inline-block;
-    margin: 5px;
-    color: #f8f8f8;
-}
-
-.decisao-provavel {
-    background-color: #2c2c2c;
-    border-radius: 5px;
-    padding: 15px;
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.decisao-aumento {
-    color: #f44336;
-}
-
-.decisao-manutencao {
-    color: #ffeb3b;
-}
-
-.decisao-reducao {
-    color: #4caf50;
-}
-
-.footer {
-    background-color: #1c1c1c;
-    color: #aaa;
-    font-size: 0.9rem;
-    padding: 15px 0;
-    margin-top: 30px;
-    text-align: center;
-}
-
-/* Estilos para o relatório de diagnóstico */
-.diagnostico-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #1c1c1c;
-    border: 1px solid #333;
-    border-radius: 5px;
-    padding: 20px;
-    max-width: 90%;
-    max-height: 90%;
-    overflow-y: auto;
-    z-index: 1050;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    display: none;
-}
-
-.diagnostico-modal.show {
-    display: block;
-}
-
-.diagnostico-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1040;
-    display: none;
-}
-
-.diagnostico-overlay.show {
-    display: block;
-}
-
-.diagnostico-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #333;
-}
-
-.diagnostico-close {
-    background: none;
+#simular-btn {
+    background-color: #238636;
+    color: white;
     border: none;
-    color: #aaa;
-    font-size: 1.5rem;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 4px;
     cursor: pointer;
 }
 
-.diagnostico-close:hover {
-    color: #fff;
+#simular-btn:hover {
+    background-color: #2ea043;
 }
 
-.diagnostico-body {
-    margin-bottom: 15px;
+/* Resultado */
+#resultado-simulacao {
+    margin-top: 30px;
+    background-color: #161b22;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #30363d;
 }
 
-.diagnostico-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 10px;
-    border-top: 1px solid #333;
-}
-
-/* Status indicators */
-.status-ok {
-    color: #4caf50;
-}
-
-.status-warning {
-    color: #ffeb3b;
-}
-
-.status-error {
-    color: #f44336;
-}
-
-/* Responsividade */
-@media (max-width: 992px) {
-    .container {
-        max-width: 100%;
-    }
-    
-    /* Let Bootstrap handle column stacking based on col-* classes */
-    /* Removed problematic override that forced all columns to 100% */
-    
-    .sidebar {
-        margin-bottom: 20px;
-    }
-    
-    .market-indicators {
-        justify-content: flex-start;
-        margin-top: 10px;
-    }
-    
-    .indicator {
-        margin-left: 0;
-        margin-right: 15px;
-        margin-bottom: 5px;
-    }
-}
-
-/* Ensure all tables can scroll horizontally if needed */
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
-
-@media (max-width: 768px) {
-    body {
-        font-size: 14px;
-    }
-    
-    .header-title {
-        font-size: 1.2rem;
-    }
-    
-    .header-subtitle {
-        font-size: 0.8rem;
-    }
-    
-    .card-title {
-        font-size: 1rem;
-    }
-    
-    .table {
-        font-size: 0.8rem;
-    }
-    
-    .table-responsive {
-        overflow-x: auto;
-    }
-    
-    .decisao-provavel {
-        font-size: 1.2rem;
-    }
-    
-    .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-    }
-}
-
-@media (max-width: 576px) {
-    body {
-        font-size: 13px;
-    }
-    
-    .container {
-        padding: 0 10px;
-    }
-    
-    .header-title {
-        font-size: 1.1rem;
-    }
-    
-    .header-subtitle {
-        font-size: 0.7rem;
-    }
-    
-    .nav-link {
-        padding: 8px 10px;
-    }
-    
-    .card-header {
-        padding: 8px 10px;
-    }
-    
-    .card-body {
-        padding: 10px;
-    }
-    
-    .table thead th, .table tbody td {
-        padding: 8px 5px;
-    }
-    
-    .form-control, .form-select {
-        padding: 6px 8px;
-    }
-    
-    .btn {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.8rem;
-    }
-    
-    .diagnostico-modal {
-        max-width: 95%;
-        padding: 15px;
-    }
-    
-    /* Melhorias para visualização em telas pequenas */
-    .card {
-        margin-bottom: 15px;
-    }
-    
-    /* Garantir que gráficos e visualizações se ajustem */
-    canvas, svg, .chart-container {
-        max-width: 100%;
-        height: auto !important;
-    }
-    
-    /* Melhorar visualização de tabelas em telas pequenas */
-    .table-responsive {
-        margin-bottom: 0;
-    }
-    
-    /* Ajustar controles do simulador para telas pequenas */
-    .simulador-controles .form-group {
-        margin-bottom: 10px;
-    }
-    
-    /* Melhorar visualização de indicadores */
-    .indicadores-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-}
-
-/* Ajustes para o menu em dispositivos móveis */
-@media (max-width: 768px) {
-    .menu {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .menu li {
-        margin: 0 5px 5px 0;
-    }
-    
-    .nav-link {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
-}
-
-/* Ajustes específicos para iPhone e dispositivos muito pequenos */
-@media (max-width: 375px) {
-    body {
-        font-size: 12px;
-    }
-    
-    .header-title {
-        font-size: 1rem;
-    }
-    
-    .header-subtitle {
-        font-size: 0.6rem;
-    }
-    
-    .menu {
-        justify-content: flex-start;
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 5px;
-    }
-    
-    .menu li {
-        display: inline-block;
-    }
-    
-    .nav-link {
-        padding: 6px 8px;
-        font-size: 0.8rem;
-    }
-    
-    .card-title {
-        font-size: 0.9rem;
-    }
-    
-    .table {
-        font-size: 0.7rem;
-    }
-    
-    .btn {
-        padding: 0.15rem 0.3rem;
-        font-size: 0.75rem;
-    }
+#resultado-simulacao h4 {
+    margin-top: 0;
+    color: #79c0ff;
 }
