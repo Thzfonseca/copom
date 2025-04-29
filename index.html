@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COPOM Dashboard</title>
+    <title>Dashboard COPOM - Rolagem IPCA+</title>
 
     <!-- Estilos -->
     <link rel="stylesheet" href="style.css" />
@@ -13,7 +13,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Menu lateral -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <h2>COPOM</h2>
             <nav>
@@ -21,7 +21,7 @@
                     <li><a href="#dashboard">Dashboard</a></li>
                     <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
                     <li><a href="#simulador">Simulador</a></li>
-                    <li><a href="#grafico-rolagem-container">Rolagem IPCA+</a></li>
+                    <li><a href="#rolagem-ipca">Rolagem IPCA+</a></li>
                 </ul>
             </nav>
         </aside>
@@ -32,12 +32,6 @@
             <section id="dashboard" class="tab-content">
                 <h1>Dashboard Econômico</h1>
                 <p>Resumo de indicadores e informações relevantes.</p>
-
-                <!-- Gráfico Selic -->
-                <div class="grafico-selic-container mt-5">
-                    <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
-                    <canvas id="grafico-selic" height="100"></canvas>
-                </div>
             </section>
 
             <!-- MODELOS PREDITIVOS -->
@@ -50,11 +44,62 @@
                 <!-- Conteúdo renderizado dinamicamente -->
             </section>
 
-            <!-- GRAFICO ROLAGEM IPCA+ -->
-            <section id="grafico-rolagem-container" class="tab-content" style="display:none;">
-                <h2>Simulação de Rolagem de Títulos IPCA+</h2>
-                <div class="grafico-rolagem-area">
-                    <canvas id="grafico-rolagem" height="100"></canvas>
+            <!-- ROLAGEM IPCA+ -->
+            <section id="rolagem-ipca" class="tab-content" style="display:none;">
+                <h1>Simulador de Rolagem IPCA+</h1>
+
+                <div class="input-container">
+                    <h3>Parâmetros dos Títulos</h3>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="taxaAtual">Taxa IPCA+ do título atual (%)</label>
+                            <input type="number" id="taxaAtual" step="0.01" value="5.5" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="vencimentoAtual">Vencimento do título atual (ano)</label>
+                            <input type="number" id="vencimentoAtual" value="2026" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="taxaNova">Taxa IPCA+ do novo título (%)</label>
+                            <input type="number" id="taxaNova" step="0.01" value="6.0" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="vencimentoNovo">Vencimento do novo título (ano)</label>
+                            <input type="number" id="vencimentoNovo" value="2030" />
+                        </div>
+                    </div>
+
+                    <h3>Projeções Econômicas</h3>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="ipcaAnos">IPCA Anual (%) - separado por vírgula</label>
+                            <input type="text" id="ipcaAnos" value="4.0,3.8,3.6,3.5,3.5" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cdiAnos">CDI Anual (%) - separado por vírgula</label>
+                            <input type="text" id="cdiAnos" value="10.5,9.5,8.5,7.5,7.0" />
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="simularRolagem">Simular Rolagem</button>
+                        <button id="resetarRolagem" class="reset">Resetar</button>
+                    </div>
+                </div>
+
+                <div class="grafico-container">
+                    <h3>Evolução da Rentabilidade</h3>
+                    <canvas id="graficoRolagem" height="120"></canvas>
+                </div>
+
+                <div id="resultadosRolagem" class="resultados-container">
+                    <!-- Resultados numéricos serão renderizados aqui -->
                 </div>
             </section>
         </main>
@@ -65,9 +110,9 @@
     <script src="js/modelos_preditivos_ui.js"></script>
     <script src="js/simulador.js"></script>
     <script src="js/grafico_selic.js"></script>
-    <script src="js/grafico_rolagem.js"></script>
+    <script src="js/simulador_rolagem.js"></script>
 
-    <!-- Controle de navegação por abas + inicialização -->
+    <!-- Controle de navegação -->
     <script>
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -85,11 +130,6 @@
                 if (tabId === 'simulador' && typeof window.renderizarSimulador === 'function') {
                     window.renderizarSimulador();
                 }
-
-                if (tabId === 'grafico-rolagem-container' && typeof window.graficoRolagem === 'object') {
-                    // Atualizar o gráfico de rolagem ao abrir
-                    window.graficoRolagem.atualizarGrafico(window.dadosSimulacaoRolagem);
-                }
             }
         }
 
@@ -101,21 +141,6 @@
         window.addEventListener('DOMContentLoaded', () => {
             const initialTab = window.location.hash.substring(1) || 'dashboard';
             showTab(initialTab);
-
-            // Inicializar o gráfico de rolagem
-            if (document.getElementById('grafico-rolagem')) {
-                window.graficoRolagem = new GraficoRolagem('grafico-rolagem');
-
-                // Dados de exemplo iniciais (depois substituímos pela simulação real)
-                window.dadosSimulacaoRolagem = {
-                    anos: ['2025', '2026', '2027', '2028', '2029', '2030'],
-                    saldoBase: [1000, 1100, 1210, 1331, 1464, 1610],
-                    saldoTroca: [1000, 1120, 1254, 1404, 1560, 1720],
-                    saldoCDI: [1000, 1080, 1166, 1259, 1359, 1466]
-                };
-
-                window.graficoRolagem.atualizarGrafico(window.dadosSimulacaoRolagem);
-            }
         });
     </script>
 </body>
