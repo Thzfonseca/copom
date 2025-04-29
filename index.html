@@ -1,118 +1,81 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard COPOM - Rolagem IPCA+</title>
-
-    <!-- Estilos -->
+    <title>COPOM Dashboard</title>
     <link rel="stylesheet" href="style.css" />
-
-    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
         <aside class="sidebar">
-            <h2>COPOM</h2>
+            <h2>COPOM Dashboard</h2>
             <nav>
                 <ul>
                     <li><a href="#dashboard">Dashboard</a></li>
-                    <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
-                    <li><a href="#simulador">Simulador</a></li>
                     <li><a href="#rolagem-ipca">Rolagem IPCA+</a></li>
                 </ul>
             </nav>
         </aside>
 
-        <!-- Conteúdo principal -->
         <main class="main-content">
             <!-- DASHBOARD -->
             <section id="dashboard" class="tab-content">
                 <h1>Dashboard Econômico</h1>
                 <p>Resumo de indicadores e informações relevantes.</p>
-            </section>
-
-            <!-- MODELOS PREDITIVOS -->
-            <section id="modelos-preditivos" class="tab-content" style="display:none;">
-                <!-- Conteúdo renderizado dinamicamente -->
-            </section>
-
-            <!-- SIMULADOR -->
-            <section id="simulador" class="tab-content" style="display:none;">
-                <!-- Conteúdo renderizado dinamicamente -->
+                <div class="grafico-selic-container mt-5">
+                    <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
+                    <canvas id="grafico-selic" height="100"></canvas>
+                </div>
             </section>
 
             <!-- ROLAGEM IPCA+ -->
             <section id="rolagem-ipca" class="tab-content" style="display:none;">
-                <h1>Simulador de Rolagem IPCA+</h1>
-
-                <div class="input-container">
-                    <h3>Parâmetros dos Títulos</h3>
-
-                    <div class="input-grid">
-                        <div class="input-group">
-                            <label for="taxaAtual">Taxa IPCA+ do título atual (%)</label>
-                            <input type="number" id="taxaAtual" step="0.01" value="5.5" />
+                <div class="simulador-container">
+                    <h2>Simulador de Rolagem IPCA+</h2>
+                    <div class="form-grid">
+                        <div>
+                            <label>Taxa IPCA+ do título atual (%)</label>
+                            <input type="number" id="taxa-atual" value="5.5" />
                         </div>
-
-                        <div class="input-group">
-                            <label for="vencimentoAtual">Vencimento do título atual (ano)</label>
-                            <input type="number" id="vencimentoAtual" value="2026" />
+                        <div>
+                            <label>Vencimento do título atual (ano)</label>
+                            <input type="number" id="vencimento-atual" value="2026" />
                         </div>
-
-                        <div class="input-group">
-                            <label for="taxaNova">Taxa IPCA+ do novo título (%)</label>
-                            <input type="number" id="taxaNova" step="0.01" value="6.0" />
+                        <div>
+                            <label>Taxa IPCA+ do novo título (%)</label>
+                            <input type="number" id="taxa-novo" value="6.0" />
                         </div>
-
-                        <div class="input-group">
-                            <label for="vencimentoNovo">Vencimento do novo título (ano)</label>
-                            <input type="number" id="vencimentoNovo" value="2030" />
+                        <div>
+                            <label>Vencimento do novo título (ano)</label>
+                            <input type="number" id="vencimento-novo" value="2030" />
                         </div>
-                    </div>
-
-                    <h3>Projeções Econômicas</h3>
-
-                    <div class="input-grid">
-                        <div class="input-group">
-                            <label for="ipcaAnos">IPCA Anual (%) - separado por vírgula</label>
-                            <input type="text" id="ipcaAnos" value="4.0,3.8,3.6,3.5,3.5" />
+                        <div>
+                            <label>IPCA Médio ao Ano (%)</label>
+                            <input type="number" id="ipca-medio" value="3.8" />
                         </div>
-
-                        <div class="input-group">
-                            <label for="cdiAnos">CDI Anual (%) - separado por vírgula</label>
-                            <input type="text" id="cdiAnos" value="10.5,9.5,8.5,7.5,7.0" />
+                        <div>
+                            <label>CDI Médio ao Ano (%)</label>
+                            <input type="number" id="cdi-medio" value="9.0" />
                         </div>
                     </div>
-
                     <div class="button-group">
-                        <button id="simularRolagem">Simular Rolagem</button>
-                        <button id="resetarRolagem" class="reset">Resetar</button>
+                        <button id="simular-btn">Simular Rolagem</button>
+                        <button id="resetar-btn" class="reset">Resetar</button>
                     </div>
-                </div>
-
-                <div class="grafico-container">
-                    <h3>Evolução da Rentabilidade</h3>
-                    <canvas id="graficoRolagem" height="120"></canvas>
-                </div>
-
-                <div id="resultadosRolagem" class="resultados-container">
-                    <!-- Resultados numéricos serão renderizados aqui -->
+                    <div class="grafico-container">
+                        <h3>Evolução da Rentabilidade</h3>
+                        <canvas id="grafico-rolagem"></canvas>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Scripts principais -->
-    <script src="js/modelos_preditivos.js"></script>
-    <script src="js/modelos_preditivos_ui.js"></script>
-    <script src="js/simulador.js"></script>
     <script src="js/grafico_selic.js"></script>
     <script src="js/simulador_rolagem.js"></script>
-
-    <!-- Controle de navegação -->
     <script>
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -120,17 +83,7 @@
             });
 
             const selected = document.getElementById(tabId);
-            if (selected) {
-                selected.style.display = 'block';
-
-                if (tabId === 'modelos-preditivos' && typeof window.renderizarModelosPreditivos === 'function') {
-                    window.renderizarModelosPreditivos();
-                }
-
-                if (tabId === 'simulador' && typeof window.renderizarSimulador === 'function') {
-                    window.renderizarSimulador();
-                }
-            }
+            if (selected) selected.style.display = 'block';
         }
 
         window.addEventListener('hashchange', () => {
