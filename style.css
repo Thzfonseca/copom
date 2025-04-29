@@ -1,164 +1,178 @@
-/* Layout geral */
+/* === Reset básico === */
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #1e293b;
-  color: #e2e8f0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
 }
 
+/* === Estrutura geral === */
 .app-container {
   display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 
-/* Sidebar */
 .sidebar {
   width: 220px;
-  background-color: #0f172a;
+  background-color: #002244;
+  color: white;
   padding: 20px;
+  flex-shrink: 0;
 }
 
 .sidebar h2 {
-  color: #f1f5f9;
-  margin-bottom: 20px;
+  margin-top: 0;
 }
 
-.sidebar ul {
+.sidebar nav ul {
   list-style: none;
-  padding-left: 0;
+  padding: 0;
 }
 
-.sidebar li {
-  margin-bottom: 12px;
+.sidebar nav ul li {
+  margin-bottom: 15px;
 }
 
-.sidebar a {
-  color: #94a3b8;
+.sidebar nav ul li a {
+  color: white;
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-weight: bold;
 }
 
-.sidebar a:hover {
-  color: #facc15;
+.sidebar nav ul li a:hover {
+  text-decoration: underline;
 }
 
-/* Conteúdo principal */
+/* === Conteúdo principal === */
 .main-content {
-  flex: 1;
-  padding: 30px;
+  flex-grow: 1;
+  padding: 20px;
   overflow-y: auto;
+  background: #f4f4f4;
 }
 
-h1, h2, h3, h4 {
-  color: #f1f5f9;
-}
-
-/* Seções */
 .tab-content {
   display: none;
 }
 
-/* Gráfico Selic */
+.mt-5 {
+  margin-top: 3rem;
+}
+
+/* === Dashboard e gráfico === */
 .grafico-selic-container {
-  background-color: #334155;
-  padding: 20px;
-  border-radius: 8px;
   margin-top: 30px;
-}
-
-/* Gráfico Chart.js */
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 300px;
-}
-
-/* ROLAGEM IPCA+ SIMULADOR */
-.simulador-rolagem-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-/* Box de inputs */
-.box-input {
-  background-color: #1e293b;
+  background: white;
   padding: 20px;
-  border: 1px solid #334155;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
-.box-input h4 {
+/* === Grid Flexível === */
+.grid.grid-2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* === Boxes de input === */
+.box-opcao,
+.box-premissas {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 10px;
+  flex: 1 1 300px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.03);
+}
+
+.box-opcao h3,
+.box-premissas h3 {
   margin-top: 0;
-  margin-bottom: 15px;
   font-size: 1.1rem;
+  color: #222;
 }
 
-.input-group {
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+input[type="number"],
+select {
+  width: 100%;
+  padding: 6px 8px;
+  margin-top: 3px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+/* === Botões === */
+.botoes-container {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-}
-
-.input-group label {
-  font-size: 0.85rem;
-  margin-bottom: 5px;
-  color: #cbd5e1;
-}
-
-.input-group input,
-.input-group select {
-  padding: 8px;
-  border: 1px solid #475569;
-  background-color: #0f172a;
-  color: #e2e8f0;
-  border-radius: 4px;
-  font-size: 0.95rem;
-}
-
-/* Botões */
-.button-group {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 20px;
+  margin: 30px 0;
 }
 
 .button {
-  background-color: #0ea5e9;
-  border: none;
-  padding: 10px 16px;
-  color: white;
-  font-weight: 600;
-  border-radius: 6px;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: bold;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.button-simular {
+  background-color: #0077b6;
+  color: white;
+}
+
+.button-resetar {
+  background-color: #adb5bd;
+  color: white;
 }
 
 .button:hover {
-  background-color: #0369a1;
+  opacity: 0.9;
 }
 
-/* Gráfico comparativo */
-.resultado-rolagem-container {
-  background-color: #1e293b;
-  padding: 25px;
-  border-radius: 8px;
-  margin-top: 20px;
+/* === Container da aba de rolagem === */
+.rolagem-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
-.resultado-rolagem-container h3 {
-  margin-bottom: 20px;
-  font-size: 1.2rem;
+/* === Gráfico === */
+.chart-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.03);
 }
 
-/* Responsivo */
+canvas {
+  max-width: 100%;
+}
+
+/* === Responsivo === */
 @media (max-width: 768px) {
-  .simulador-rolagem-container {
+  .grid.grid-2 {
     flex-direction: column;
   }
 
-  .box-input {
-    width: 100%;
+  .sidebar {
+    display: none; /* Pode ser substituído por menu móvel se quiser */
+  }
+
+  .main-content {
+    margin: 0;
+    padding: 15px;
   }
 }
