@@ -20,8 +20,8 @@
                 <ul>
                     <li><a href="#dashboard">Dashboard</a></li>
                     <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
-                    <li><a href="#simulador">Simulador Econômico</a></li>
-                    <li><a href="#simulador-rolagem">Simulador de Rolagem</a></li>
+                    <li><a href="#simulador">Simulador</a></li>
+                    <li><a href="#grafico-rolagem-container">Rolagem IPCA+</a></li>
                 </ul>
             </nav>
         </aside>
@@ -33,6 +33,7 @@
                 <h1>Dashboard Econômico</h1>
                 <p>Resumo de indicadores e informações relevantes.</p>
 
+                <!-- Gráfico Selic -->
                 <div class="grafico-selic-container mt-5">
                     <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
                     <canvas id="grafico-selic" height="100"></canvas>
@@ -41,17 +42,20 @@
 
             <!-- MODELOS PREDITIVOS -->
             <section id="modelos-preditivos" class="tab-content" style="display:none;">
-                <!-- Conteúdo dinâmico -->
+                <!-- Conteúdo renderizado dinamicamente -->
             </section>
 
-            <!-- SIMULADOR ECONÔMICO -->
+            <!-- SIMULADOR -->
             <section id="simulador" class="tab-content" style="display:none;">
-                <!-- Conteúdo dinâmico -->
+                <!-- Conteúdo renderizado dinamicamente -->
             </section>
 
-            <!-- SIMULADOR DE ROLAGEM -->
-            <section id="simulador-rolagem" class="tab-content" style="display:none;">
-                <!-- Conteúdo dinâmico -->
+            <!-- GRAFICO ROLAGEM IPCA+ -->
+            <section id="grafico-rolagem-container" class="tab-content" style="display:none;">
+                <h2>Simulação de Rolagem de Títulos IPCA+</h2>
+                <div class="grafico-rolagem-area">
+                    <canvas id="grafico-rolagem" height="100"></canvas>
+                </div>
             </section>
         </main>
     </div>
@@ -61,10 +65,9 @@
     <script src="js/modelos_preditivos_ui.js"></script>
     <script src="js/simulador.js"></script>
     <script src="js/grafico_selic.js"></script>
-    <script src="js/simulador_rolagem.js"></script>
-    <script src="js/simulador_rolagem_ui.js"></script>
+    <script src="js/grafico_rolagem.js"></script>
 
-    <!-- Controle de navegação por abas -->
+    <!-- Controle de navegação por abas + inicialização -->
     <script>
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -83,8 +86,9 @@
                     window.renderizarSimulador();
                 }
 
-                if (tabId === 'simulador-rolagem' && typeof window.renderizarSimuladorRolagem === 'function') {
-                    window.renderizarSimuladorRolagem();
+                if (tabId === 'grafico-rolagem-container' && typeof window.graficoRolagem === 'object') {
+                    // Atualizar o gráfico de rolagem ao abrir
+                    window.graficoRolagem.atualizarGrafico(window.dadosSimulacaoRolagem);
                 }
             }
         }
@@ -97,6 +101,21 @@
         window.addEventListener('DOMContentLoaded', () => {
             const initialTab = window.location.hash.substring(1) || 'dashboard';
             showTab(initialTab);
+
+            // Inicializar o gráfico de rolagem
+            if (document.getElementById('grafico-rolagem')) {
+                window.graficoRolagem = new GraficoRolagem('grafico-rolagem');
+
+                // Dados de exemplo iniciais (depois substituímos pela simulação real)
+                window.dadosSimulacaoRolagem = {
+                    anos: ['2025', '2026', '2027', '2028', '2029', '2030'],
+                    saldoBase: [1000, 1100, 1210, 1331, 1464, 1610],
+                    saldoTroca: [1000, 1120, 1254, 1404, 1560, 1720],
+                    saldoCDI: [1000, 1080, 1166, 1259, 1359, 1466]
+                };
+
+                window.graficoRolagem.atualizarGrafico(window.dadosSimulacaoRolagem);
+            }
         });
     </script>
 </body>
