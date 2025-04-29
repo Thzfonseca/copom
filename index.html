@@ -1,47 +1,92 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard COPOM</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="lib/bootstrap.min.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COPOM Dashboard</title>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div id="loading-spinner" class="spinner-overlay">
-    <div class="spinner-border text-light" role="status">
-      <span class="visually-hidden">Carregando...</span>
+    <div class="app-container">
+        <!-- Menu lateral -->
+        <aside class="sidebar">
+            <h2>COPOM</h2>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
+                    <li><a href="#simulador">Simulador</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <main class="main-content">
+            <!-- DASHBOARD -->
+            <section id="dashboard" class="tab-content">
+                <h1>Dashboard Econômico</h1>
+                <p>Resumo de indicadores e informações relevantes.</p>
+
+                <!-- Gráfico Selic -->
+                <div class="grafico-selic-container mt-5">
+                    <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
+                    <canvas id="grafico-selic" height="100"></canvas>
+                </div>
+            </section>
+
+            <!-- MODELOS PREDITIVOS -->
+            <section id="modelos-preditivos" class="tab-content" style="display:none;">
+                <!-- Conteúdo renderizado dinamicamente -->
+            </section>
+
+            <!-- SIMULADOR -->
+            <section id="simulador" class="tab-content" style="display:none;">
+                <!-- Conteúdo renderizado dinamicamente -->
+            </section>
+        </main>
     </div>
-  </div>
 
-  <div class="dashboard-wrapper">
-    <nav class="sidebar">
-      <h2 class="sidebar-title">COPOM</h2>
-      <ul class="sidebar-menu">
-        <li><a href="#dashboard">Início</a></li>
-        <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
-        <li><a href="#simulador">Simulador</a></li>
-        <li><a href="#analise-atas">Análise de Atas</a></li>
-      </ul>
-    </nav>
+    <!-- Scripts principais -->
+    <script src="js/modelos_preditivos.js"></script>
+    <script src="js/modelos_preditivos_ui.js"></script>
+    <script src="js/simulador.js"></script>
+    <script src="js/grafico_selic.js"></script>
 
-    <main class="main-content">
-      <section id="dashboard" class="tab-content">Seja bem-vindo ao Dashboard do COPOM.</section>
-      <section id="modelos-preditivos" class="tab-content" style="display: none;"></section>
-      <section id="simulador" class="tab-content" style="display: none;"></section>
-      <section id="analise-atas" class="tab-content" style="display: none;"></section>
-    </main>
-  </div>
+    <!-- Controle de navegação por abas -->
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
 
-  <!-- Bibliotecas -->
-  <script src="lib/chart.min.js"></script>
-  <script src="lib/bootstrap.bundle.min.js"></script>
+            const selected = document.getElementById(tabId);
+            if (selected) {
+                selected.style.display = 'block';
 
-  <!-- Scripts do Projeto -->
-  <script src="js/modelos_preditivos.js"></script>
-  <script src="js/modelos_preditivos_ui.js"></script>
-  <script src="js/simulador.js"></script>
-  <script src="js/analise_atas_ui.js"></script>
-  <script src="js/script.js"></script>
+                if (tabId === 'modelos-preditivos' && typeof window.renderizarModelosPreditivos === 'function') {
+                    window.renderizarModelosPreditivos();
+                }
+
+                if (tabId === 'simulador' && typeof window.renderizarSimulador === 'function') {
+                    window.renderizarSimulador();
+                }
+            }
+        }
+
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.substring(1);
+            showTab(hash || 'dashboard');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const initialTab = window.location.hash.substring(1) || 'dashboard';
+            showTab(initialTab);
+        });
+    </script>
 </body>
 </html>
