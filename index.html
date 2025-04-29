@@ -1,81 +1,47 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard COPOM</title>
-
-  <!-- Estilos -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Bibliotecas externas -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="lib/bootstrap.min.css" />
 </head>
-
 <body>
-  <div class="app-container">
-    <!-- Menu Lateral -->
-    <aside class="sidebar">
-      <h1 class="sidebar-title">COPOM</h1>
-      <nav class="sidebar-nav">
-        <ul>
-          <li><a href="#dashboard" onclick="showTab('dashboard')">Dashboard</a></li>
-          <li><a href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos Preditivos</a></li>
-          <li><a href="#simulador" onclick="showTab('simulador')">Simulador</a></li>
-        </ul>
-      </nav>
-    </aside>
+  <div id="loading-spinner" class="spinner-overlay">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+  </div>
 
-    <!-- Conteúdo Principal -->
+  <div class="dashboard-wrapper">
+    <nav class="sidebar">
+      <h2 class="sidebar-title">COPOM</h2>
+      <ul class="sidebar-menu">
+        <li><a href="#dashboard">Início</a></li>
+        <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
+        <li><a href="#simulador">Simulador</a></li>
+        <li><a href="#analise-atas">Análise de Atas</a></li>
+      </ul>
+    </nav>
+
     <main class="main-content">
-      <section id="dashboard" class="tab-content">
-        <h2>Bem-vindo ao Dashboard COPOM</h2>
-        <p>Escolha uma opção no menu ao lado para começar.</p>
-      </section>
-
-      <section id="modelos-preditivos" class="tab-content" style="display: none;">
-        <!-- Aqui será carregado pelo modelos_preditivos_ui.js -->
-      </section>
-
-      <section id="simulador" class="tab-content" style="display: none;">
-        <!-- Aqui será carregado pelo simulador.js -->
-      </section>
+      <section id="dashboard" class="tab-content">Seja bem-vindo ao Dashboard do COPOM.</section>
+      <section id="modelos-preditivos" class="tab-content" style="display: none;"></section>
+      <section id="simulador" class="tab-content" style="display: none;"></section>
+      <section id="analise-atas" class="tab-content" style="display: none;"></section>
     </main>
   </div>
 
-  <!-- Scripts -->
+  <!-- Bibliotecas -->
+  <script src="lib/chart.min.js"></script>
+  <script src="lib/bootstrap.bundle.min.js"></script>
+
+  <!-- Scripts do Projeto -->
   <script src="js/modelos_preditivos.js"></script>
   <script src="js/modelos_preditivos_ui.js"></script>
   <script src="js/simulador.js"></script>
-
-  <script>
-    // Funções para controle de tabs
-    function showTab(tabId) {
-      const tabs = document.querySelectorAll('.tab-content');
-      tabs.forEach(tab => tab.style.display = 'none');
-      const tabSelecionada = document.getElementById(tabId);
-      if (tabSelecionada) {
-        tabSelecionada.style.display = 'block';
-
-        if (tabId === 'modelos-preditivos' && typeof window.renderizarModelosPreditivos === 'function') {
-          window.renderizarModelosPreditivos();
-        }
-
-        if (tabId === 'simulador' && typeof window.SimuladorCopom !== 'undefined') {
-          const container = document.getElementById('simulador');
-          const simulador = new SimuladorCopom();
-          if (simulador.inicializar()) {
-            simulador.renderizar(container);
-          }
-        }
-      }
-    }
-
-    // Quando carregar a página
-    document.addEventListener('DOMContentLoaded', function () {
-      const hash = window.location.hash.substring(1) || 'dashboard';
-      showTab(hash);
-    });
-  </script>
+  <script src="js/analise_atas_ui.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
