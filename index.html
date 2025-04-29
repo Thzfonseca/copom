@@ -1,100 +1,124 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COPOM Dashboard</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>COPOM Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <aside class="sidebar">
-            <h2>COPOM Dashboard</h2>
-            <nav>
-                <ul>
-                    <li><a href="#dashboard">Dashboard</a></li>
-                    <li><a href="#rolagem-ipca">Rolagem IPCA+</a></li>
-                </ul>
-            </nav>
-        </aside>
+  <div class="app-container">
+    <aside class="sidebar">
+      <h2>COPOM</h2>
+      <nav>
+        <ul>
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
+          <li><a href="#simulador">Simulador Econômico</a></li>
+          <li><a href="#rolagem-ipca">Rolagem IPCA+</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-        <main class="main-content">
-            <!-- DASHBOARD -->
-            <section id="dashboard" class="tab-content">
-                <h1>Dashboard Econômico</h1>
-                <p>Resumo de indicadores e informações relevantes.</p>
-                <div class="grafico-selic-container mt-5">
-                    <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
-                    <canvas id="grafico-selic" height="100"></canvas>
-                </div>
-            </section>
+    <main class="main-content">
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="tab-content">
+        <h1>Dashboard Econômico</h1>
+        <p>Resumo de indicadores econômicos.</p>
+        <div class="grafico-selic-container mt-5">
+          <h4>Evolução Histórica da Taxa Selic</h4>
+          <canvas id="grafico-selic" height="100"></canvas>
+        </div>
+      </section>
 
-            <!-- ROLAGEM IPCA+ -->
-            <section id="rolagem-ipca" class="tab-content" style="display:none;">
-                <div class="simulador-container">
-                    <h2>Simulador de Rolagem IPCA+</h2>
-                    <div class="form-grid">
-                        <div>
-                            <label>Taxa IPCA+ do título atual (%)</label>
-                            <input type="number" id="taxa-atual" value="5.5" />
-                        </div>
-                        <div>
-                            <label>Vencimento do título atual (ano)</label>
-                            <input type="number" id="vencimento-atual" value="2026" />
-                        </div>
-                        <div>
-                            <label>Taxa IPCA+ do novo título (%)</label>
-                            <input type="number" id="taxa-novo" value="6.0" />
-                        </div>
-                        <div>
-                            <label>Vencimento do novo título (ano)</label>
-                            <input type="number" id="vencimento-novo" value="2030" />
-                        </div>
-                        <div>
-                            <label>IPCA Médio ao Ano (%)</label>
-                            <input type="number" id="ipca-medio" value="3.8" />
-                        </div>
-                        <div>
-                            <label>CDI Médio ao Ano (%)</label>
-                            <input type="number" id="cdi-medio" value="9.0" />
-                        </div>
-                    </div>
-                    <div class="button-group">
-                        <button id="simular-btn">Simular Rolagem</button>
-                        <button id="resetar-btn" class="reset">Resetar</button>
-                    </div>
-                    <div class="grafico-container">
-                        <h3>Evolução da Rentabilidade</h3>
-                        <canvas id="grafico-rolagem"></canvas>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+      <!-- MODELOS PREDITIVOS -->
+      <section id="modelos-preditivos" class="tab-content" style="display:none;">
+        <h2>Modelos Preditivos</h2>
+        <div id="conteudo-modelos"></div>
+      </section>
 
-    <script src="js/grafico_selic.js"></script>
-    <script src="js/simulador_rolagem.js"></script>
-    <script>
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.style.display = 'none';
-            });
+      <!-- SIMULADOR ECONÔMICO -->
+      <section id="simulador" class="tab-content" style="display:none;">
+        <h2>Simulador Econômico</h2>
+        <div id="conteudo-simulador"></div>
+      </section>
 
-            const selected = document.getElementById(tabId);
-            if (selected) selected.style.display = 'block';
+      <!-- SIMULADOR ROLAGEM IPCA+ -->
+      <section id="rolagem-ipca" class="tab-content" style="display:none;">
+        <h2>Simulador de Rolagem IPCA+</h2>
+        <div class="form-grid">
+          <div>
+            <label>Taxa IPCA+ do título atual (%)</label>
+            <input type="number" id="taxa-atual" step="0.01" value="5.5" />
+          </div>
+          <div>
+            <label>Vencimento do título atual (ano)</label>
+            <input type="number" id="vencimento-atual" value="2026" />
+          </div>
+          <div>
+            <label>Taxa IPCA+ do novo título (%)</label>
+            <input type="number" id="taxa-nova" step="0.01" value="6.0" />
+          </div>
+          <div>
+            <label>Vencimento do novo título (ano)</label>
+            <input type="number" id="vencimento-nova" value="2030" />
+          </div>
+          <div>
+            <label>IPCA Médio (% a.a.)</label>
+            <input type="number" id="ipca-medio" step="0.1" value="3.8" />
+          </div>
+          <div>
+            <label>CDI Médio (% a.a.)</label>
+            <input type="number" id="cdi-medio" step="0.1" value="10.0" />
+          </div>
+        </div>
+        <div class="botoes-simulador">
+          <button id="simular-btn">Simular Rolagem</button>
+          <button id="resetar-btn">Resetar</button>
+        </div>
+        <div class="grafico-container">
+          <canvas id="grafico-rolagem"></canvas>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/modelos_preditivos.js"></script>
+  <script src="js/modelos_preditivos_ui.js"></script>
+  <script src="js/simulador.js"></script>
+  <script src="js/grafico_selic.js"></script>
+  <script src="js/simulador_rolagem.js"></script>
+
+  <!-- Controle de navegação entre abas -->
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+      });
+
+      const selected = document.getElementById(tabId);
+      if (selected) {
+        selected.style.display = 'block';
+        if (tabId === 'modelos-preditivos' && typeof window.renderizarModelosPreditivos === 'function') {
+          window.renderizarModelosPreditivos();
         }
+        if (tabId === 'simulador' && typeof window.renderizarSimulador === 'function') {
+          window.renderizarSimulador();
+        }
+      }
+    }
 
-        window.addEventListener('hashchange', () => {
-            const hash = window.location.hash.substring(1);
-            showTab(hash || 'dashboard');
-        });
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.substring(1);
+      showTab(hash || 'dashboard');
+    });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const initialTab = window.location.hash.substring(1) || 'dashboard';
-            showTab(initialTab);
-        });
-    </script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const initialTab = window.location.hash.substring(1) || 'dashboard';
+      showTab(initialTab);
+    });
+  </script>
 </body>
 </html>
