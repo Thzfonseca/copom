@@ -1,4 +1,4 @@
-/* === Reset básico === */
+/* === Reset e base === */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -6,7 +6,6 @@ body {
   color: #333;
 }
 
-/* === Estrutura geral === */
 .app-container {
   display: flex;
   height: 100vh;
@@ -44,7 +43,6 @@ body {
   text-decoration: underline;
 }
 
-/* === Conteúdo principal === */
 .main-content {
   flex-grow: 1;
   padding: 20px;
@@ -56,27 +54,33 @@ body {
   display: none;
 }
 
+.mt-3 {
+  margin-top: 1.5rem;
+}
+
 .mt-5 {
   margin-top: 3rem;
 }
 
-/* === Dashboard e gráfico === */
-.grafico-selic-container {
-  margin-top: 30px;
+/* === Gráficos e layout === */
+.grafico-selic-container,
+.chart-container {
   background: white;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
-/* === Grid Flexível === */
+canvas {
+  max-width: 100%;
+}
+
 .grid.grid-2 {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
 }
 
-/* === Boxes de input === */
 .box-opcao,
 .box-premissas {
   background-color: #f9f9f9;
@@ -111,7 +115,6 @@ select {
   box-sizing: border-box;
 }
 
-/* === Botões === */
 .botoes-container {
   display: flex;
   gap: 20px;
@@ -141,24 +144,11 @@ select {
   opacity: 0.9;
 }
 
-/* === Container da aba de rolagem === */
 .rolagem-container {
   background-color: #fff;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-
-/* === Gráfico === */
-.chart-container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.03);
-}
-
-canvas {
-  max-width: 100%;
 }
 
 /* === Responsivo === */
@@ -168,11 +158,6 @@ canvas {
   }
 
   .sidebar {
-    display: none; /* Pode ser substituído por menu móvel se quiser */
-  }
-
-  .main-content {
-    margin: 0;
-    padding: 15px;
+    display: none;
   }
 }
