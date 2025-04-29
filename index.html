@@ -86,6 +86,11 @@
         window.addEventListener('DOMContentLoaded', () => {
             const initialTab = window.location.hash.substring(1) || 'dashboard';
             showTab(initialTab);
+
+            // Carregar o gráfico da Selic no carregamento inicial
+            if (typeof window.renderizarGraficoSelic === 'function') {
+                window.renderizarGraficoSelic();
+            }
         });
     </script>
 </body>
