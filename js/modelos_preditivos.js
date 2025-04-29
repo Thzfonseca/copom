@@ -1,3 +1,5 @@
+// js/modelos_preditivos.js
+
 class ModelosPreditivos {
     constructor() {
         this.coeficientes = {
@@ -13,23 +15,6 @@ class ModelosPreditivos {
             hiato: -0.8
         };
 
-        this.historicoSelic = [
-            { data: 'jan/2023', taxa: 13.75 },
-            { data: 'mar/2023', taxa: 13.75 },
-            { data: 'mai/2023', taxa: 13.75 },
-            { data: 'jul/2023', taxa: 13.25 },
-            { data: 'set/2023', taxa: 12.75 },
-            { data: 'nov/2023', taxa: 12.25 },
-            { data: 'jan/2024', taxa: 11.75 },
-            { data: 'mar/2024', taxa: 11.50 },
-            { data: 'mai/2024', taxa: 11.25 },
-            { data: 'jul/2024', taxa: 11.00 },
-            { data: 'set/2024', taxa: 10.75 },
-            { data: 'nov/2024', taxa: 10.50 },
-            { data: 'jan/2025', taxa: 10.25 },
-            { data: 'mar/2025', taxa: 10.25 }
-        ];
-
         this.resultadoAtual = this.preverSelic(this.cenarioBase);
     }
 
@@ -41,35 +26,19 @@ class ModelosPreditivos {
             (hiato * (cenario.hiato ?? 0));
 
         let decisao = 'manutencao';
-        const ultimaTaxa = this.historicoSelic.at(-1).taxa;
+        const taxaAtual = 13.75;
 
-        if (selicPrevista > ultimaTaxa + 0.25) {
-            decisao = 'aumento25';
-        } else if (selicPrevista < ultimaTaxa - 0.25) {
-            decisao = 'reducao25';
-        }
+        if (selicPrevista > taxaAtual + 0.25) decisao = 'aumento25';
+        else if (selicPrevista < taxaAtual - 0.25) decisao = 'reducao25';
 
         return {
             taxaPrevista: selicPrevista,
-            decisaoPrevista: decisao,
-            dataReferencia: "19/03/2025",
-            proximaReuniao: {
-                previsaoConsolidada: decisao
-            }
+            previsaoConsolidada: decisao
         };
     }
 
     getResultados() {
         return this.resultadoAtual;
-    }
-
-    atualizarCenario(novoCenario) {
-        this.resultadoAtual = this.preverSelic(novoCenario);
-        return this.resultadoAtual;
-    }
-
-    getHistoricoSelic() {
-        return this.historicoSelic;
     }
 }
 
