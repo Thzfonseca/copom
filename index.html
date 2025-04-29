@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>COPOM Dashboard</title>
 
     <!-- Estilos -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 
-    <!-- Chart.js para os gráficos -->
+    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -20,7 +20,8 @@
                 <ul>
                     <li><a href="#dashboard">Dashboard</a></li>
                     <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
-                    <li><a href="#simulador">Simulador</a></li>
+                    <li><a href="#simulador">Simulador Econômico</a></li>
+                    <li><a href="#simulador-rolagem">Simulador de Rolagem</a></li>
                 </ul>
             </nav>
         </aside>
@@ -32,7 +33,6 @@
                 <h1>Dashboard Econômico</h1>
                 <p>Resumo de indicadores e informações relevantes.</p>
 
-                <!-- Gráfico histórico da Selic -->
                 <div class="grafico-selic-container mt-5">
                     <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
                     <canvas id="grafico-selic" height="100"></canvas>
@@ -41,38 +41,50 @@
 
             <!-- MODELOS PREDITIVOS -->
             <section id="modelos-preditivos" class="tab-content" style="display:none;">
-                <!-- Conteúdo dinâmico renderizado aqui -->
+                <!-- Conteúdo dinâmico -->
             </section>
 
-            <!-- SIMULADOR -->
+            <!-- SIMULADOR ECONÔMICO -->
             <section id="simulador" class="tab-content" style="display:none;">
-                <!-- Conteúdo dinâmico renderizado aqui -->
+                <!-- Conteúdo dinâmico -->
+            </section>
+
+            <!-- SIMULADOR DE ROLAGEM -->
+            <section id="simulador-rolagem" class="tab-content" style="display:none;">
+                <!-- Conteúdo dinâmico -->
             </section>
         </main>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scripts principais -->
     <script src="js/modelos_preditivos.js"></script>
     <script src="js/modelos_preditivos_ui.js"></script>
     <script src="js/simulador.js"></script>
     <script src="js/grafico_selic.js"></script>
+    <script src="js/simulador_rolagem.js"></script>
+    <script src="js/simulador_rolagem_ui.js"></script>
 
-    <!-- Controle de abas -->
+    <!-- Controle de navegação por abas -->
     <script>
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.style.display = 'none';
             });
 
-            const selectedTab = document.getElementById(tabId);
-            if (selectedTab) {
-                selectedTab.style.display = 'block';
+            const selected = document.getElementById(tabId);
+            if (selected) {
+                selected.style.display = 'block';
 
                 if (tabId === 'modelos-preditivos' && typeof window.renderizarModelosPreditivos === 'function') {
                     window.renderizarModelosPreditivos();
                 }
+
                 if (tabId === 'simulador' && typeof window.renderizarSimulador === 'function') {
                     window.renderizarSimulador();
+                }
+
+                if (tabId === 'simulador-rolagem' && typeof window.renderizarSimuladorRolagem === 'function') {
+                    window.renderizarSimuladorRolagem();
                 }
             }
         }
