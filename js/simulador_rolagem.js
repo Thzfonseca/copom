@@ -1,5 +1,3 @@
-// ✅ Simulador de Rolagem IPCA+ com reinvestimento em CDI e marcador visual + box de comparativo
-
 let resultadoFinalBox;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -77,6 +75,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <canvas id="grafico-rolagem-ipca" height="100"></canvas>
       </div>
 
+      <div class="chart-container mt-5">
+        <canvas id="grafico-anualizado-ipca" height="100"></canvas>
+      </div>
+
       <div id="resultado-final"></div>
     </div>
   `;
@@ -85,6 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
+
+  window.rolagemChart = null;
+  window.anualizadoChart = null;
 });
 
 function simularRolagem() {
@@ -95,7 +100,8 @@ function simularRolagem() {
   const curvaCurta = calcularCurva(curta, prazoFinal);
   const curvaLonga = calcularCurva(longa, prazoFinal);
 
-  desenharGrafico(curvaCurta, curvaLonga, curta.prazo, prazoFinal);
+  desenharGrafico(curvaCurta, curvaLonga, prazoFinal);
+  desenharGraficoAnualizado(curvaCurta, curvaLonga);
 
   const retornoCurtaFinal = curvaCurta[curvaCurta.length - 1].retorno;
   const retornoLongaFinal = curvaLonga[curvaLonga.length - 1].retorno;
@@ -124,7 +130,7 @@ function calcularCurva({ indexador, taxa, prazo, ipcaMedio, cdiMedio }, prazoFin
   let acumulado = 1;
 
   for (let t = 0.5; t <= prazoFinal; t += 0.5) {
-    let rentabilidade = t <= prazo
+    const rentabilidade = t <= prazo
       ? (indexador === "ipca"
           ? (1 + ipcaMedio / 100) * (1 + taxa / 100)
           : (1 + taxa / 100))
@@ -137,16 +143,12 @@ function calcularCurva({ indexador, taxa, prazo, ipcaMedio, cdiMedio }, prazoFin
   return pontos;
 }
 
-function desenharGrafico(curvaCurta, curvaLonga, prazoCurta, prazoFinal) {
+function desenharGrafico(curvaCurta, curvaLonga, prazoFinal) {
   const ctx = document.getElementById("grafico-rolagem-ipca").getContext("2d");
-  const labels = [];
+  const labels = curvaCurta.map(p => p.prazo + "a");
 
-  for (let t = 0.5; t <= prazoFinal; t += 0.5) {
-    labels.push(t.toFixed(1) + "a");
-  }
-
-  const dadosCurta = labels.map(l => curvaCurta.find(p => p.prazo + "a" === l)?.retorno || null);
-  const dadosLonga = labels.map(l => curvaLonga.find(p => p.prazo + "a" === l)?.retorno || null);
+  const dadosCurta = curvaCurta.map(p => parseFloat(p.retorno));
+  const dadosLonga = curvaLonga.map(p => parseFloat(p.retorno));
 
   if (window.rolagemChart) window.rolagemChart.destroy();
 
@@ -174,37 +176,79 @@ function desenharGrafico(curvaCurta, curvaLonga, prazoCurta, prazoFinal) {
     options: {
       responsive: true,
       plugins: {
-        legend: {
-          labels: { color: "#333" }
-        },
-        annotation: {
-          annotations: {
-            linhaReinvestimento: {
-              type: 'line',
-              xMin: prazoCurta + "a",
-              xMax: prazoCurta + "a",
-              borderColor: '#0077b6',
-              borderWidth: 2,
-              borderDash: [6, 6],
-              label: {
-                content: 'Início reinvestimento CDI',
-                enabled: true,
-                position: 'top',
-                backgroundColor: '#0077b6',
-                color: 'white',
-                font: {
-                  style: 'italic', weight: 'bold', size: 11
-                }
-              }
-            }
-          }
-        }
+        legend: { labels: { color: "#333" } }
       },
       scales: {
         y: {
           ticks: {
             color: "#333",
             callback: val => `${val.toFixed(0)}%`
+          }
+        },
+        x: {
+          ticks: { color: "#333" }
+        }
+      }
+    }
+  });
+}
+
+function desenharGraficoAnualizado(curvaCurta, curvaLonga) {
+  const ctx = document.getElementById("grafico-anualizado-ipca").getContext("2d");
+
+  const labels = curvaCurta.map(p => p.prazo + "a");
+
+  const dadosCurta = curvaCurta.map(p => {
+    const t = parseFloat(p.prazo);
+    const r = parseFloat(p.retorno) / 100;
+    return t > 0 ? (Math.pow(1 + r, 1 / t) - 1) * 100 : null;
+  });
+
+  const dadosLonga = curvaLonga.map(p => {
+    const t = parseFloat(p.prazo);
+    const r = parseFloat(p.retorno) / 100;
+    return t > 0 ? (Math.pow(1 + r, 1 / t) - 1) * 100 : null;
+  });
+
+  if (window.anualizadoChart) window.anualizadoChart.destroy();
+
+  window.anualizadoChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Curta + CDI (anualizado)",
+          data: dadosCurta,
+          borderColor: "#3a86ff",
+          borderWidth: 2,
+          fill: false
+        },
+        {
+          label: "Longa (anualizado)",
+          data: dadosLonga,
+          borderColor: "#ff006e",
+          borderWidth: 2,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: { color: "#333" }
+        }
+      },
+      scales: {
+        y: {
+          ticks: {
+            color: "#333",
+            callback: val => `${val.toFixed(2)}%`
+          },
+          title: {
+            display: true,
+            text: "Rentabilidade Anualizada (%)"
           }
         },
         x: {
