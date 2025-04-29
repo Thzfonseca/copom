@@ -1,61 +1,53 @@
 // js/grafico_rolagem.js
 
-class GraficoRolagem {
-    constructor(containerId) {
-        this.ctx = document.getElementById(containerId).getContext('2d');
-        this.chart = null;
-        this.inicializarGrafico();
-    }
+let graficoRolagem;
 
-    inicializarGrafico() {
-        this.chart = new Chart(this.ctx, {
-            type: 'line',
-            data: {
-                labels: [], // anos
-                datasets: [
-                    {
-                        label: 'Cenário Base',
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'transparent',
-                        data: []
-                    },
-                    {
-                        label: 'Cenário Troca',
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'transparent',
-                        data: []
-                    },
-                    {
-                        label: 'CDI',
-                        borderColor: '#10b981',
-                        backgroundColor: 'transparent',
-                        data: []
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: { color: '#e2e8f0' }
-                    }
-                },
-                scales: {
-                    x: { ticks: { color: '#e2e8f0' } },
-                    y: { ticks: { color: '#e2e8f0' } }
+function atualizarGraficoRolagem(resultados) {
+    const ctx = document.getElementById('grafico-rolagem')?.getContext('2d');
+    if (!ctx) return;
+
+    const data = {
+        labels: ['Resultado Atual', 'Resultado Novo', 'CDI Médio'],
+        datasets: [{
+            label: 'Comparação de Retornos (%)',
+            data: [
+                resultados.rendimentoAtual,
+                resultados.rendimentoNovo,
+                resultados.retornoCDI
+            ],
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
+        }]
+    };
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: context => `${context.parsed.y.toFixed(2)}%`
                 }
             }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { color: '#e2e8f0' }
+            },
+            x: {
+                ticks: { color: '#e2e8f0' }
+            }
+        }
+    };
+
+    if (graficoRolagem) {
+        graficoRolagem.data = data;
+        graficoRolagem.update();
+    } else {
+        graficoRolagem = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: options
         });
     }
-
-    atualizarGrafico(dados) {
-        this.chart.data.labels = dados.anos;
-        this.chart.data.datasets[0].data = dados.saldoBase;
-        this.chart.data.datasets[1].data = dados.saldoTroca;
-        this.chart.data.datasets[2].data = dados.saldoCDI;
-        this.chart.update();
-    }
 }
-
-// Disponibilizar globalmente
-window.GraficoRolagem = GraficoRolagem;

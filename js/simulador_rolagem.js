@@ -1,50 +1,65 @@
 // js/simulador_rolagem.js
 
-class SimuladorRolagemIPCA {
+class SimuladorRolagem {
     constructor() {
-        this.dados = {
-            dataCompra: '2022-01-01',
-            precoCompra: 2500.00,
-            precoAtual: 3200.00,
-            vencimento: '2030-01-01',
-            ipcaAcumulado: 10.0, // em percentual
-            taxaReinvestimento: 0.9 // % ao mês
-        };
+        this.prazoAtual = 5.0; // Exemplo: 5 anos
+        this.prazoNovo = 7.0; // Exemplo: 7 anos
+        this.ipcaAtual = 4.0; // IPCA médio (%)
+        this.cdiMedio = 10.5; // CDI médio (%)
+        this.ipcaNovo = 3.5; // IPCA médio novo título
+        this.cupomAtual = 5.5; // Cupom do título atual (%)
+        this.cupomNovo = 5.2; // Cupom do novo título (%)
     }
 
     calcularResultados() {
-        const { dataCompra, precoCompra, precoAtual, vencimento, ipcaAcumulado, taxaReinvestimento } = this.dados;
-
-        const hoje = new Date();
-        const vencimentoData = new Date(vencimento);
-        const anosAteVencimento = (vencimentoData - hoje) / (1000 * 60 * 60 * 24 * 365.25);
-
-        // Rentabilidade projetada até o vencimento se mantiver
-        const taxaAnual = (precoAtual / precoCompra - 1 + ipcaAcumulado / 100) / ((new Date() - new Date(dataCompra)) / (1000 * 60 * 60 * 24 * 365.25));
-        const taxaFinalManter = taxaAnual * anosAteVencimento;
-
-        // Se vender hoje e reinvestir
-        const taxaMensalReinv = taxaReinvestimento / 100;
-        const mesesReinv = anosAteVencimento * 12;
-        const valorReinvestido = precoAtual * Math.pow(1 + taxaMensalReinv, mesesReinv);
-        const taxaFinalVender = (valorReinvestido / precoCompra) - 1;
+        const rendimentoAtual = (this.ipcaAtual + this.cupomAtual) * (this.prazoAtual);
+        const rendimentoNovo = (this.ipcaNovo + this.cupomNovo) * (this.prazoNovo);
+        const retornoCDI = this.cdiMedio * this.prazoNovo;
 
         return {
-            manter: {
-                valorFinal: precoAtual * (1 + taxaFinalManter),
-                taxaFinal: (taxaFinalManter * 100).toFixed(2)
-            },
-            vender: {
-                valorFinal: valorReinvestido,
-                taxaFinal: (taxaFinalVender * 100).toFixed(2)
-            }
+            rendimentoAtual,
+            rendimentoNovo,
+            retornoCDI,
+            vantagemRolagem: rendimentoNovo > rendimentoAtual,
+            excessoSobreCDI: rendimentoNovo - retornoCDI
         };
-    }
-
-    atualizarDados(novosDados) {
-        this.dados = { ...this.dados, ...novosDados };
     }
 }
 
-// Disponibilizar globalmente
-window.simuladorRolagemIPCA = new SimuladorRolagemIPCA();
+window.simuladorRolagem = new SimuladorRolagem();
+
+// Função para atualizar inputs e gráfico
+function atualizarSimuladorRolagem() {
+    const get = id => parseFloat(document.getElementById(id)?.value || 0);
+
+    simuladorRolagem.prazoAtual = get('prazo-atual');
+    simuladorRolagem.prazoNovo = get('prazo-novo');
+    simuladorRolagem.ipcaAtual = get('ipca-atual');
+    simuladorRolagem.ipcaNovo = get('ipca-novo');
+    simuladorRolagem.cdiMedio = get('cdi-medio');
+    simuladorRolagem.cupomAtual = get('cupom-atual');
+    simuladorRolagem.cupomNovo = get('cupom-novo');
+
+    const resultados = simuladorRolagem.calcularResultados();
+    atualizarGraficoRolagem(resultados);
+
+    const info = document.getElementById('info-rolagem');
+    if (info) {
+        info.innerHTML = `
+            <p><strong>Resultado Atual:</strong> ${resultados.rendimentoAtual.toFixed(2)}%</p>
+            <p><strong>Resultado Novo:</strong> ${resultados.rendimentoNovo.toFixed(2)}%</p>
+            <p><strong>Excesso sobre CDI:</strong> ${resultados.excessoSobreCDI.toFixed(2)}%</p>
+            <p><strong>Vale a rolagem?</strong> ${resultados.vantagemRolagem ? 'Sim' : 'Não'}</p>
+        `;
+    }
+}
+
+// Inicializar no carregamento da página
+document.addEventListener('DOMContentLoaded', () => {
+    atualizarSimuladorRolagem();
+
+    const inputs = document.querySelectorAll('.input-simulador-rolagem');
+    inputs.forEach(input => {
+        input.addEventListener('input', atualizarSimuladorRolagem);
+    });
+});
