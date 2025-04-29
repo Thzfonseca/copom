@@ -1,160 +1,133 @@
-/* Reset básico */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* Estilos gerais */
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #1a202c;
-    color: #e2e8f0;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0f172a;
+  color: #e2e8f0;
 }
 
-/* Layout geral */
 .app-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  height: 100vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 250px;
-    background-color: #2d3748;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  width: 220px;
+  background-color: #1e293b;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar h2 {
-    color: #f8f9fa;
-    font-size: 1.5em;
-    margin-bottom: 10px;
+  margin-bottom: 20px;
+  color: #38bdf8;
+  font-size: 24px;
 }
 
 .sidebar nav ul {
-    list-style: none;
+  list-style: none;
+  padding: 0;
 }
 
 .sidebar nav ul li {
-    margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .sidebar nav ul li a {
-    color: #e2e8f0;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 8px;
-    display: block;
-    border-radius: 4px;
-    transition: background 0.2s;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
 }
 
 .sidebar nav ul li a:hover {
-    background-color: #4a5568;
+  color: #38bdf8;
 }
 
-/* Conteúdo principal */
+/* Main content */
 .main-content {
-    flex: 1;
-    padding: 30px;
-    overflow-y: auto;
-    background-color: #1a202c;
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
 }
 
-h1, h2, h3, h4 {
-    color: #f8f9fa;
-    margin-bottom: 15px;
+.tab-content {
+  animation: fadeIn 0.5s ease;
 }
 
-p {
-    color: #cbd5e0;
-    margin-bottom: 10px;
-}
-
-.mt-5 {
-    margin-top: 2rem;
-}
-
-/* Cards */
-.card {
-    background-color: #2d3748;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Botões */
-.button {
-    padding: 10px 20px;
-    background-color: #3182ce;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.button:hover {
-    background-color: #2b6cb0;
-}
-
-/* Grids */
-.grid {
-    display: grid;
-    gap: 30px;
-}
-
-.grid-2 {
-    grid-template-columns: 1fr 1fr;
-}
-
-@media (max-width: 768px) {
-    .grid-2 {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Gráfico Selic */
+/* Dashboard */
 .grafico-selic-container {
-    background-color: #2d3748;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
+  margin-top: 30px;
+  background-color: #1e293b;
+  border-radius: 8px;
+  padding: 20px;
 }
 
-/* Chart.js cores */
-canvas {
-    background-color: #1a202c;
-    border-radius: 8px;
+.grafico-selic-container h4 {
+  margin-bottom: 15px;
+  color: #38bdf8;
 }
 
 /* Simulador */
+.simulador-container {
+  background-color: #1e293b;
+  border-radius: 8px;
+  padding: 20px;
+}
+
 .simulador-container h2 {
-    margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.simulador-container label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 0.9em;
+.grid {
+  display: grid;
+  gap: 20px;
 }
 
-.simulador-container input[type="range"] {
-    width: 100%;
-    margin-bottom: 10px;
+.grid-2 {
+  grid-template-columns: 1fr 1fr;
 }
 
-.simulador-container .chart-container {
-    margin-top: 20px;
+.card {
+  background-color: #334155;
+  border-radius: 8px;
+  padding: 20px;
 }
 
-#resultado-texto {
-    margin: 10px 0;
-    font-weight: bold;
+.button {
+  display: inline-block;
+  background-color: #38bdf8;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #0ea5e9;
+}
+
+/* Chart.js tweaks */
+.chart-container {
+  margin-top: 20px;
+}
+
+/* Animação de entrada */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
