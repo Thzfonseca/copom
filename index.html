@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>COPOM Dashboard</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js e Plugin de Anotação -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -39,43 +42,7 @@
       <section id="simulador" class="tab-content" style="display: none;"></section>
 
       <!-- ROLAGEM IPCA+ -->
-      <section id="rolagem-ipca" class="tab-content" style="display: none;">
-        <h1>Simulação de Rolagem IPCA+</h1>
-        <div class="box-container">
-          <div class="input-box">
-            <h4>Opção Curta</h4>
-            <label>Indexador:
-              <select id="indexadorCurto">
-                <option>IPCA</option>
-                <option>Pré</option>
-              </select>
-            </label>
-            <label>Taxa (%): <input type="number" id="taxaCurta" step="0.01"></label>
-            <label>Prazo (anos): <input type="number" id="prazoCurta" step="0.5" min="0.5"></label>
-          </div>
-
-          <div class="input-box">
-            <h4>Opção Longa</h4>
-            <label>Indexador:
-              <select id="indexadorLongo">
-                <option>IPCA</option>
-                <option>Pré</option>
-              </select>
-            </label>
-            <label>Taxa (%): <input type="number" id="taxaLonga" step="0.01"></label>
-            <label>Prazo (anos): <input type="number" id="prazoLonga" step="0.5" min="0.5"></label>
-          </div>
-
-          <div class="input-box">
-            <h4>Premissas</h4>
-            <label>IPCA médio (% a.a.): <input type="number" id="ipcaPremissa" value="4.0" step="0.1"></label>
-            <label>CDI médio (% a.a.): <input type="number" id="cdiPremissa" value="10.0" step="0.1"></label>
-          </div>
-        </div>
-
-        <button onclick="simularRolagem()">Simular</button>
-        <canvas id="graficoRolagem" height="120"></canvas>
-      </section>
+      <section id="rolagem-ipca" class="tab-content" style="display: none;"></section>
     </main>
   </div>
 
