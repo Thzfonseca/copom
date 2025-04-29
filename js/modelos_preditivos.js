@@ -1,5 +1,3 @@
-// js/modelos_preditivos.js
-
 class ModelosPreditivos {
     constructor() {
         this.coeficientes = {
@@ -15,10 +13,21 @@ class ModelosPreditivos {
             hiato: -0.8
         };
 
-        this.historicoDecisoes = [
-            { reuniao: '269ª', data: '18-19/03/2025', taxa: 14.25, decisao: 'Aumento de 25 pontos-base' },
-            { reuniao: '268ª', data: '29-30/01/2025', taxa: 14.00, decisao: 'Aumento de 25 pontos-base' },
-            { reuniao: '267ª', data: '11-12/12/2024', taxa: 13.75, decisao: 'Aumento de 25 pontos-base' }
+        this.historicoSelic = [
+            { data: 'jan/2023', taxa: 13.75 },
+            { data: 'mar/2023', taxa: 13.75 },
+            { data: 'mai/2023', taxa: 13.75 },
+            { data: 'jul/2023', taxa: 13.25 },
+            { data: 'set/2023', taxa: 12.75 },
+            { data: 'nov/2023', taxa: 12.25 },
+            { data: 'jan/2024', taxa: 11.75 },
+            { data: 'mar/2024', taxa: 11.50 },
+            { data: 'mai/2024', taxa: 11.25 },
+            { data: 'jul/2024', taxa: 11.00 },
+            { data: 'set/2024', taxa: 10.75 },
+            { data: 'nov/2024', taxa: 10.50 },
+            { data: 'jan/2025', taxa: 10.25 },
+            { data: 'mar/2025', taxa: 10.25 }
         ];
 
         this.resultadoAtual = this.preverSelic(this.cenarioBase);
@@ -26,14 +35,13 @@ class ModelosPreditivos {
 
     preverSelic(cenario) {
         const { intercepto, ipca, cambio, hiato } = this.coeficientes;
-
         const selicPrevista = intercepto +
             (ipca * (cenario.ipca ?? 0)) +
             (cambio * (cenario.cambio ?? 0)) +
             (hiato * (cenario.hiato ?? 0));
 
-        const ultimaTaxa = this.historicoDecisoes[0].taxa;
         let decisao = 'manutencao';
+        const ultimaTaxa = this.historicoSelic.at(-1).taxa;
 
         if (selicPrevista > ultimaTaxa + 0.25) {
             decisao = 'aumento25';
@@ -45,7 +53,9 @@ class ModelosPreditivos {
             taxaPrevista: selicPrevista,
             decisaoPrevista: decisao,
             dataReferencia: "19/03/2025",
-            historicoDecisoes: this.historicoDecisoes
+            proximaReuniao: {
+                previsaoConsolidada: decisao
+            }
         };
     }
 
@@ -57,9 +67,10 @@ class ModelosPreditivos {
         this.resultadoAtual = this.preverSelic(novoCenario);
         return this.resultadoAtual;
     }
+
+    getHistoricoSelic() {
+        return this.historicoSelic;
+    }
 }
 
-// Exportar para a janela global
-if (typeof window !== 'undefined') {
-    window.modelosPreditivos = new ModelosPreditivos();
-}
+window.modelosPreditivos = new ModelosPreditivos();
