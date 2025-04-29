@@ -4,39 +4,39 @@ class SimuladorCopom {
     constructor() {
         this.cenarioBase = {
             ipca: 4.25,
-            cambio: 5.20,
             hiato: -0.8,
+            cambio: 5.20,
             jurosEUA: 5.50
         };
 
         this.cenarioAtual = { ...this.cenarioBase };
+        this.resultadoBase = null;
+        this.resultadoAtual = null;
         this.chart = null;
     }
 
     inicializar() {
-        return !!window.modelosPreditivos;
+        if (!window.modelosPreditivos) return false;
+        this.resultadoBase = window.modelosPreditivos.getResultados();
+        this.resultadoAtual = { ...this.resultadoBase };
+        return true;
     }
 
     renderizar(container) {
         if (!container) return;
 
         container.innerHTML = `
-            <div class="simulador-container">
+            <div class="card">
                 <h2>Simulador de Cenários</h2>
-                <div class="grid grid-2">
-                    <div class="card">
-                        <h3>Variáveis Econômicas</h3>
-                        ${this.renderizarSliders()}
-                        <button class="button" id="simular-btn">Simular</button>
-                        <button class="button" id="resetar-btn" style="background-color: #64748b;">Resetar</button>
-                    </div>
-                    <div class="card">
-                        <h3>Resultado</h3>
-                        <p id="resultado-texto">Simule um cenário para ver o resultado.</p>
-                        <div class="chart-container">
-                            <canvas id="resultado-chart"></canvas>
-                        </div>
-                    </div>
+                <div class="form-grid">
+                    ${this.renderizarSliders()}
+                </div>
+                <div class="botoes-simulador">
+                    <button id="simular-btn">Simular</button>
+                    <button id="resetar-btn" style="background-color:#64748b;">Resetar</button>
+                </div>
+                <div class="grafico-container">
+                    <canvas id="grafico-simulador" height="200"></canvas>
                 </div>
             </div>
         `;
@@ -48,9 +48,9 @@ class SimuladorCopom {
 
     renderizarSliders() {
         return Object.entries(this.cenarioBase).map(([key, value]) => `
-            <div style="margin-bottom: 15px;">
+            <div>
                 <label>${this.labelVariavel(key)}: <span id="valor-${key}">${value}</span></label>
-                <input type="range" id="slider-${key}" min="0" max="10" step="0.1" value="${value}" />
+                <input type="range" id="slider-${key}" min="0" max="10" step="0.1" value="${value}">
             </div>
         `).join('');
     }
@@ -58,8 +58,8 @@ class SimuladorCopom {
     labelVariavel(key) {
         const labels = {
             ipca: "Inflação IPCA",
-            cambio: "Câmbio (USD/BRL)",
             hiato: "Hiato do Produto",
+            cambio: "Câmbio (USD/BRL)",
             jurosEUA: "Juros EUA"
         };
         return labels[key] || key;
@@ -74,32 +74,41 @@ class SimuladorCopom {
             }
         });
 
+        this.resultadoAtual = this.calcularResultadoSimulado();
         this.atualizarGrafico();
-        this.atualizarTexto();
+    }
+
+    calcularResultadoSimulado() {
+        const tendencia = (
+            this.cenarioAtual.ipca * 0.5 +
+            this.cenarioAtual.cambio * 0.3 -
+            this.cenarioAtual.hiato * 0.4 +
+            this.cenarioAtual.jurosEUA * 0.2
+        );
+        return {
+            tendencia
+        };
     }
 
     renderizarGrafico() {
-        const ctx = document.getElementById('resultado-chart').getContext('2d');
+        const ctx = document.getElementById('grafico-simulador').getContext('2d');
         this.chart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['IPCA', 'Câmbio', 'Hiato', 'Juros EUA'],
+                labels: ['Inflação', 'Hiato', 'Câmbio', 'Juros EUA'],
                 datasets: [
                     {
-                        label: 'Cenário Base',
-                        backgroundColor: '#3b82f6',
-                        data: Object.values(this.cenarioBase)
-                    },
-                    {
-                        label: 'Cenário Atual',
-                        backgroundColor: '#f59e0b',
+                        label: 'Cenário Simulado',
+                        backgroundColor: '#3182ce',
                         data: Object.values(this.cenarioAtual)
                     }
                 ]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { labels: { color: '#e2e8f0' } } },
+                plugins: {
+                    legend: { labels: { color: '#e2e8f0' } }
+                },
                 scales: {
                     x: { ticks: { color: '#e2e8f0' } },
                     y: { ticks: { color: '#e2e8f0' } }
@@ -110,20 +119,9 @@ class SimuladorCopom {
 
     atualizarGrafico() {
         if (this.chart) {
-            this.chart.data.datasets[1].data = Object.values(this.cenarioAtual);
+            this.chart.data.datasets[0].data = Object.values(this.cenarioAtual);
             this.chart.update();
         }
-    }
-
-    atualizarTexto() {
-        const tendencia = this.cenarioAtual.ipca + this.cenarioAtual.cambio - this.cenarioAtual.hiato;
-        const texto = tendencia > 10
-            ? "Cenário indica aumento da Selic."
-            : tendencia < 5
-            ? "Cenário indica redução da Selic."
-            : "Cenário sugere manutenção da Selic.";
-
-        document.getElementById('resultado-texto').innerText = texto;
     }
 
     resetar() {

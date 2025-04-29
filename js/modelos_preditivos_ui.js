@@ -1,25 +1,29 @@
 // js/modelos_preditivos_ui.js
 
 (function () {
-    function renderizarModelosPreditivos() {
+    function renderizarModelosPreditivos(resultados) {
         const container = document.getElementById('modelos-preditivos');
-        if (!container) {
-            console.error('[COPOM Dashboard] Container modelos-preditivos não encontrado.');
+        if (!container) return;
+
+        if (!resultados || !resultados.proximaReuniao) {
+            container.innerHTML = `<div class="alert alert-warning mt-4">Resultados indisponíveis.</div>`;
             return;
         }
 
-        const resultados = window.modelosPreditivos.getResultados();
-        const previsao = resultados?.previsaoConsolidada || 'indefinido';
-        const taxa = resultados?.taxaPrevista?.toFixed(2) || '-';
+        const previsao = resultados.proximaReuniao.previsaoConsolidada;
+        const taxaPrevista = resultados.taxaPrevista?.toFixed(2) || '-';
 
         container.innerHTML = `
-            <div class="modelos-preditivos-container">
+            <div class="card">
                 <h2>Modelos Preditivos</h2>
                 <p><strong>Previsão Consolidada:</strong> ${previsao}</p>
-                <p><strong>Taxa Selic Prevista:</strong> ${taxa}%</p>
+                <p><strong>Taxa Selic Prevista:</strong> ${taxaPrevista}%</p>
             </div>
         `;
     }
 
-    window.renderizarModelosPreditivos = renderizarModelosPreditivos;
+    window.renderizarModelosPreditivos = function () {
+        const resultados = window.modelosPreditivos.getResultados();
+        renderizarModelosPreditivos(resultados);
+    };
 })();
