@@ -1,56 +1,81 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COPOM Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard COPOM</title>
 
-    <!-- Estilos -->
-    <link rel="stylesheet" href="style.css">
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style.css">
 
-    <!-- Chart.js -->
-    <script src="lib/chart.min.js"></script>
+  <!-- Bibliotecas externas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <div class="dashboard">
-        <aside class="sidebar">
-            <h1>COPOM Dashboard</h1>
-            <nav class="nav">
-                <ul>
-                    <li><a href="#dashboard" onclick="showTab('dashboard')">Início</a></li>
-                    <li><a href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos Preditivos</a></li>
-                    <li><a href="#simulador" onclick="showTab('simulador')">Simulador</a></li>
-                </ul>
-            </nav>
-        </aside>
+  <div class="app-container">
+    <!-- Menu Lateral -->
+    <aside class="sidebar">
+      <h1 class="sidebar-title">COPOM</h1>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#dashboard" onclick="showTab('dashboard')">Dashboard</a></li>
+          <li><a href="#modelos-preditivos" onclick="showTab('modelos-preditivos')">Modelos Preditivos</a></li>
+          <li><a href="#simulador" onclick="showTab('simulador')">Simulador</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-        <main class="content">
-            <!-- Spinner Loading -->
-            <div id="loading-spinner" class="spinner-overlay">
-                <div class="spinner"></div>
-            </div>
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      <section id="dashboard" class="tab-content">
+        <h2>Bem-vindo ao Dashboard COPOM</h2>
+        <p>Escolha uma opção no menu ao lado para começar.</p>
+      </section>
 
-            <!-- Tabs -->
-            <div id="dashboard" class="tab-content">
-                <h2>Bem-vindo ao Dashboard do COPOM</h2>
-                <p>Utilize o menu ao lado para navegar entre os modelos preditivos e o simulador de cenários.</p>
-            </div>
+      <section id="modelos-preditivos" class="tab-content" style="display: none;">
+        <!-- Aqui será carregado pelo modelos_preditivos_ui.js -->
+      </section>
 
-            <div id="modelos-preditivos" class="tab-content" style="display: none;">
-                <!-- Conteúdo dos modelos preditivos será carregado via JS -->
-            </div>
+      <section id="simulador" class="tab-content" style="display: none;">
+        <!-- Aqui será carregado pelo simulador.js -->
+      </section>
+    </main>
+  </div>
 
-            <div id="simulador" class="tab-content" style="display: none;">
-                <!-- Conteúdo do simulador será carregado via JS -->
-            </div>
-        </main>
-    </div>
+  <!-- Scripts -->
+  <script src="js/modelos_preditivos.js"></script>
+  <script src="js/modelos_preditivos_ui.js"></script>
+  <script src="js/simulador.js"></script>
 
-    <!-- Scripts -->
-    <script src="js/script.js"></script>
-    <script src="js/modelos_preditivos.js"></script>
-    <script src="js/modelos_preditivos_ui.js"></script>
-    <script src="js/simulador.js"></script>
+  <script>
+    // Funções para controle de tabs
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.style.display = 'none');
+      const tabSelecionada = document.getElementById(tabId);
+      if (tabSelecionada) {
+        tabSelecionada.style.display = 'block';
 
+        if (tabId === 'modelos-preditivos' && typeof window.renderizarModelosPreditivos === 'function') {
+          window.renderizarModelosPreditivos();
+        }
+
+        if (tabId === 'simulador' && typeof window.SimuladorCopom !== 'undefined') {
+          const container = document.getElementById('simulador');
+          const simulador = new SimuladorCopom();
+          if (simulador.inicializar()) {
+            simulador.renderizar(container);
+          }
+        }
+      }
+    }
+
+    // Quando carregar a página
+    document.addEventListener('DOMContentLoaded', function () {
+      const hash = window.location.hash.substring(1) || 'dashboard';
+      showTab(hash);
+    });
+  </script>
 </body>
 </html>
