@@ -152,13 +152,12 @@ function gerarTabelaPremissas(prazoFinal) {
 function getPremissasPorAno(prazoFinal) {
   const cdi = [], ipca = [];
   for (let ano = 1; ano <= prazoFinal; ano++) {
-    cdi.push(parseFloat(document.getElementById(`cdi-ano-${ano}`).value));
-    ipca.push(parseFloat(document.getElementById(`ipca-ano-${ano}`).value));
+    cdi.push(parseFloat(document.getElementById(`cdi-ano-${ano}`)?.value || "10"));
+    ipca.push(parseFloat(document.getElementById(`ipca-ano-${ano}`)?.value || "4"));
   }
   return { cdi, ipca };
 }
 
-// Função que lê a planilha horizontal do Itaú
 function handleExcelUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -171,20 +170,30 @@ function handleExcelUpload(event) {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    // Procurar linha IPCA e CDI
     const linhaIpca = json.find(row => row[2] && row[2].toString().toUpperCase().includes("IPCA"));
     const linhaCdi  = json.find(row => row[2] && row[2].toString().toUpperCase().includes("CDI"));
-
-    const anos = json[1]; // Supondo que os anos estão na linha 1 (índices 3 em diante)
+    const anos = json[1]; // Cabeçalhos horizontais
 
     const premissas = {};
     for (let col = 3; col < anos.length; col++) {
       const ano = parseInt(anos[col]);
-      if (!ano || isNaN(ano)) continue;
-      const ipca = parseFloat(linhaIpca[col]) * 100;
-      const cdi  = parseFloat(linhaCdi[col])  * 100;
-      if (!isNaN(ipca) && !isNaN(cdi)) {
-        premissas[ano] = { ipca, cdi };
+      if (ano && ano >= 2024) {
+        const ipca = parseFloat(linhaIpca[col]) * 100;
+        const cdi  = parseFloat(linhaCdi[col]) * 100;
+        if (!isNaN(ipca) && !isNaN(cdi)) {
+          premissas[ano] = { ipca, cdi };
+        }
+      }
+    }
+
+    const prazoLongo = parseFloat(document.getElementById("longa-prazo").value);
+    const anoAtual = new Date().getFullYear();
+    const ultimoAno = anoAtual + Math.ceil(prazoLongo);
+
+    const fallback = premissas[2028];
+    for (let ano = 2029; ano <= ultimoAno; ano++) {
+      if (!premissas[ano]) {
+        premissas[ano] = { ...fallback };
       }
     }
 
@@ -211,7 +220,6 @@ function preencherTabelaComPremissas(premissas) {
   });
 }
 
-// Versão simplificada da curva
 function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
   const pontos = [];
   let acumulado = 1;
