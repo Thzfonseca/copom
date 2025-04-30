@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,12 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>COPOM Dashboard</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- SheetJS para leitura de Excel -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -31,9 +28,21 @@
       <section id="dashboard" class="tab-content">
         <h1>Dashboard Econômico</h1>
         <p>Resumo de indicadores e informações relevantes.</p>
+
         <div class="grafico-selic-container mt-5">
           <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
           <canvas id="grafico-selic" height="100"></canvas>
+        </div>
+
+        <div class="tabela-macro-container mt-5">
+          <h4>Projeções Macroeconômicas (Fonte: Itaú BBA)</h4>
+          <input type="file" id="input-excel-dashboard" accept=".xlsx,.xls" />
+          <div class="tabela-scroll">
+            <table id="tabela-macro-itau">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -54,8 +63,8 @@
   <script src="js/simulador.js"></script>
   <script src="js/grafico_selic.js"></script>
   <script src="js/simulador_rolagem.js"></script>
+  <script src="js/dashboard_macro.js"></script>
 
-  <!-- Navegação por hash -->
   <script>
     function showTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(tab => {
@@ -65,14 +74,6 @@
       const selected = document.getElementById(tabId);
       if (selected) {
         selected.style.display = 'block';
-
-        if (tabId === 'modelos-preditivos' && typeof window.renderizarModelosPreditivos === 'function') {
-          window.renderizarModelosPreditivos();
-        }
-
-        if (tabId === 'simulador' && typeof window.renderizarSimulador === 'function') {
-          window.renderizarSimulador();
-        }
       }
     }
 

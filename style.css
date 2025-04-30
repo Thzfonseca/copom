@@ -209,3 +209,43 @@ canvas {
     padding: 15px;
   }
 }
+/* === Tabela Macroeconômica - Dashboard === */
+.tabela-macro-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  margin-top: 40px;
+}
+
+.tabela-scroll {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+#tabela-macro-itau {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-top: 10px;
+}
+
+#tabela-macro-itau th,
+#tabela-macro-itau td {
+  border: 1px solid #dee2e6;
+  padding: 8px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#tabela-macro-itau th {
+  background-color: #e9ecef;
+  color: #212529;
+  font-weight: bold;
+}
+
+#tabela-macro-itau td:first-child,
+#tabela-macro-itau th:first-child {
+  text-align: left;
+  font-weight: 600;
+}
