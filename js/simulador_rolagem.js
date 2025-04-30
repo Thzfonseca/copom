@@ -86,19 +86,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
-
-  const prazoInicial = parseFloat(document.getElementById("longa-prazo").value);
-  gerarTabelaPremissas(prazoInicial);
-
   document.getElementById("longa-prazo").addEventListener("change", () => {
     const prazo = parseFloat(document.getElementById("longa-prazo").value);
     gerarTabelaPremissas(prazo);
   });
-
   document.getElementById("input-excel-itau").addEventListener("change", handleExcelUpload);
-
-  window.rolagemChart = null;
-  window.anualizadoChart = null;
+  gerarTabelaPremissas(parseFloat(document.getElementById("longa-prazo").value));
 });
 
 function handleExcelUpload(event) {
@@ -114,8 +107,13 @@ function handleExcelUpload(event) {
 
     const linhaIpca = json.find(row => row[2] && row[2].toString().toUpperCase().includes("IPCA"));
     const linhaCdi  = json.find(row => row[2] && row[2].toString().toUpperCase().includes("CDI"));
-    const anos = json[1];
 
+    if (!linhaIpca || !linhaCdi) {
+      alert("Erro: Não foi possível localizar as linhas de IPCA e CDI na planilha.");
+      return;
+    }
+
+    const anos = json[1];
     const premissas = {};
     for (let col = 3; col < anos.length; col++) {
       const ano = parseInt(anos[col]);
@@ -141,7 +139,6 @@ function handleExcelUpload(event) {
 
     preencherTabelaComPremissas(premissas);
   };
-
   reader.readAsArrayBuffer(file);
 }
 
@@ -180,8 +177,7 @@ function simularRolagem() {
   const longa = getDados("longa");
   const prazoFinal = Math.max(curta.prazo, longa.prazo);
 
-  const premissas = window.premissasFinalArray || getPremissasPorAno(prazoFinal);
-
+  const premissas = window.premissasFinalArray;
   const curvaCurta = calcularCurva(curta, premissas, prazoFinal);
   const curvaLonga = calcularCurva(longa, premissas, prazoFinal);
 
@@ -200,23 +196,14 @@ function simularRolagem() {
   `;
 }
 
-function getPremissasPorAno(prazoFinal) {
-  const cdi = [], ipca = [];
-  for (let ano = 1; ano <= prazoFinal; ano++) {
-    cdi.push(parseFloat(document.getElementById(`cdi-ano-${ano + 2024}`)?.value || "10"));
-    ipca.push(parseFloat(document.getElementById(`ipca-ano-${ano + 2024}`)?.value || "4"));
-  }
-  return { cdi, ipca };
-}
-
 function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
   const pontos = [];
   let acumulado = 1;
 
   for (let t = 0.5; t <= prazoFinal; t += 0.5) {
     const anoIndex = Math.ceil(t) - 1;
-    const ipca = premissas.ipca[anoIndex] / 100 || 0.04;
-    const cdi  = premissas.cdi[anoIndex] / 100 || 0.10;
+    const ipca = (premissas.ipca[anoIndex] || 4) / 100;
+    const cdi = (premissas.cdi[anoIndex] || 10) / 100;
 
     let rentabilidade;
     if (t <= prazo) {
@@ -242,8 +229,8 @@ function desenharGrafico(curta, longa, prazoFinal) {
     labels.push(`${t.toFixed(1)}a`);
   }
 
-  const dadosCurta = labels.map((l, i) => parseFloat(curta[i]?.retorno || null));
-  const dadosLonga = labels.map((l, i) => parseFloat(longa[i]?.retorno || null));
+  const dadosCurta = labels.map((_, i) => parseFloat(curta[i]?.retorno || null));
+  const dadosLonga = labels.map((_, i) => parseFloat(longa[i]?.retorno || null));
 
   if (window.rolagemChart) window.rolagemChart.destroy();
 
@@ -273,20 +260,16 @@ function desenharGrafico(curta, longa, prazoFinal) {
       scales: {
         y: {
           ticks: {
-            callback: (val) => `${val.toFixed(0)}%`,
+            callback: val => `${val.toFixed(0)}%`,
             color: "#2d3748"
           }
         },
         x: {
-          ticks: {
-            color: "#2d3748"
-          }
+          ticks: { color: "#2d3748" }
         }
       },
       plugins: {
-        legend: {
-          labels: { color: "#2d3748" }
-        }
+        legend: { labels: { color: "#2d3748" } }
       }
     }
   });
@@ -336,7 +319,7 @@ function desenharGraficoAnualizado(curta, longa) {
       scales: {
         y: {
           ticks: {
-            callback: (val) => `${val.toFixed(1)}%`,
+            callback: val => `${val.toFixed(1)}%`,
             color: "#2d3748"
           }
         },
@@ -345,9 +328,7 @@ function desenharGraficoAnualizado(curta, longa) {
         }
       },
       plugins: {
-        legend: {
-          labels: { color: "#2d3748" }
-        }
+        legend: { labels: { color: "#2d3748" } }
       }
     }
   });
