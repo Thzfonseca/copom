@@ -25,11 +25,16 @@
       <section id="rolagem-ipca" class="tab-content">
         <!-- Conteúdo será injetado via JS -->
       </section>
-    </main>
+    
+        <div><button onclick="copiarRelatorioErros()" style="float:right;background:#f88;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;">Copiar Logs</button></div><div id="relatorio-erros" style="position:fixed;bottom:10px;left:240px;right:10px;
+        background:#fee;border:1px solid #f88;padding:10px;border-radius:8px;
+        font-family:monospace;font-size:0.9rem;color:#900;max-height:150px;
+        overflow:auto;display:none;z-index:1000;"></div>
+</main>
   </div>
 
   <!-- Scripts -->
-  <script src="js/simulador_rolagem.js"></script>
+  <script src="simulador_rolagem.js"></script>
 
   <script>
     function showTab(tabId) {
