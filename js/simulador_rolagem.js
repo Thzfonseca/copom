@@ -162,6 +162,8 @@ function handleExcelUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  alert("📥 Arquivo carregado: " + file.name);
+
   const reader = new FileReader();
   reader.onload = function (e) {
     const data = new Uint8Array(e.target.result);
@@ -171,8 +173,21 @@ function handleExcelUpload(event) {
     const sheet = workbook.Sheets[sheetName];
     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+    console.log("📊 Dados da planilha:", json);
     preencherTabelaComExcel(json);
+
+    const box = document.getElementById("premissas-dinamicas");
+    let msg = document.getElementById("feedback-upload");
+    if (!msg) {
+      msg = document.createElement("div");
+      msg.id = "feedback-upload";
+      msg.style.marginTop = "10px";
+      msg.style.color = "green";
+      box.appendChild(msg);
+    }
+    msg.textContent = "✓ Planilha carregada e premissas preenchidas com sucesso.";
   };
+
   reader.readAsArrayBuffer(file);
 }
 
@@ -194,12 +209,18 @@ function preencherTabelaComExcel(planilha) {
     }
   }
 
+  console.log("📅 Anos encontrados:", anos);
+  console.log("📈 CDI:", cdi);
+  console.log("📉 IPCA:", ipca);
+
   anos.forEach((ano, i) => {
     const cdiInput = document.getElementById(`cdi-ano-${ano}`);
     const ipcaInput = document.getElementById(`ipca-ano-${ano}`);
     if (cdiInput && ipcaInput) {
       cdiInput.value = cdi[i];
       ipcaInput.value = ipca[i];
+    } else {
+      console.warn(`⚠️ Campo para ano ${ano} não encontrado.`);
     }
   });
 }
