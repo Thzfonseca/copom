@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,7 +14,7 @@
       <h2>COPOM</h2>
       <nav>
         <ul>
-          <li><a href="#dashboard">Dashboard</a></li>
+          <!-- <li><a href="#dashboard">Dashboard</a></li> -->
           <!-- <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
           <li><a href="#simulador">Simulador</a></li> -->
           <li><a href="#rolagem-ipca">Rolagem IPCA+</a></li>
@@ -24,27 +23,13 @@
     </aside>
 
     <main class="main-content">
-      <!-- DASHBOARD -->
+      <!-- DASHBOARD ocultado -->
+      <!--
       <section id="dashboard" class="tab-content">
         <h1>Dashboard Econômico</h1>
-        <p>Resumo de indicadores e informações relevantes.</p>
-
-        <div class="grafico-selic-container mt-5">
-          <h4>Evolução Histórica da Taxa Selic (2015–2024)</h4>
-          <canvas id="grafico-selic" height="100"></canvas>
-        </div>
-
-        <div class="tabela-macro-container mt-5">
-          <h4>Projeções Macroeconômicas (Fonte: Itaú BBA)</h4>
-          <input type="file" id="input-excel-dashboard" accept=".xlsx,.xls" />
-          <div class="tabela-scroll">
-            <table id="tabela-macro-itau">
-              <thead></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+        ...
       </section>
+      -->
 
       <!-- MODELOS PREDITIVOS (oculto) -->
       <!-- <section id="modelos-preditivos" class="tab-content" style="display: none;"></section> -->
@@ -53,7 +38,15 @@
       <!-- <section id="simulador" class="tab-content" style="display: none;"></section> -->
 
       <!-- ROLAGEM IPCA+ -->
-      <section id="rolagem-ipca" class="tab-content" style="display: none;"></section>
+      <section id="rolagem-ipca" class="tab-content">
+        <!-- O conteúdo será injetado dinamicamente pelo simulador_rolagem.js -->
+      </section>
+
+      <!-- DISCLAIMER -->
+      <footer style="margin-top: 60px; font-size: 0.85rem; color: #666; text-align: center;">
+        <hr style="margin-top: 40px;"/>
+        <p>Desenvolvido por <strong>Thomaz Fonseca</strong> • sem direitos reservados — o conhecimento foi feito para ser compartilhado</p>
+      </footer>
     </main>
   </div>
 
@@ -79,11 +72,11 @@
 
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.substring(1);
-      showTab(hash || 'dashboard');
+      showTab(hash || 'rolagem-ipca');
     });
 
     window.addEventListener('DOMContentLoaded', () => {
-      const initialTab = window.location.hash.substring(1) || 'dashboard';
+      const initialTab = window.location.hash.substring(1) || 'rolagem-ipca';
       showTab(initialTab);
     });
   </script>
