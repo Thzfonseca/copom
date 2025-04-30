@@ -58,6 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
           </thead>
           <tbody id="tabela-premissas-body"></tbody>
         </table>
+
+        <div class="mt-3">
+          <label><strong>Importar projeções do Itaú (Excel):</strong></label><br/>
+          <input type="file" id="input-excel-itau" accept=".xlsx,.xls" />
+        </div>
       </div>
 
       <div class="botoes-container">
@@ -82,15 +87,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
 
-  // NOVO: Gera tabela assim que a aba carregar
   const prazoInicial = parseFloat(document.getElementById("longa-prazo").value);
   gerarTabelaPremissas(prazoInicial);
 
-  // Também atualiza tabela se o usuário mudar o prazo manualmente
   document.getElementById("longa-prazo").addEventListener("change", () => {
     const prazo = parseFloat(document.getElementById("longa-prazo").value);
     gerarTabelaPremissas(prazo);
   });
+
+  document.getElementById("input-excel-itau").addEventListener("change", handleExcelUpload);
 
   window.rolagemChart = null;
   window.anualizadoChart = null;
@@ -153,4 +158,48 @@ function getPremissasPorAno(prazoFinal) {
   return { cdi, ipca };
 }
 
-// calcularCurva, desenharGrafico, desenharGraficoAnualizado permanecem iguais
+function handleExcelUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    preencherTabelaComExcel(json);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function preencherTabelaComExcel(planilha) {
+  const anos = [], cdi = [], ipca = [];
+
+  for (let i = 1; i < planilha.length; i++) {
+    const linha = planilha[i];
+    if (!linha || linha.length < 3) continue;
+
+    const ano = parseInt(linha[0]);
+    const cdiVal = parseFloat(linha[1]);
+    const ipcaVal = parseFloat(linha[2]);
+
+    if (!isNaN(ano) && !isNaN(cdiVal) && !isNaN(ipcaVal)) {
+      anos.push(ano);
+      cdi.push(cdiVal);
+      ipca.push(ipcaVal);
+    }
+  }
+
+  anos.forEach((ano, i) => {
+    const cdiInput = document.getElementById(`cdi-ano-${ano}`);
+    const ipcaInput = document.getElementById(`ipca-ano-${ano}`);
+    if (cdiInput && ipcaInput) {
+      cdiInput.value = cdi[i];
+      ipcaInput.value = ipca[i];
+    }
+  });
+}
