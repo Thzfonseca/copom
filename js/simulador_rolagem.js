@@ -168,8 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const linhas = XLSX.utils.sheet_to_json(sheet, { header: 1 });
     const hoje = new Date();
-    const mesAtual = hoje.getMonth(); // 0 a 11
-    const anoAtual = hoje.getFullYear();
+    let mesAtual = hoje.getMonth(); // 0 a 11
+    let anoAtual = hoje.getFullYear();
     const trimestres = ["Mar", "Jun", "Sep", "Dec"];
 mesAtual = hoje.getMonth(); // 0-11
 anoAtual = hoje.getFullYear();
