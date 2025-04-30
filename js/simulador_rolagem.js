@@ -85,17 +85,19 @@ function handleTrimestralUpload(event) {
     const sheet = workbook.Sheets["Brasil_Trimestral"];
     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+    // Obter referência tipo "Jun-25" com base na data atual
     const hoje = new Date();
-    const mesAtual = hoje.getMonth() + 1;
-    const anoAtual = hoje.getFullYear();
+    const trimestreBase = new Date(hoje.getFullYear(), hoje.getMonth() + 2); // dois meses à frente
+    const mesRef = trimestreBase.toLocaleString("en-US", { month: "short" }); // ex: "Jun"
+    const anoRef = String(trimestreBase.getFullYear()).slice(-2);            // ex: "25"
+    const busca = `${mesRef}-${anoRef}`;                                     // ex: "Jun-25"
 
-    // Determinar ponto de partida — Junho/25 está na linha 92 da estrutura atual
     let startIndex = json.findIndex(row =>
-      typeof row[0] === "string" && row[0].toLowerCase().includes("jun/25")
+      typeof row[0] === "string" && row[0].includes(busca)
     );
 
     if (startIndex === -1) {
-      alert("Início dos trimestres (jun/25) não encontrado. Verifique a aba Brasil_Trimestral.");
+      alert(`Início dos trimestres (${busca}) não encontrado. Verifique a aba Brasil_Trimestral.`);
       return;
     }
 
@@ -110,10 +112,10 @@ function handleTrimestralUpload(event) {
         const selicMed = (selic1 + selic2) / 2;
         const ipcaMed = (ipca1 + ipca2) / 2;
 
-        const selicSemestral = (Math.pow(1 + selicMed, 0.5) - 1) * 100;
-        const ipcaSemestral = (Math.pow(1 + ipcaMed, 0.5) - 1) * 100;
+        const selicSem = (Math.pow(1 + selicMed, 0.5) - 1) * 100;
+        const ipcaSem = (Math.pow(1 + ipcaMed, 0.5) - 1) * 100;
 
-        taxas.push({ cdi: selicSemestral, ipca: ipcaSemestral });
+        taxas.push({ cdi: selicSem, ipca: ipcaSem });
       }
     }
 
@@ -223,15 +225,15 @@ function desenharGraficoAnualizado(curta, longa) {
           label: "Curta + CDI (Anualizada)",
           data: dadosCurta,
           borderColor: "#4299e1",
-          backgroundColor: "transparent",
-          borderWidth: 2
+          borderWidth: 2,
+          fill: false
         },
         {
           label: "Longa (Anualizada)",
           data: dadosLonga,
           borderColor: "#f6ad55",
-          backgroundColor: "transparent",
-          borderWidth: 2
+          borderWidth: 2,
+          fill: false
         }
       ]
     },
@@ -239,10 +241,7 @@ function desenharGraficoAnualizado(curta, longa) {
       responsive: true,
       scales: {
         y: {
-          ticks: {
-            callback: val => `${val.toFixed(1)}%`,
-            color: "#2d3748"
-          }
+          ticks: { callback: val => `${val.toFixed(1)}%`, color: "#2d3748" }
         },
         x: {
           ticks: { color: "#2d3748" }
@@ -266,8 +265,8 @@ function simularRolagem() {
   desenharGrafico(curvaCurta, curvaLonga, prazoFinal);
   desenharGraficoAnualizado(curvaCurta, curvaLonga);
 
-  const retornoCurtaFinal = parseFloat(curvaCurta[curvaCurta.length - 1].retorno);
-  const retornoLongaFinal = parseFloat(curvaLonga[curvaLonga.length - 1].retorno);
+  const retornoCurtaFinal = parseFloat(curvaCurta[curta.prazo * 2 - 1].retorno);
+  const retornoLongaFinal = parseFloat(curvaLonga[longa.prazo * 2 - 1].retorno);
 
   const t1 = curta.prazo;
   const t2 = longa.prazo;
@@ -284,7 +283,7 @@ function simularRolagem() {
 
   resultadoFinalBox.innerHTML = `
     <div class="box-premissas mt-3">
-      <h3>Resumo Comparativo - Retorno ao Ano</h3>
+      <h3>Resumo Comparativo - Retorno Médio ao Ano</h3>
       <table class="tabela-premissas">
         <thead>
           <tr>
@@ -335,5 +334,4 @@ function media(arr) {
   if (!arr.length) return 0;
   return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
-
 
