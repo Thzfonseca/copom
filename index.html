@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +7,7 @@
   <title>COPOM Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -14,60 +15,27 @@
       <h2>COPOM</h2>
       <nav>
         <ul>
-          <!-- <li><a href="#dashboard">Dashboard</a></li> -->
-          <!-- <li><a href="#modelos-preditivos">Modelos Preditivos</a></li>
-          <li><a href="#simulador">Simulador</a></li> -->
           <li><a href="#rolagem-ipca">Rolagem IPCA+</a></li>
         </ul>
       </nav>
     </aside>
 
     <main class="main-content">
-      <!-- DASHBOARD ocultado -->
-      <!--
-      <section id="dashboard" class="tab-content">
-        <h1>Dashboard Econômico</h1>
-        ...
-      </section>
-      -->
-
-      <!-- MODELOS PREDITIVOS (oculto) -->
-      <!-- <section id="modelos-preditivos" class="tab-content" style="display: none;"></section> -->
-
-      <!-- SIMULADOR (oculto) -->
-      <!-- <section id="simulador" class="tab-content" style="display: none;"></section> -->
-
       <!-- ROLAGEM IPCA+ -->
       <section id="rolagem-ipca" class="tab-content">
-        <!-- O conteúdo será injetado dinamicamente pelo simulador_rolagem.js -->
+        <!-- Conteúdo será injetado via JS -->
       </section>
-
-      <!-- DISCLAIMER -->
-      <footer style="margin-top: 60px; font-size: 0.85rem; color: #666; text-align: center;">
-        <hr style="margin-top: 40px;"/>
-        <p>Desenvolvido por <strong>Thomaz Fonseca</strong> • sem direitos reservados — o conhecimento foi feito para ser compartilhado</p>
-      </footer>
     </main>
   </div>
 
   <!-- Scripts -->
-  <script src="js/modelos_preditivos.js"></script>
-  <script src="js/modelos_preditivos_ui.js"></script>
-  <script src="js/simulador.js"></script>
-  <script src="js/grafico_selic.js"></script>
-  <script src="js/simulador_rolagem.js"></script>
-  <script src="js/dashboard_macro.js"></script>
+  <script src="simulador_rolagem.js"></script>
 
   <script>
     function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
-      });
-
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
       const selected = document.getElementById(tabId);
-      if (selected) {
-        selected.style.display = 'block';
-      }
+      if (selected) selected.style.display = 'block';
     }
 
     window.addEventListener('hashchange', () => {
@@ -80,5 +48,9 @@
       showTab(initialTab);
     });
   </script>
+
+  <footer style="text-align:center; padding: 10px; font-size: 0.9rem; color: #888;">
+    Desenvolvido por Thomaz Fonseca • sem direitos reservados — o conhecimento foi feito para ser compartilhado
+  </footer>
 </body>
 </html>
