@@ -175,6 +175,25 @@ canvas {
   color: #2e7d32;
 }
 
+/* === Tabela de premissas === */
+.tabela-premissas {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabela-premissas th,
+.tabela-premissas td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.tabela-premissas input {
+  width: 80px;
+  text-align: right;
+}
+
 /* === Responsivo === */
 @media (max-width: 768px) {
   .grid.grid-2 {
