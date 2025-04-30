@@ -106,7 +106,7 @@ function simularRolagem() {
   const longa = getDados("longa");
   const prazoFinal = Math.max(curta.prazo, longa.prazo);
 
-  const premissas = getPremissasPorAno(prazoFinal);
+  const premissas = window.premissasFinalArray || getPremissasPorAno(prazoFinal);
 
   const curvaCurta = calcularCurva(curta, premissas, prazoFinal);
   const curvaLonga = calcularCurva(longa, premissas, prazoFinal);
@@ -172,7 +172,7 @@ function handleExcelUpload(event) {
 
     const linhaIpca = json.find(row => row[2] && row[2].toString().toUpperCase().includes("IPCA"));
     const linhaCdi  = json.find(row => row[2] && row[2].toString().toUpperCase().includes("CDI"));
-    const anos = json[1]; // Cabeçalhos horizontais
+    const anos = json[1];
 
     const premissas = {};
     for (let col = 3; col < anos.length; col++) {
@@ -189,8 +189,8 @@ function handleExcelUpload(event) {
     const prazoLongo = parseFloat(document.getElementById("longa-prazo").value);
     const anoAtual = new Date().getFullYear();
     const ultimoAno = anoAtual + Math.ceil(prazoLongo);
-
     const fallback = premissas[2028];
+
     for (let ano = 2029; ano <= ultimoAno; ano++) {
       if (!premissas[ano]) {
         premissas[ano] = { ...fallback };
@@ -207,9 +207,15 @@ function preencherTabelaComPremissas(premissas) {
   const tbody = document.getElementById("tabela-premissas-body");
   tbody.innerHTML = "";
 
-  const anos = Object.keys(premissas).map(a => parseInt(a)).sort((a, b) => a - b);
+  const anos = Object.keys(premissas).map(Number).sort((a, b) => a - b);
+
+  window.premissasFinalArray = { ipca: [], cdi: [] };
+
   anos.forEach(ano => {
     const { cdi, ipca } = premissas[ano];
+    window.premissasFinalArray.ipca.push(ipca);
+    window.premissasFinalArray.cdi.push(cdi);
+
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${ano}</td>
@@ -225,13 +231,15 @@ function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
   let acumulado = 1;
 
   for (let t = 0.5; t <= prazoFinal; t += 0.5) {
-    const ano = Math.ceil(t);
-    const ipca = premissas.ipca[ano - 1] / 100 || 0.04;
-    const cdi  = premissas.cdi[ano - 1] / 100 || 0.10;
+    const anoIndex = Math.ceil(t) - 1;
+    const ipca = premissas.ipca[anoIndex] / 100 || 0.04;
+    const cdi  = premissas.cdi[anoIndex] / 100 || 0.10;
 
     let rentabilidade;
     if (t <= prazo) {
-      rentabilidade = indexador === "ipca" ? (1 + ipca) * (1 + taxa / 100) : (1 + taxa / 100);
+      rentabilidade = indexador === "ipca"
+        ? (1 + ipca) * (1 + taxa / 100)
+        : (1 + taxa / 100);
     } else {
       rentabilidade = 1 + cdi;
     }
