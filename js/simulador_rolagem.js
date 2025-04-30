@@ -158,69 +158,79 @@ function getPremissasPorAno(prazoFinal) {
   return { cdi, ipca };
 }
 
+// Função que lê a planilha horizontal do Itaú
 function handleExcelUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-
-  alert("📥 Arquivo carregado: " + file.name);
 
   const reader = new FileReader();
   reader.onload = function (e) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: "array" });
 
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    console.log("📊 Dados da planilha:", json);
-    preencherTabelaComExcel(json);
+    // Procurar linha IPCA e CDI
+    const linhaIpca = json.find(row => row[2] && row[2].toString().toUpperCase().includes("IPCA"));
+    const linhaCdi  = json.find(row => row[2] && row[2].toString().toUpperCase().includes("CDI"));
 
-    const box = document.getElementById("premissas-dinamicas");
-    let msg = document.getElementById("feedback-upload");
-    if (!msg) {
-      msg = document.createElement("div");
-      msg.id = "feedback-upload";
-      msg.style.marginTop = "10px";
-      msg.style.color = "green";
-      box.appendChild(msg);
+    const anos = json[1]; // Supondo que os anos estão na linha 1 (índices 3 em diante)
+
+    const premissas = {};
+    for (let col = 3; col < anos.length; col++) {
+      const ano = parseInt(anos[col]);
+      if (!ano || isNaN(ano)) continue;
+      const ipca = parseFloat(linhaIpca[col]) * 100;
+      const cdi  = parseFloat(linhaCdi[col])  * 100;
+      if (!isNaN(ipca) && !isNaN(cdi)) {
+        premissas[ano] = { ipca, cdi };
+      }
     }
-    msg.textContent = "✓ Planilha carregada e premissas preenchidas com sucesso.";
+
+    preencherTabelaComPremissas(premissas);
   };
 
   reader.readAsArrayBuffer(file);
 }
 
-function preencherTabelaComExcel(planilha) {
-  const anos = [], cdi = [], ipca = [];
+function preencherTabelaComPremissas(premissas) {
+  const tbody = document.getElementById("tabela-premissas-body");
+  tbody.innerHTML = "";
 
-  for (let i = 1; i < planilha.length; i++) {
-    const linha = planilha[i];
-    if (!linha || linha.length < 3) continue;
+  const anos = Object.keys(premissas).map(a => parseInt(a)).sort((a, b) => a - b);
+  anos.forEach(ano => {
+    const { cdi, ipca } = premissas[ano];
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${ano}</td>
+      <td><input type="number" id="cdi-ano-${ano}" value="${cdi.toFixed(2)}" step="0.01" /></td>
+      <td><input type="number" id="ipca-ano-${ano}" value="${ipca.toFixed(2)}" step="0.01" /></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
 
-    const ano = parseInt(linha[0]);
-    const cdiVal = parseFloat(linha[1]);
-    const ipcaVal = parseFloat(linha[2]);
+// Versão simplificada da curva
+function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
+  const pontos = [];
+  let acumulado = 1;
 
-    if (!isNaN(ano) && !isNaN(cdiVal) && !isNaN(ipcaVal)) {
-      anos.push(ano);
-      cdi.push(cdiVal);
-      ipca.push(ipcaVal);
+  for (let t = 0.5; t <= prazoFinal; t += 0.5) {
+    const ano = Math.ceil(t);
+    const ipca = premissas.ipca[ano - 1] / 100 || 0.04;
+    const cdi  = premissas.cdi[ano - 1] / 100 || 0.10;
+
+    let rentabilidade;
+    if (t <= prazo) {
+      rentabilidade = indexador === "ipca" ? (1 + ipca) * (1 + taxa / 100) : (1 + taxa / 100);
+    } else {
+      rentabilidade = 1 + cdi;
     }
+
+    acumulado *= Math.pow(rentabilidade, 0.5);
+    pontos.push({ prazo: t.toFixed(1), retorno: ((acumulado - 1) * 100).toFixed(2) });
   }
 
-  console.log("📅 Anos encontrados:", anos);
-  console.log("📈 CDI:", cdi);
-  console.log("📉 IPCA:", ipca);
-
-  anos.forEach((ano, i) => {
-    const cdiInput = document.getElementById(`cdi-ano-${ano}`);
-    const ipcaInput = document.getElementById(`ipca-ano-${ano}`);
-    if (cdiInput && ipcaInput) {
-      cdiInput.value = cdi[i];
-      ipcaInput.value = ipca[i];
-    } else {
-      console.warn(`⚠️ Campo para ano ${ano} não encontrado.`);
-    }
-  });
+  return pontos;
 }
