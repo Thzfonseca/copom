@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
 
       <div class="box-premissas mt-3" id="premissas-dinamicas">
-        <h3>Premissas por Ano (até prazo da opção longa)</h3>
+        <h3>Premissas por Ano (a partir de 2025)</h3>
         <table class="tabela-premissas">
           <thead>
             <tr>
@@ -101,63 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.anualizadoChart = null;
 });
 
-function simularRolagem() {
-  const curta = getDados("curta");
-  const longa = getDados("longa");
-  const prazoFinal = Math.max(curta.prazo, longa.prazo);
-
-  const premissas = window.premissasFinalArray || getPremissasPorAno(prazoFinal);
-
-  const curvaCurta = calcularCurva(curta, premissas, prazoFinal);
-  const curvaLonga = calcularCurva(longa, premissas, prazoFinal);
-
-  desenharGrafico(curvaCurta, curvaLonga, prazoFinal);
-  desenharGraficoAnualizado(curvaCurta, curvaLonga);
-
-  const retornoCurtaFinal = curvaCurta[curvaCurta.length - 1].retorno;
-  const retornoLongaFinal = curvaLonga[curvaLonga.length - 1].retorno;
-
-  resultadoFinalBox.innerHTML = `
-    <div class="box-premissas mt-3">
-      <h3>Comparativo Final</h3>
-      <p><strong>Opção Curta + CDI:</strong> ${retornoCurtaFinal}%</p>
-      <p><strong>Opção Longa:</strong> ${retornoLongaFinal}%</p>
-    </div>
-  `;
-}
-
-function getDados(prefixo) {
-  return {
-    indexador: document.getElementById(`${prefixo}-indexador`).value,
-    taxa: parseFloat(document.getElementById(`${prefixo}-taxa`).value),
-    prazo: parseFloat(document.getElementById(`${prefixo}-prazo`).value)
-  };
-}
-
-function gerarTabelaPremissas(prazoFinal) {
-  const tbody = document.getElementById("tabela-premissas-body");
-  tbody.innerHTML = "";
-
-  for (let ano = 1; ano <= prazoFinal; ano++) {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${ano}</td>
-      <td><input type="number" id="cdi-ano-${ano}" value="10.00" step="0.01" /></td>
-      <td><input type="number" id="ipca-ano-${ano}" value="4.00" step="0.01" /></td>
-    `;
-    tbody.appendChild(row);
-  }
-}
-
-function getPremissasPorAno(prazoFinal) {
-  const cdi = [], ipca = [];
-  for (let ano = 1; ano <= prazoFinal; ano++) {
-    cdi.push(parseFloat(document.getElementById(`cdi-ano-${ano}`)?.value || "10"));
-    ipca.push(parseFloat(document.getElementById(`ipca-ano-${ano}`)?.value || "4"));
-  }
-  return { cdi, ipca };
-}
-
 function handleExcelUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -176,7 +119,7 @@ function handleExcelUpload(event) {
     const premissas = {};
     for (let col = 3; col < anos.length; col++) {
       const ano = parseInt(anos[col]);
-      if (ano && ano >= 2024) {
+      if (ano && ano >= 2025) {
         const ipca = parseFloat(linhaIpca[col]) * 100;
         const cdi  = parseFloat(linhaCdi[col]) * 100;
         if (!isNaN(ipca) && !isNaN(cdi)) {
@@ -222,6 +165,48 @@ function preencherTabelaComPremissas(premissas) {
     `;
     tbody.appendChild(row);
   });
+}
+
+function getDados(prefixo) {
+  return {
+    indexador: document.getElementById(`${prefixo}-indexador`).value,
+    taxa: parseFloat(document.getElementById(`${prefixo}-taxa`).value),
+    prazo: parseFloat(document.getElementById(`${prefixo}-prazo`).value)
+  };
+}
+
+function simularRolagem() {
+  const curta = getDados("curta");
+  const longa = getDados("longa");
+  const prazoFinal = Math.max(curta.prazo, longa.prazo);
+
+  const premissas = window.premissasFinalArray || getPremissasPorAno(prazoFinal);
+
+  const curvaCurta = calcularCurva(curta, premissas, prazoFinal);
+  const curvaLonga = calcularCurva(longa, premissas, prazoFinal);
+
+  desenharGrafico(curvaCurta, curvaLonga, prazoFinal);
+  desenharGraficoAnualizado(curvaCurta, curvaLonga);
+
+  const retornoCurtaFinal = curvaCurta[curvaCurta.length - 1].retorno;
+  const retornoLongaFinal = curvaLonga[curvaLonga.length - 1].retorno;
+
+  resultadoFinalBox.innerHTML = `
+    <div class="box-premissas mt-3">
+      <h3>Comparativo Final</h3>
+      <p><strong>Opção Curta + CDI:</strong> ${retornoCurtaFinal}%</p>
+      <p><strong>Opção Longa:</strong> ${retornoLongaFinal}%</p>
+    </div>
+  `;
+}
+
+function getPremissasPorAno(prazoFinal) {
+  const cdi = [], ipca = [];
+  for (let ano = 1; ano <= prazoFinal; ano++) {
+    cdi.push(parseFloat(document.getElementById(`cdi-ano-${ano + 2024}`)?.value || "10"));
+    ipca.push(parseFloat(document.getElementById(`ipca-ano-${ano + 2024}`)?.value || "4"));
+  }
+  return { cdi, ipca };
 }
 
 function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
