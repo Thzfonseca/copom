@@ -82,7 +82,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
 
-  // NOVO: gerar premissas quando prazo da longa for alterado
+  // NOVO: Gera tabela assim que a aba carregar
+  const prazoInicial = parseFloat(document.getElementById("longa-prazo").value);
+  gerarTabelaPremissas(prazoInicial);
+
+  // Também atualiza tabela se o usuário mudar o prazo manualmente
   document.getElementById("longa-prazo").addEventListener("change", () => {
     const prazo = parseFloat(document.getElementById("longa-prazo").value);
     gerarTabelaPremissas(prazo);
