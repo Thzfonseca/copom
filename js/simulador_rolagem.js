@@ -82,6 +82,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
 
+  // NOVO: gerar premissas quando prazo da longa for alterado
+  document.getElementById("longa-prazo").addEventListener("change", () => {
+    const prazo = parseFloat(document.getElementById("longa-prazo").value);
+    gerarTabelaPremissas(prazo);
+  });
+
   window.rolagemChart = null;
   window.anualizadoChart = null;
 });
@@ -91,7 +97,6 @@ function simularRolagem() {
   const longa = getDados("longa");
   const prazoFinal = Math.max(curta.prazo, longa.prazo);
 
-  gerarTabelaPremissas(prazoFinal);
   const premissas = getPremissasPorAno(prazoFinal);
 
   const curvaCurta = calcularCurva(curta, premissas, prazoFinal);
@@ -144,4 +149,4 @@ function getPremissasPorAno(prazoFinal) {
   return { cdi, ipca };
 }
 
-// As demais funções de cálculo e gráficos permanecem iguais
+// calcularCurva, desenharGrafico, desenharGraficoAnualizado permanecem iguais
