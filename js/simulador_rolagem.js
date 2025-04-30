@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const anoAtual = hoje.getFullYear();
     const trimestres = ["Mar", "Jun", "Sep", "Dec"];
 mesAtual = hoje.getMonth(); // 0-11
-const anoAtual = hoje.getFullYear();
+anoAtual = hoje.getFullYear();
 
 const trimestreIndex = Math.floor((mesAtual + 3) / 3) % 4;
 const anoRef = (trimestreIndex === 0 && mesAtual >= 9) ? anoAtual + 1 : anoAtual;
