@@ -166,7 +166,6 @@ function handleExcelUpload(event) {
   reader.onload = function (e) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: "array" });
-
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
@@ -208,7 +207,6 @@ function preencherTabelaComPremissas(premissas) {
   tbody.innerHTML = "";
 
   const anos = Object.keys(premissas).map(Number).sort((a, b) => a - b);
-
   window.premissasFinalArray = { ipca: [], cdi: [] };
 
   anos.forEach(ano => {
@@ -272,14 +270,14 @@ function desenharGrafico(curta, longa, prazoFinal) {
         {
           label: "Opção Curta + CDI",
           data: dadosCurta,
-          borderColor: "#4299e1",
+          borderColor: "#3182ce",
           backgroundColor: "transparent",
           borderWidth: 2
         },
         {
           label: "Opção Longa",
           data: dadosLonga,
-          borderColor: "#ed8936",
+          borderColor: "#dd6b20",
           backgroundColor: "transparent",
           borderWidth: 2
         }
@@ -291,18 +289,18 @@ function desenharGrafico(curta, longa, prazoFinal) {
         y: {
           ticks: {
             callback: (val) => `${val.toFixed(0)}%`,
-            color: "#cbd5e0"
+            color: "#2d3748"
           }
         },
         x: {
           ticks: {
-            color: "#cbd5e0"
+            color: "#2d3748"
           }
         }
       },
       plugins: {
         legend: {
-          labels: { color: "#e2e8f0" }
+          labels: { color: "#2d3748" }
         }
       }
     }
@@ -335,7 +333,7 @@ function desenharGraficoAnualizado(curta, longa) {
         {
           label: "Curta + CDI (Anualizada)",
           data: dadosCurta,
-          borderColor: "#63b3ed",
+          borderColor: "#4299e1",
           backgroundColor: "transparent",
           borderWidth: 2
         },
@@ -354,16 +352,16 @@ function desenharGraficoAnualizado(curta, longa) {
         y: {
           ticks: {
             callback: (val) => `${val.toFixed(1)}%`,
-            color: "#cbd5e0"
+            color: "#2d3748"
           }
         },
         x: {
-          ticks: { color: "#cbd5e0" }
+          ticks: { color: "#2d3748" }
         }
       },
       plugins: {
         legend: {
-          labels: { color: "#e2e8f0" }
+          labels: { color: "#2d3748" }
         }
       }
     }
