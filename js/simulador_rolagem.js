@@ -93,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("input-excel-itau").addEventListener("change", handleExcelUpload);
   gerarTabelaPremissas(parseFloat(document.getElementById("longa-prazo").value));
 });
-
 function handleExcelUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -107,13 +106,8 @@ function handleExcelUpload(event) {
 
     const linhaIpca = json.find(row => row[2] && row[2].toString().toUpperCase().includes("IPCA"));
     const linhaCdi  = json.find(row => row[2] && row[2].toString().toUpperCase().includes("CDI"));
-
-    if (!linhaIpca || !linhaCdi) {
-      alert("Erro: Não foi possível localizar as linhas de IPCA e CDI na planilha.");
-      return;
-    }
-
     const anos = json[1];
+
     const premissas = {};
     for (let col = 3; col < anos.length; col++) {
       const ano = parseInt(anos[col]);
@@ -139,6 +133,7 @@ function handleExcelUpload(event) {
 
     preencherTabelaComPremissas(premissas);
   };
+
   reader.readAsArrayBuffer(file);
 }
 
@@ -147,7 +142,7 @@ function preencherTabelaComPremissas(premissas) {
   tbody.innerHTML = "";
 
   const anos = Object.keys(premissas).map(Number).sort((a, b) => a - b);
-  window.premissasFinalArray = { ipca: [], cdi: [] };
+  window.premissasFinalArray = { ipca: [], cdi: [], anos };
 
   anos.forEach(ano => {
     const { cdi, ipca } = premissas[ano];
@@ -172,30 +167,6 @@ function getDados(prefixo) {
   };
 }
 
-function simularRolagem() {
-  const curta = getDados("curta");
-  const longa = getDados("longa");
-  const prazoFinal = Math.max(curta.prazo, longa.prazo);
-
-  const premissas = window.premissasFinalArray;
-  const curvaCurta = calcularCurva(curta, premissas, prazoFinal);
-  const curvaLonga = calcularCurva(longa, premissas, prazoFinal);
-
-  desenharGrafico(curvaCurta, curvaLonga, prazoFinal);
-  desenharGraficoAnualizado(curvaCurta, curvaLonga);
-
-  const retornoCurtaFinal = curvaCurta[curvaCurta.length - 1].retorno;
-  const retornoLongaFinal = curvaLonga[curvaLonga.length - 1].retorno;
-
-  resultadoFinalBox.innerHTML = `
-    <div class="box-premissas mt-3">
-      <h3>Comparativo Final</h3>
-      <p><strong>Opção Curta + CDI:</strong> ${retornoCurtaFinal}%</p>
-      <p><strong>Opção Longa:</strong> ${retornoLongaFinal}%</p>
-    </div>
-  `;
-}
-
 function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
   const pontos = [];
   let acumulado = 1;
@@ -203,7 +174,7 @@ function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
   for (let t = 0.5; t <= prazoFinal; t += 0.5) {
     const anoIndex = Math.ceil(t) - 1;
     const ipca = (premissas.ipca[anoIndex] || 4) / 100;
-    const cdi = (premissas.cdi[anoIndex] || 10) / 100;
+    const cdi  = (premissas.cdi[anoIndex] || 10) / 100;
 
     let rentabilidade;
     if (t <= prazo) {
@@ -220,11 +191,96 @@ function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
 
   return pontos;
 }
+function simularRolagem() {
+  const curta = getDados("curta");
+  const longa = getDados("longa");
+  const prazoFinal = Math.max(curta.prazo, longa.prazo);
+  const premissas = window.premissasFinalArray;
+
+  const curvaCurta = calcularCurva(curta, premissas, prazoFinal);
+  const curvaLonga = calcularCurva(longa, premissas, prazoFinal);
+
+  desenharGrafico(curvaCurta, curvaLonga, prazoFinal);
+  desenharGraficoAnualizado(curvaCurta, curvaLonga);
+
+  const retornoCurtaFinal = curvaCurta[curvaCurta.length - 1].retorno;
+  const retornoLongaFinal = curvaLonga[curvaLonga.length - 1].retorno;
+
+  resultadoFinalBox.innerHTML = `
+    <div class="box-premissas mt-3">
+      <h3>Comparativo Final</h3>
+      <p><strong>Opção Curta + CDI:</strong> ${retornoCurtaFinal}%</p>
+      <p><strong>Opção Longa:</strong> ${retornoLongaFinal}%</p>
+    </div>
+  `;
+
+  // Tabela de retornos ao ano por período
+  const t1 = curta.prazo;
+  const t2 = longa.prazo;
+  const rCurta = parseFloat(retornoCurtaFinal) / 100;
+  const rLonga = parseFloat(retornoLongaFinal) / 100;
+  const rAnualCurta = ((Math.pow(1 + rCurta, 1 / t1) - 1) * 100).toFixed(2);
+  const rAnualLonga = ((Math.pow(1 + rLonga, 1 / t2) - 1) * 100).toFixed(2);
+
+  const cdiCurta = media(premissas.cdi.slice(0, Math.ceil(t1)));
+  const cdiLonga = media(premissas.cdi.slice(0, Math.ceil(t2)));
+  const cdiEntre = media(premissas.cdi.slice(Math.ceil(t1), Math.ceil(t2)));
+
+  const ipcaCurta = media(premissas.ipca.slice(0, Math.ceil(t1)));
+  const ipcaLonga = media(premissas.ipca.slice(0, Math.ceil(t2)));
+  const ipcaEntre = media(premissas.ipca.slice(Math.ceil(t1), Math.ceil(t2)));
+
+  resultadoFinalBox.innerHTML += `
+    <div class="box-premissas mt-3">
+      <h3>Resumo Comparativo - Retorno ao Ano</h3>
+      <table class="tabela-premissas">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Curta (IPCA+)</th>
+            <th>Longa (IPCA+)</th>
+            <th>CDI</th>
+            <th>IPCA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Até venc. Curta</td>
+            <td>${rAnualCurta}%</td>
+            <td>-</td>
+            <td>${cdiCurta.toFixed(2)}%</td>
+            <td>${ipcaCurta.toFixed(2)}%</td>
+          </tr>
+          <tr>
+            <td>Até venc. Longa</td>
+            <td>${rAnualCurta}%</td>
+            <td>${rAnualLonga}%</td>
+            <td>${cdiLonga.toFixed(2)}%</td>
+            <td>${ipcaLonga.toFixed(2)}%</td>
+          </tr>
+          <tr>
+            <td>Entre Curta e Longa</td>
+            <td>-</td>
+            <td>-</td>
+            <td>${cdiEntre.toFixed(2)}%</td>
+            <td>${ipcaEntre.toFixed(2)}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function media(arr) {
+  if (!arr.length) return 0;
+  const total = arr.reduce((a, b) => a + b, 0);
+  return total / arr.length;
+}
 
 function desenharGrafico(curta, longa, prazoFinal) {
   const ctx = document.getElementById("grafico-rolagem-ipca").getContext("2d");
-
   const labels = [];
+
   for (let t = 0.5; t <= prazoFinal; t += 0.5) {
     labels.push(`${t.toFixed(1)}a`);
   }
@@ -333,3 +389,5 @@ function desenharGraficoAnualizado(curta, longa) {
     }
   });
 }
+
+
