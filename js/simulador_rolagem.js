@@ -250,3 +250,122 @@ function calcularCurva({ indexador, taxa, prazo }, premissas, prazoFinal) {
 
   return pontos;
 }
+
+function desenharGrafico(curta, longa, prazoFinal) {
+  const ctx = document.getElementById("grafico-rolagem-ipca").getContext("2d");
+
+  const labels = [];
+  for (let t = 0.5; t <= prazoFinal; t += 0.5) {
+    labels.push(`${t.toFixed(1)}a`);
+  }
+
+  const dadosCurta = labels.map((l, i) => parseFloat(curta[i]?.retorno || null));
+  const dadosLonga = labels.map((l, i) => parseFloat(longa[i]?.retorno || null));
+
+  if (window.rolagemChart) window.rolagemChart.destroy();
+
+  window.rolagemChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Opção Curta + CDI",
+          data: dadosCurta,
+          borderColor: "#4299e1",
+          backgroundColor: "transparent",
+          borderWidth: 2
+        },
+        {
+          label: "Opção Longa",
+          data: dadosLonga,
+          borderColor: "#ed8936",
+          backgroundColor: "transparent",
+          borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          ticks: {
+            callback: (val) => `${val.toFixed(0)}%`,
+            color: "#cbd5e0"
+          }
+        },
+        x: {
+          ticks: {
+            color: "#cbd5e0"
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: "#e2e8f0" }
+        }
+      }
+    }
+  });
+}
+
+function desenharGraficoAnualizado(curta, longa) {
+  const ctx = document.getElementById("grafico-anualizado-ipca").getContext("2d");
+
+  const labels = curta.map(p => p.prazo + "a");
+  const dadosCurta = curta.map(p => {
+    const t = parseFloat(p.prazo);
+    const r = parseFloat(p.retorno) / 100;
+    return ((Math.pow(1 + r, 1 / t) - 1) * 100).toFixed(2);
+  });
+
+  const dadosLonga = longa.map(p => {
+    const t = parseFloat(p.prazo);
+    const r = parseFloat(p.retorno) / 100;
+    return ((Math.pow(1 + r, 1 / t) - 1) * 100).toFixed(2);
+  });
+
+  if (window.anualizadoChart) window.anualizadoChart.destroy();
+
+  window.anualizadoChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Curta + CDI (Anualizada)",
+          data: dadosCurta,
+          borderColor: "#63b3ed",
+          backgroundColor: "transparent",
+          borderWidth: 2
+        },
+        {
+          label: "Longa (Anualizada)",
+          data: dadosLonga,
+          borderColor: "#f6ad55",
+          backgroundColor: "transparent",
+          borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          ticks: {
+            callback: (val) => `${val.toFixed(1)}%`,
+            color: "#cbd5e0"
+          }
+        },
+        x: {
+          ticks: { color: "#cbd5e0" }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: "#e2e8f0" }
+        }
+      }
+    }
+  });
+}
