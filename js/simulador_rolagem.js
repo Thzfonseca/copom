@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mesAtual = hoje.getMonth(); // 0 a 11
     const anoAtual = hoje.getFullYear();
     const trimestres = ["Mar", "Jun", "Sep", "Dec"];
-const mesAtual = hoje.getMonth(); // 0-11
+let mesAtual = hoje.getMonth(); // 0-11
 const anoAtual = hoje.getFullYear();
 
 const trimestreIndex = Math.floor((mesAtual + 3) / 3) % 4;
