@@ -1,3 +1,4 @@
+// js/simulador_rolagem.js
 
 function registrarErro(msg) {
   console.error("[COPOM-DEBUG]", msg);
@@ -20,65 +21,21 @@ function copiarRelatorioErros() {
 }
 
 function normalizarReferenciaTrimestre(valor) {
-  if (!valor || typeof valor !== 'string') return null;
-  const mapPT = { 'mar': 'Mar', 'jun': 'Jun', 'set': 'Sep', 'dez': 'Dec' };
-  const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  let ref = valor.toString().trim();
-  if (/\d{2}\/\d{4}/.test(ref)) {
-    const [mes, ano] = ref.split('/');
-    const idx = parseInt(mes, 10) - 1;
-    return meses[idx] + '-' + ano.slice(2);
+  if (!valor) return null;
+
+  if (typeof valor === 'object' && valor instanceof Date) {
+    const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${meses[valor.getMonth()]}-${valor.getFullYear().toString().slice(2)}`;
   }
+
+  let ref = valor.toString().trim().toLowerCase().replace(/\s+/g, '').replace('.', '/');
+
+  const mapPT = { 'mar': 'Mar', 'abr': 'Apr', 'mai': 'May', 'jun': 'Jun', 'jul': 'Jul', 'ago': 'Aug', 'set': 'Sep', 'out': 'Oct', 'nov': 'Nov', 'dez': 'Dec' };
   for (let [pt, en] of Object.entries(mapPT)) {
-    ref = ref.replace(new RegExp(pt, 'i'), en);
-  }
-  const regex = /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[- ]?(\d{2,4})/i;
-  const match = ref.match(regex);
-  if (!match) return null;
-  const mes = match[1].charAt(0).toUpperCase() + match[1].slice(1,3).toLowerCase();
-  let ano = match[2];
-  if (ano.length === 4) ano = ano.slice(2);
-  return `${mes}-${ano}`;
-}
-
-
-
-function registrarErro(msg) {
-  console.error("[COPOM-DEBUG]", msg);
-  window.__errosDebug = window.__errosDebug || [];
-  window.__errosDebug.push(msg);
-
-  const div = document.getElementById("relatorio-erros");
-  if (div) {
-    div.style.display = "block";
-    div.innerHTML += `<div>[!] ${msg}</div>`;
-    div.scrollTop = div.scrollHeight;
-  }
-}
-
-
-function normalizarReferenciaTrimestre(valor) {
-  if (!valor || typeof valor !== 'string') return null;
-
-  const mapPT = { 'mar': 'Mar', 'jun': 'Jun', 'set': 'Sep', 'dez': 'Dec' };
-  const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  let ref = valor.toString().trim();
-
-  // Tenta converter datas Excel para texto "Jun-25"
-  if (/\d{2}\/\d{4}/.test(ref)) {
-    const [mes, ano] = ref.split('/');
-    const idx = parseInt(mes, 10) - 1;
-    return meses[idx] + '-' + ano.slice(2);
+    ref = ref.replace(pt, en.toLowerCase());
   }
 
-  // Normaliza português para inglês
-  for (let [pt, en] of Object.entries(mapPT)) {
-    ref = ref.replace(new RegExp(pt, 'i'), en);
-  }
-
-  // Extrai mês e ano
-  const regex = /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[- ]?(\d{2,4})/i;
+  const regex = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[^\d]*(\d{2,4})/i;
   const match = ref.match(regex);
   if (!match) return null;
 
@@ -87,8 +44,6 @@ function normalizarReferenciaTrimestre(valor) {
   if (ano.length === 4) ano = ano.slice(2);
   return `${mes}-${ano}`;
 }
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("rolagem-ipca");
@@ -148,13 +103,12 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="chart-container">
         <canvas id="grafico-rolagem-ipca" height="100"></canvas>
       </div>
+
+      <div id="resultado-final"></div>
     </div>
   `;
 
-  document.getElementById("btn-simular-rolagem").addEventListener("click", () => {
-    registrarErro("Função de simulação será acoplada aqui com base nas premissas.");
-  });
-
+  document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
 
   document.getElementById("input-arquivo").addEventListener("change", async (event) => {
@@ -168,15 +122,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const linhas = XLSX.utils.sheet_to_json(sheet, { header: 1 });
     const hoje = new Date();
-    let mesAtual = hoje.getMonth(); // 0 a 11
-    let anoAtual = hoje.getFullYear();
     const trimestres = ["Mar", "Jun", "Sep", "Dec"];
-mesAtual = hoje.getMonth(); // 0-11
-anoAtual = hoje.getFullYear();
-
-const trimestreIndex = Math.floor((mesAtual + 3) / 3) % 4;
-const anoRef = (trimestreIndex === 0 && mesAtual >= 9) ? anoAtual + 1 : anoAtual;
-const refInicial = `${trimestres[trimestreIndex]}-${anoRef.toString().slice(2)}`;
+    const mesAtual = hoje.getMonth();
+    const anoAtual = hoje.getFullYear();
+    const trimestreIndex = Math.floor((mesAtual + 3) / 3) % 4;
+    const anoRef = (trimestreIndex === 0 && mesAtual >= 9) ? anoAtual + 1 : anoAtual;
+    const refInicial = `${trimestres[trimestreIndex]}-${anoRef.toString().slice(2)}`;
 
     const idxInicio = linhas.findIndex(l => normalizarReferenciaTrimestre(l[0]) === refInicial);
     if (idxInicio === -1) return registrarErro(`Início dos trimestres (${refInicial}) não encontrado. Verifique a aba Brasil_Trimestral.`);
@@ -201,16 +152,6 @@ const refInicial = `${trimestres[trimestreIndex]}-${anoRef.toString().slice(2)}`
   });
 });
 
-function copiarRelatorioErros() {
-  const erros = window.__errosDebug || [];
-  const texto = erros.length ? erros.map(e => `[!] ${e}`).join('\n') : 'Nenhum erro registrado.';
-  navigator.clipboard.writeText(texto).then(() => {
-    alert("Relatório copiado para a área de transferência.");
-  });
-}
-
-
-
 function getDados(prefixo) {
   return {
     indexador: document.getElementById(`${prefixo}-indexador`).value,
@@ -232,7 +173,6 @@ function simularRolagem() {
   const curvaLonga = calcularCurva(longa, "longa");
 
   desenharGrafico(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
-  desenharGraficoAnualizado(curvaCurta, curvaLonga);
   desenharTabelaResumo(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
 }
 
@@ -305,24 +245,19 @@ function desenharGrafico(curta, longa, prazoCurta, prazoLonga) {
   });
 }
 
-function desenharGraficoAnualizado(curta, longa) {
-  // Implementação opcional posterior: gráfico de retorno médio ao ano por período
-}
-
 function desenharTabelaResumo(curta, longa, prazoCurta, prazoLonga) {
   const div = document.getElementById("resultado-final");
   if (!div) return;
 
   const retornoCurta = (curta.find(p => p.t === prazoCurta)?.retorno || 0) / prazoCurta;
   const retornoLonga = (longa.find(p => p.t === prazoLonga)?.retorno || 0) / prazoLonga;
-
   const entre = prazoLonga - prazoCurta;
   const diff = ((longa.find(p => p.t === prazoLonga)?.retorno || 0) - (curta.find(p => p.t === prazoCurta)?.retorno || 0)) / entre;
 
   const ipca = window.premissasFinalArray.ipca.slice(0, prazoLonga * 2);
   const cdi = window.premissasFinalArray.cdi.slice(0, prazoLonga * 2);
-  const ipcaMedia = ipca.reduce((a,b)=>a+b,0)/ipca.length;
-  const cdiMedia = cdi.reduce((a,b)=>a+b,0)/cdi.length;
+  const ipcaMedia = ipca.reduce((a, b) => a + b, 0) / ipca.length;
+  const cdiMedia = cdi.reduce((a, b) => a + b, 0) / cdi.length;
 
   div.innerHTML = `
     <div class="box-premissas">
