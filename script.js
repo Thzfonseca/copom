@@ -15,7 +15,7 @@ function simular() {
 
     let acumCurtoAteVencimento = 1;
     let acumCurtoFinal = 1;
-    let acumLongoFinal = 1;
+    let acumLongo = 1;
 
     for (let i = 0; i <= intervalos; i++) {
       const t = i * 0.5;
@@ -26,7 +26,7 @@ function simular() {
       const cdi = premissas[ano]?.cdi ?? premissas[2028].cdi;
 
       const taxaRealCurta = taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0);
-      const taxaRealLonga = taxaLongo + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0);
+      const taxaRealLonga = taxaLonga + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0);
 
       if (t <= prazoCurta) {
         acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
@@ -35,11 +35,13 @@ function simular() {
         acumCurtoFinal *= 1 + cdi / 100 / 2;
       }
 
-      acumLongoFinal *= 1 + taxaRealLonga / 100 / 2;
+      acumLongo *= 1 + taxaRealLonga / 100 / 2;
 
       rentabilidadeCurta.push((acumCurtoFinal - 1) * 100);
-      rentabilidadeLonga.push((acumLongoFinal - 1) * 100);
+      rentabilidadeLonga.push((acumLongo - 1) * 100);
     }
+
+    const acumLongoFinal = acumLongo;
 
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
     mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurta, prazoLonga);
@@ -83,14 +85,21 @@ function plotarGrafico(labels, serie1, serie2) {
 }
 
 function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurto, prazoLongo) {
-  const retornoAnualCurto = Math.pow(acumCurtoAteVencimento, 1 / prazoCurto) - 1;
-  const retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+  let retornoAnualCurto = NaN;
+  let retornoAnualLongo = NaN;
+
+  try {
+    retornoAnualCurto = Math.pow(acumCurtoAteVencimento, 1 / prazoCurto) - 1;
+    retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+  } catch (e) {
+    registrarErro("Erro ao calcular retornos anualizados: " + e.message);
+  }
 
   let cdiBreakEven = '-';
   const tempoRestante = prazoLongo - prazoCurto;
   const n = tempoRestante * 2; // semestres
 
-  if (n > 0 && acumCurtoAteVencimento > 0) {
+  if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
     try {
       const fator = acumLongoFinal / acumCurtoAteVencimento;
       const taxaSemestral = Math.pow(fator, 1 / n) - 1;
@@ -102,8 +111,8 @@ function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, p
   }
 
   const resumo = `
-    <p><strong>Retorno Anualizado Curto:</strong> ${(retornoAnualCurto * 100).toFixed(2)}%</p>
-    <p><strong>Retorno Anualizado Longo:</strong> ${(retornoAnualLongo * 100).toFixed(2)}%</p>
+    <p><strong>Retorno Anualizado Curto:</strong> ${isNaN(retornoAnualCurto) ? 'NaN%' : (retornoAnualCurto * 100).toFixed(2) + '%'}</p>
+    <p><strong>Retorno Anualizado Longo:</strong> ${isNaN(retornoAnualLongo) ? 'NaN%' : (retornoAnualLongo * 100).toFixed(2) + '%'}</p>
     <p><strong>CDI Break-even:</strong> ${cdiBreakEven}</p>
   `;
   document.getElementById('resumo').innerHTML = resumo;
