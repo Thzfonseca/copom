@@ -184,18 +184,23 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
 
   document.getElementById('resumo').innerHTML = `
     <div class="card">
+      <i data-lucide="trending-down"></i>
       <h3>Retorno Anualizado Curto</h3>
       <p>${isNaN(retornoAnualCurto) ? '-' : (retornoAnualCurto * 100).toFixed(2) + '%'}</p>
     </div>
     <div class="card">
+      <i data-lucide="trending-up"></i>
       <h3>Retorno Anualizado Longo</h3>
       <p>${isNaN(retornoAnualLongo) ? '-' : (retornoAnualLongo * 100).toFixed(2) + '%'}</p>
     </div>
     <div class="card">
+      <i data-lucide="target"></i>
       <h3>CDI Break-even</h3>
       <p>${cdiBreakEven}</p>
     </div>
   `;
+
+  lucide.createIcons();
 
   const narrativa = `
     <p><strong>Simulação:</strong> Esta comparação avalia dois caminhos de investimento indexado ao IPCA+: uma opção curta com vencimento em ${prazoCurto} anos e uma opção longa com vencimento em ${prazoLongo} anos.</p>

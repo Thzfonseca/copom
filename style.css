@@ -31,7 +31,8 @@ label {
   color: #1a1a1a;
 }
 
-input, select {
+input[type="number"],
+select {
   padding: 0.4rem 0.6rem;
   font-size: 0.95rem;
   border-radius: 6px;
@@ -41,7 +42,8 @@ input, select {
   box-sizing: border-box;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: #2e5bff;
   outline: none;
 }
@@ -55,7 +57,7 @@ button {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: background 0.3s ease;
 }
 
@@ -66,7 +68,7 @@ button:hover {
 .box {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   padding: 1.2rem 1.5rem;
   margin-bottom: 1.5rem;
   max-width: 720px;
@@ -88,25 +90,6 @@ button:hover {
   padding: 1.2rem;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  font-size: 0.9rem;
-}
-
-th, td {
-  padding: 0.6rem;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-}
-
-th {
-  background-color: #f0f2f5;
-  color: #333;
-  font-weight: 600;
-}
-
 canvas {
   margin-top: 2rem;
   max-width: 100%;
@@ -115,7 +98,7 @@ canvas {
   margin-right: auto;
 }
 
-/* Cards de resumo */
+/* Cards com ícones */
 .resumo-cards {
   display: flex;
   flex-wrap: wrap;
@@ -135,20 +118,61 @@ canvas {
   padding: 1rem 1.2rem;
   min-width: 220px;
   flex: 1;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.resumo-cards .card svg {
+  width: 24px;
+  height: 24px;
+  stroke: #2e5bff;
 }
 
 .resumo-cards .card h3 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #2e5bff;
-  margin-bottom: 0.4rem;
+  margin: 0;
 }
 
 .resumo-cards .card p {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: #1e1e1e;
   margin: 0;
+}
+
+/* Sliders refinados */
+#sliders-premissas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.slider-bloco {
+  background: #f9f9fc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.slider-ano {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2e5bff;
+}
+
+.slider-bloco label {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.slider-bloco input[type="range"] {
+  width: 100%;
+  margin-top: 0.2rem;
 }
 
 .narrativa-explicativa {
@@ -159,7 +183,7 @@ canvas {
   padding: 1.5rem;
   border-left: 4px solid #2e5bff;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .narrativa-explicativa ul {
