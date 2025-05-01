@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,7 +6,6 @@
   <title>COPOM Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -23,14 +21,76 @@
     <main class="main-content">
       <!-- ROLAGEM IPCA+ -->
       <section id="rolagem-ipca" class="tab-content">
-        <!-- Conteúdo será injetado via JS -->
+        <div class="rolagem-container">
+          <h2>Simulador de Rolagem IPCA+</h2>
+
+          <div class="grid grid-2">
+            <div>
+              <div class="box-opcao">
+                <h3>Opção Curta</h3>
+                <label>Indexador:
+                  <select id="curta-indexador">
+                    <option value="ipca">IPCA+</option>
+                    <option value="pre">Pré</option>
+                  </select>
+                </label>
+                <label>Taxa (% a.a.):
+                  <input type="number" id="curta-taxa" value="6.00" step="0.01" />
+                </label>
+                <label>Prazo (anos):
+                  <input type="number" id="curta-prazo" value="2.0" step="0.5" />
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <div class="box-opcao">
+                <h3>Opção Longa</h3>
+                <label>Indexador:
+                  <select id="longa-indexador">
+                    <option value="ipca">IPCA+</option>
+                    <option value="pre">Pré</option>
+                  </select>
+                </label>
+                <label>Taxa (% a.a.):
+                  <input type="number" id="longa-taxa" value="6.50" step="0.01" />
+                </label>
+                <label>Prazo (anos):
+                  <input type="number" id="longa-prazo" value="5.0" step="0.5" />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="box-premissas mt-3">
+            <h3>Premissas de IPCA e CDI (% a.a.)</h3>
+            <table class="tabela-premissas">
+              <thead><tr><th>Ano</th><th>IPCA</th><th>CDI</th></tr></thead>
+              <tbody id="tabela-premissas-body"></tbody>
+            </table>
+          </div>
+
+          <div class="botoes-container">
+            <button class="button button-simular" id="btn-simular-rolagem">Simular Rolagem</button>
+            <button class="button button-resetar" id="btn-resetar-rolagem">Resetar</button>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="grafico-rolagem-ipca" height="100"></canvas>
+          </div>
+
+          <div id="resultado-final"></div>
+        </div>
       </section>
-    
-        <div><button onclick="copiarRelatorioErros()" style="float:right;background:#f88;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;">Copiar Logs</button></div><div id="relatorio-erros" style="position:fixed;bottom:10px;left:240px;right:10px;
+
+      <div>
+        <button onclick="copiarRelatorioErros()" style="float:right;background:#f88;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;">Copiar Logs</button>
+      </div>
+      <div id="relatorio-erros" style="position:fixed;bottom:10px;left:240px;right:10px;
         background:#fee;border:1px solid #f88;padding:10px;border-radius:8px;
         font-family:monospace;font-size:0.9rem;color:#900;max-height:150px;
         overflow:auto;display:none;z-index:1000;"></div>
-</main>
+    </main>
   </div>
 
   <!-- Scripts -->
