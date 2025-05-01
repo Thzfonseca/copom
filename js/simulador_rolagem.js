@@ -70,7 +70,6 @@ function simularRolagem() {
   const curvaLonga = calcularCurva(longa, "longa", longa.prazo);
 
   desenharGrafico(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
-  desenharGraficoBarras(curta, longa, curvaCurta, curvaLonga);
   desenharTabelaResumo(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
 }
 
@@ -130,40 +129,6 @@ function desenharGrafico(curta, longa, prazoCurta, prazoLonga) {
   });
 }
 
-function desenharGraficoBarras(curta, longa, curvaCurta, curvaLonga) {
-  const container = document.getElementById("grafico-barras");
-  if (!container) return;
-
-  const retornoCurta = (curvaCurta.find(p => p.t === longa.prazo)?.retorno || 0) / longa.prazo;
-  const retornoLonga = (curvaLonga.find(p => p.t === longa.prazo)?.retorno || 0) / longa.prazo;
-
-  const cdiBreakEven = (Math.pow((curvaLonga.find(p => p.t === longa.prazo)?.retorno || 0) / (curvaCurta.find(p => p.t === longa.prazo)?.retorno || 1), 1 / (longa.prazo - curta.prazo)) - 1);
-  const cdiBreakEvenAA = (Math.pow(1 + cdiBreakEven, 2) - 1) * 100;
-
-  if (window.barrasChart) window.barrasChart.destroy();
-
-  const ctx = container.getContext("2d");
-  window.barrasChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Opção Curta", "Opção Longa", "CDI Break-even"],
-      datasets: [{
-        label: "Retorno Médio % a.a.",
-        data: [retornoCurta, retornoLonga, cdiBreakEvenAA],
-        backgroundColor: ["#0077b6", "#f77f00", "#90be6d"]
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { ticks: { callback: v => v + "%" }, beginAtZero: true },
-        x: { ticks: { color: "#333" } }
-      }
-    }
-  });
-}
-
 function desenharTabelaResumo(curvaCurta, curvaLonga, prazoCurta, prazoLonga) {
   const div = document.getElementById("resultado-final");
   if (!div) return;
@@ -180,7 +145,9 @@ function desenharTabelaResumo(curvaCurta, curvaLonga, prazoCurta, prazoLonga) {
   const ipcaMedia = ipca.reduce((a, b) => a + b, 0) / ipca.length;
   const cdiMedia = cdi.reduce((a, b) => a + b, 0) / cdi.length;
 
-  const narrativa = `A troca de um título IPCA+ de ${prazoCurta} anos a ${getDados("curta").taxa.toFixed(2)}% para um de ${prazoLonga} anos a ${getDados("longa").taxa.toFixed(2)}% pode oferecer um ganho anualizado de ${ganhoAnualizado.toFixed(2)} p.p. Se, após o vencimento do papel curto, o reinvestimento for feito a um CDI médio inferior a ${cdiBreakEvenAA.toFixed(2)}% a.a., a troca se justifica.`;
+  const narrativa = `Entre um papel que vence antes e outro que atravessa o tempo, a diferença está no que acontece depois.<br>
+  Caso os juros permaneçam numa trajetória decrescente, com CDI médio abaixo de ${cdiBreakEvenAA.toFixed(2)}% ao ano no período de reinvestimento, o papel mais longo tende a entregar um retorno superior — com mais estabilidade e menor exposição à incerteza da curva.<br>
+  Não se trata de prever o futuro, mas de entender o preço do tempo hoje.`;
 
   div.innerHTML = `
     <div class="box-premissas">
