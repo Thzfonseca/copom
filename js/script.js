@@ -90,12 +90,12 @@ function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, p
   const tempoRestante = prazoLongo - prazoCurto;
   const n = tempoRestante * 2; // semestres
 
-  if (n > 0) {
+  if (n > 0 && acumCurtoAteVencimento > 0) {
     try {
-      const fatorCDI = acumLongoFinal / acumCurtoAteVencimento;
-      const rSemestral = Math.pow(fatorCDI, 1 / n) - 1;
-      const rAnual = Math.pow(1 + rSemestral, 2) - 1;
-      cdiBreakEven = (rAnual * 100).toFixed(2) + '%';
+      const fator = acumLongoFinal / acumCurtoAteVencimento;
+      const taxaSemestral = Math.pow(fator, 1 / n) - 1;
+      const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
+      cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
     } catch (e) {
       registrarErro("Erro ao calcular CDI break-even: " + e.message);
     }
@@ -109,7 +109,6 @@ function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, p
   document.getElementById('resumo').innerHTML = resumo;
 }
 
-// Coletor de erros
 function registrarErro(msg) {
   console.error("[SIMULADOR-ERRO]", msg);
   window.__errosDebug = window.__errosDebug || [];

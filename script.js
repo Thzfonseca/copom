@@ -13,8 +13,9 @@ function simular() {
     const rentabilidadeLonga = [];
     const intervalos = Math.ceil(prazoLonga * 2);
 
-    let acumuladoCurto = 1;
-    let acumuladoLongo = 1;
+    let acumCurtoAteVencimento = 1;
+    let acumCurtoFinal = 1;
+    let acumLongoFinal = 1;
 
     for (let i = 0; i <= intervalos; i++) {
       const t = i * 0.5;
@@ -24,20 +25,24 @@ function simular() {
       const ipca = premissas[ano]?.ipca ?? premissas[2028].ipca;
       const cdi = premissas[ano]?.cdi ?? premissas[2028].cdi;
 
+      const taxaRealCurta = taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0);
+      const taxaRealLonga = taxaLongo + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0);
+
       if (t <= prazoCurta) {
-        acumuladoCurto *= 1 + (taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0)) / 100 / 2;
+        acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
+        acumCurtoFinal *= 1 + taxaRealCurta / 100 / 2;
       } else {
-        acumuladoCurto *= 1 + cdi / 100 / 2;
+        acumCurtoFinal *= 1 + cdi / 100 / 2;
       }
 
-      acumuladoLongo *= 1 + (taxaLonga + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0)) / 100 / 2;
+      acumLongoFinal *= 1 + taxaRealLonga / 100 / 2;
 
-      rentabilidadeCurta.push((acumuladoCurto - 1) * 100);
-      rentabilidadeLonga.push((acumuladoLongo - 1) * 100);
+      rentabilidadeCurta.push((acumCurtoFinal - 1) * 100);
+      rentabilidadeLonga.push((acumLongoFinal - 1) * 100);
     }
 
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
-    mostrarResumo(acumuladoCurto, acumuladoLongo, prazoLonga);
+    mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurta, prazoLonga);
   } catch (e) {
     registrarErro(e.message);
   }
@@ -69,24 +74,41 @@ function plotarGrafico(labels, serie1, serie2) {
     },
     options: {
       responsive: true,
-      plugins: { legend: { position: 'top' }, title: { display: true, text: 'Rentabilidade Acumulada (%)' } }
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Rentabilidade Acumulada (%)' }
+      }
     }
   });
 }
 
-function mostrarResumo(acumCurta, acumLonga, prazo) {
-  const retornoCurto = Math.pow(acumCurta, 1 / prazo) - 1;
-  const retornoLongo = Math.pow(acumLonga, 1 / prazo) - 1;
-  const breakeven = ((retornoLongo - retornoCurto) * 100).toFixed(2);
+function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurto, prazoLongo) {
+  const retornoAnualCurto = Math.pow(acumCurtoAteVencimento, 1 / prazoCurto) - 1;
+  const retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+
+  let cdiBreakEven = '-';
+  const tempoRestante = prazoLongo - prazoCurto;
+  const n = tempoRestante * 2; // semestres
+
+  if (n > 0 && acumCurtoAteVencimento > 0) {
+    try {
+      const fator = acumLongoFinal / acumCurtoAteVencimento;
+      const taxaSemestral = Math.pow(fator, 1 / n) - 1;
+      const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
+      cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
+    } catch (e) {
+      registrarErro("Erro ao calcular CDI break-even: " + e.message);
+    }
+  }
+
   const resumo = `
-    <p><strong>Retorno Anualizado Curto:</strong> ${(retornoCurto * 100).toFixed(2)}%</p>
-    <p><strong>Retorno Anualizado Longo:</strong> ${(retornoLongo * 100).toFixed(2)}%</p>
-    <p><strong>CDI Break-even:</strong> ${breakeven}%</p>
+    <p><strong>Retorno Anualizado Curto:</strong> ${(retornoAnualCurto * 100).toFixed(2)}%</p>
+    <p><strong>Retorno Anualizado Longo:</strong> ${(retornoAnualLongo * 100).toFixed(2)}%</p>
+    <p><strong>CDI Break-even:</strong> ${cdiBreakEven}</p>
   `;
   document.getElementById('resumo').innerHTML = resumo;
 }
 
-// Coletor de erros
 function registrarErro(msg) {
   console.error("[SIMULADOR-ERRO]", msg);
   window.__errosDebug = window.__errosDebug || [];
