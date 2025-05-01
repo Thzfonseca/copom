@@ -69,7 +69,8 @@ function simularRolagem() {
   const curvaCurta = calcularCurva(curta, "curta", longa.prazo);
   const curvaLonga = calcularCurva(longa, "longa", longa.prazo);
 
-  desenharGrafico(curvaCurta, curvaLonga, longa.prazo);
+  desenharGrafico(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
+  desenharGraficoBarras(curta, longa, curvaCurta, curvaLonga);
   desenharTabelaResumo(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
 }
 
@@ -99,7 +100,7 @@ function calcularCurva({ indexador, taxa, prazo }, tipo, prazoFinal) {
   return pontos;
 }
 
-function desenharGrafico(curta, longa, prazoLonga) {
+function desenharGrafico(curta, longa, prazoCurta, prazoLonga) {
   const ctx = document.getElementById("grafico-rolagem-ipca").getContext("2d");
   const labels = [];
   for (let t = 0.5; t <= prazoLonga; t += 0.5) labels.push(t.toFixed(1) + "a");
@@ -108,44 +109,78 @@ function desenharGrafico(curta, longa, prazoLonga) {
   const dadosLonga = labels.map(l => longa.find(p => p.t.toFixed(1) + "a" === l)?.retorno?.toFixed(2) ?? null);
 
   if (window.rolagemChart) window.rolagemChart.destroy();
+
   window.rolagemChart = new Chart(ctx, {
     type: "line",
     data: {
       labels,
       datasets: [
-        { label: "Opção Curta", data: dadosCurta, borderColor: "#0077b6", borderWidth: 2 },
-        { label: "Opção Longa", data: dadosLonga, borderColor: "#f77f00", borderWidth: 2 }
+        { label: "Opção Curta", data: dadosCurta, borderColor: "#0077b6", borderWidth: 3, pointRadius: 0, fill: false },
+        { label: "Opção Longa", data: dadosLonga, borderColor: "#f77f00", borderWidth: 3, pointRadius: 0, fill: false }
       ]
     },
     options: {
       responsive: true,
       plugins: { legend: { labels: { color: "#333" } } },
       scales: {
-        y: { ticks: { callback: v => v + "%", color: "#444" } },
-        x: { ticks: { color: "#444" } }
+        y: { ticks: { callback: v => v + "%", color: "#444" }, grid: { color: "#eee" } },
+        x: { ticks: { color: "#444" }, grid: { color: "#eee" } }
       }
     }
   });
 }
 
-function desenharTabelaResumo(curta, longa, prazoCurta, prazoLonga) {
+function desenharGraficoBarras(curta, longa, curvaCurta, curvaLonga) {
+  const container = document.getElementById("grafico-barras");
+  if (!container) return;
+
+  const retornoCurta = (curvaCurta.find(p => p.t === longa.prazo)?.retorno || 0) / longa.prazo;
+  const retornoLonga = (curvaLonga.find(p => p.t === longa.prazo)?.retorno || 0) / longa.prazo;
+
+  const cdiBreakEven = (Math.pow((curvaLonga.find(p => p.t === longa.prazo)?.retorno || 0) / (curvaCurta.find(p => p.t === longa.prazo)?.retorno || 1), 1 / (longa.prazo - curta.prazo)) - 1);
+  const cdiBreakEvenAA = (Math.pow(1 + cdiBreakEven, 2) - 1) * 100;
+
+  if (window.barrasChart) window.barrasChart.destroy();
+
+  const ctx = container.getContext("2d");
+  window.barrasChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Opção Curta", "Opção Longa", "CDI Break-even"],
+      datasets: [{
+        label: "Retorno Médio % a.a.",
+        data: [retornoCurta, retornoLonga, cdiBreakEvenAA],
+        backgroundColor: ["#0077b6", "#f77f00", "#90be6d"]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: v => v + "%" }, beginAtZero: true },
+        x: { ticks: { color: "#333" } }
+      }
+    }
+  });
+}
+
+function desenharTabelaResumo(curvaCurta, curvaLonga, prazoCurta, prazoLonga) {
   const div = document.getElementById("resultado-final");
   if (!div) return;
 
-  const retornoCurta = (curta.find(p => p.t === prazoLonga)?.retorno || 0) / prazoLonga;
-  const retornoLonga = (longa.find(p => p.t === prazoLonga)?.retorno || 0) / prazoLonga;
+  const retornoCurta = (curvaCurta.find(p => p.t === prazoLonga)?.retorno || 0) / prazoLonga;
+  const retornoLonga = (curvaLonga.find(p => p.t === prazoLonga)?.retorno || 0) / prazoLonga;
   const entre = prazoLonga - prazoCurta;
-
-  const ganhoTotal = (longa.find(p => p.t === prazoLonga)?.retorno || 0) / 100 / (curta.find(p => p.t === prazoLonga)?.retorno || 1) * 100;
-  const ganhoAnualizado = (Math.pow((1 + ganhoTotal / 100), 1 / entre) - 1) * 100;
-
-  const cdiBreakEven = (Math.pow((longa.find(p => p.t === prazoLonga)?.retorno || 0) / (curta.find(p => p.t === prazoLonga)?.retorno || 1), 1 / entre) - 1);
+  const ganhoAnualizado = (Math.pow((1 + retornoLonga / 100) / (1 + retornoCurta / 100), 1 / entre) - 1) * 100;
+  const cdiBreakEven = (Math.pow((curvaLonga.find(p => p.t === prazoLonga)?.retorno || 0) / (curvaCurta.find(p => p.t === prazoLonga)?.retorno || 1), 1 / entre) - 1);
   const cdiBreakEvenAA = (Math.pow(1 + cdiBreakEven, 2) - 1) * 100;
 
   const ipca = window.premissasFinalArray.ipca.slice(0, prazoLonga * 2);
   const cdi = window.premissasFinalArray.cdi.slice(0, prazoLonga * 2);
   const ipcaMedia = ipca.reduce((a, b) => a + b, 0) / ipca.length;
   const cdiMedia = cdi.reduce((a, b) => a + b, 0) / cdi.length;
+
+  const narrativa = `A troca de um título IPCA+ de ${prazoCurta} anos a ${getDados("curta").taxa.toFixed(2)}% para um de ${prazoLonga} anos a ${getDados("longa").taxa.toFixed(2)}% pode oferecer um ganho anualizado de ${ganhoAnualizado.toFixed(2)} p.p. Se, após o vencimento do papel curto, o reinvestimento for feito a um CDI médio inferior a ${cdiBreakEvenAA.toFixed(2)}% a.a., a troca se justifica.`;
 
   div.innerHTML = `
     <div class="box-premissas">
@@ -157,14 +192,16 @@ function desenharTabelaResumo(curta, longa, prazoCurta, prazoLonga) {
         <tr><td>IPCA</td><td colspan="3">${ipcaMedia.toFixed(2)}%</td></tr>
         <tr><td>CDI Break-even</td><td colspan="3">${cdiBreakEvenAA.toFixed(2)}%</td></tr>
       </table>
-      <p><strong>Narração:</strong></p>
-      <p>A troca do papel IPCA de ${prazoCurta} anos a ${(getDados("curta").taxa).toFixed(2)}% para um IPCA de ${prazoLonga} anos a ${(getDados("longa").taxa).toFixed(2)}% pode render um ganho anualizado de ${ganhoAnualizado.toFixed(2)} p.p., segundo as premissas atuais. <br>Para que o trade se justifique, o CDI médio no reinvestimento deve ficar abaixo de ${cdiBreakEvenAA.toFixed(2)}% a.a.</p>
-      <button onclick="copiarResumo()">Copiar Texto</button>
+      <div style="margin-top: 12px;">
+        <strong>Narração Comercial:</strong>
+        <p id="narrativa-texto">${narrativa}</p>
+        <button class="button" onclick="copiarNarrativa()">Copiar Texto</button>
+      </div>
     </div>
   `;
 }
 
-function copiarResumo() {
-  const texto = document.querySelector("#resultado-final p:nth-of-type(2)").innerText;
-  navigator.clipboard.writeText(texto).then(() => alert("Narrativa copiada."));
+function copiarNarrativa() {
+  const texto = document.getElementById("narrativa-texto").innerText;
+  navigator.clipboard.writeText(texto).then(() => alert("Narrativa copiada!"));
 }
