@@ -23,7 +23,6 @@ function copiarRelatorioErros() {
 function normalizarReferenciaTrimestre(valor) {
   if (!valor) return null;
 
-  // Caso seja número de série do Excel (data)
   if (typeof valor === 'number' && valor > 40000) {
     const excelEpoch = new Date(Date.UTC(1899, 11, 30));
     const date = new Date(excelEpoch.getTime() + valor * 86400 * 1000);
@@ -31,7 +30,6 @@ function normalizarReferenciaTrimestre(valor) {
     return `${meses[date.getMonth()]}-${date.getFullYear().toString().slice(2)}`;
   }
 
-  // Caso seja objeto Date direto
   if (typeof valor === 'object' && valor instanceof Date) {
     const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return `${meses[valor.getMonth()]}-${valor.getFullYear().toString().slice(2)}`;
@@ -58,7 +56,64 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("rolagem-ipca");
   if (!container) return;
 
-  container.innerHTML = `...`; // conteúdo HTML omitido por brevidade
+  container.innerHTML = `
+    <div class="rolagem-container">
+      <h2>Simulador de Rolagem IPCA+</h2>
+      <div class="grid grid-2">
+        <div>
+          <div class="box-opcao">
+            <h3>Opção Curta</h3>
+            <label>Indexador:
+              <select id="curta-indexador">
+                <option value="ipca">IPCA+</option>
+                <option value="pre">Pré</option>
+              </select>
+            </label>
+            <label>Taxa (% a.a.):
+              <input type="number" id="curta-taxa" value="6.00" step="0.01" />
+            </label>
+            <label>Prazo (anos):
+              <input type="number" id="curta-prazo" value="2.0" step="0.5" />
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <div class="box-opcao">
+            <h3>Opção Longa</h3>
+            <label>Indexador:
+              <select id="longa-indexador">
+                <option value="ipca">IPCA+</option>
+                <option value="pre">Pré</option>
+              </select>
+            </label>
+            <label>Taxa (% a.a.):
+              <input type="number" id="longa-taxa" value="6.50" step="0.01" />
+            </label>
+            <label>Prazo (anos):
+              <input type="number" id="longa-prazo" value="5.0" step="0.5" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="box-premissas mt-3">
+        <h3>Premissas por Ano (a partir de 2025)</h3>
+        <input type="file" id="input-arquivo" accept=".xlsx" />
+      </div>
+
+      <div class="botoes-container">
+        <button class="button button-simular" id="btn-simular-rolagem">Simular Rolagem</button>
+        <button class="button button-resetar" id="btn-resetar-rolagem">Resetar</button>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="grafico-rolagem-ipca" height="100"></canvas>
+      </div>
+
+      <div id="resultado-final"></div>
+    </div>
+  `;
 
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
