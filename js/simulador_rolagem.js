@@ -45,11 +45,11 @@ async function buscarDadosFocus() {
   try {
     const res = await fetch("https://api.bcb.gov.br/dados/serie/bcdata.sgs.4385/dados/ultimos/4?formato=json");
     const ipcaData = await res.json();
-    const ipca = ipcaData.map(v => parseFloat(v.valor)).reverse();
+    const ipca = ipcaData.map(v => parseFloat(v.valor.replace(',', '.'))).reverse();
 
     const res2 = await fetch("https://api.bcb.gov.br/dados/serie/bcdata.sgs.1178/dados/ultimos/4?formato=json");
     const selicData = await res2.json();
-    const cdi = selicData.map(v => parseFloat(v.valor)).reverse();
+    const cdi = selicData.map(v => parseFloat(v.valor.replace(',', '.'))).reverse();
 
     preencherTabelaPremissas(ipca, cdi);
   } catch (e) {
