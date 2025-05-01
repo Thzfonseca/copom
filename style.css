@@ -13,34 +13,32 @@ h1 {
   font-size: 2.2rem;
   font-weight: 600;
   color: #0a2540;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
 h2 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #0a2540;
-  margin-top: 2rem;
   margin-bottom: 1rem;
 }
 
 label {
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
   font-weight: 500;
   color: #1a1a1a;
 }
 
 input, select {
-  padding: 0.6rem 0.8rem;
-  font-size: 1rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
   border: 1px solid #ccc;
   width: 100%;
+  margin-top: 0.2rem;
   box-sizing: border-box;
-  margin-top: 0.3rem;
-  background: white;
-  transition: border 0.2s ease-in-out;
 }
 
 input:focus, select:focus {
@@ -51,13 +49,12 @@ input:focus, select:focus {
 button {
   background-color: #2e5bff;
   color: white;
-  padding: 0.7rem 1.5rem;
+  padding: 0.6rem 1.4rem;
   font-size: 1rem;
   font-weight: 600;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 1.5rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   transition: background 0.3s ease;
 }
@@ -68,20 +65,34 @@ button:hover {
 
 .box {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-  padding: 1.8rem;
-  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.5rem;
   max-width: 720px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.grid-duas-colunas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 2rem;
+}
+
+.grid-duas-colunas .box {
+  max-width: 350px;
+  flex: 1;
+  padding: 1.2rem;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 th, td {
@@ -97,7 +108,7 @@ th {
 }
 
 canvas {
-  margin-top: 3rem;
+  margin-top: 2rem;
   max-width: 100%;
   display: block;
   margin-left: auto;
@@ -106,11 +117,11 @@ canvas {
 
 .narrativa-explicativa {
   font-size: 1rem;
-  line-height: 1.75;
+  line-height: 1.65;
   color: #333;
   background: #ffffff;
   padding: 1.5rem;
-  border-left: 5px solid #2e5bff;
+  border-left: 4px solid #2e5bff;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.05);
 }
@@ -140,8 +151,12 @@ canvas {
     padding: 20px;
   }
 
+  .grid-duas-colunas {
+    flex-direction: column;
+  }
+
   .box {
-    padding: 1.2rem;
+    padding: 1rem;
   }
 
   h1 {
