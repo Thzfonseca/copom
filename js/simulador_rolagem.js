@@ -74,12 +74,7 @@ function simularRolagem() {
     return;
   }
 
-  window.premissasFinalArray = {
-    ipca,
-    cdi,
-    maxAno,
-    anos
-  };
+  window.premissasFinalArray = { ipca, cdi, maxAno, anos };
 
   const curta = getDados("curta");
   const longa = getDados("longa");
@@ -88,12 +83,11 @@ function simularRolagem() {
   const curvaLonga = calcularCurva(longa, "longa");
 
   desenharGrafico(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
-  desenharTabelaResumo(curvaCurta, curvaLonga, curta.prazo, longa.prazo);
+  desenharTabelaResumo(curvaCurta, curvaLonga, curta.prazo, longa.prazo, curta, longa);
 }
 
 function calcularCurva({ indexador, taxa, prazo }, tipo) {
   const { ipca, cdi } = window.premissasFinalArray;
-
   const pontos = [];
   let acumulado = 1;
 
@@ -119,24 +113,27 @@ function calcularCurva({ indexador, taxa, prazo }, tipo) {
   return pontos;
 }
 
+function calcularBreakEven(curvaCurta, curvaLonga, prazoCurta, prazoLonga) {
+  const entre = prazoLonga - prazoCurta;
+  const retornoCurta = curvaCurta.find(p => p.t === prazoCurta)?.retorno || 0;
+  const retornoLonga = curvaLonga.find(p => p.t === prazoLonga)?.retorno || 0;
+  const retornoEntre = (retornoLonga - retornoCurta) / entre;
+  return retornoEntre;
+}
+
+function gerarNarrativa(curta, longa, diff, breakEven) {
+  return `A troca do papel ${curta.indexador.toUpperCase()} de ${curta.prazo} anos a ${curta.taxa.toFixed(2)}% para um ${longa.indexador.toUpperCase()} de ${longa.prazo} anos a ${longa.taxa.toFixed(2)}% pode render um ganho anualizado de ${diff.toFixed(2)} p.p., segundo as premissas atuais. Para que o trade se justifique, o CDI médio no reinvestimento deve ficar abaixo de ${breakEven.toFixed(2)}% a.a.`;
+}
+
 function desenharGrafico(curta, longa, prazoCurta, prazoLonga) {
   const ctx = document.getElementById("grafico-rolagem-ipca").getContext("2d");
   const labels = [];
-
   const maxPrazo = Math.max(prazoCurta, prazoLonga);
-  for (let t = 0.5; t <= maxPrazo; t += 0.5) {
-    labels.push(t.toFixed(1) + "a");
-  }
 
-  const dadosCurta = labels.map(l => {
-    const p = curta.find(p => p.t.toFixed(1) + "a" === l);
-    return p ? p.retorno.toFixed(2) : null;
-  });
+  for (let t = 0.5; t <= maxPrazo; t += 0.5) labels.push(t.toFixed(1) + "a");
 
-  const dadosLonga = labels.map(l => {
-    const p = longa.find(p => p.t.toFixed(1) + "a" === l);
-    return p ? p.retorno.toFixed(2) : null;
-  });
+  const dadosCurta = labels.map(l => curta.find(p => p.t.toFixed(1) + "a" === l)?.retorno.toFixed(2) || null);
+  const dadosLonga = labels.map(l => longa.find(p => p.t.toFixed(1) + "a" === l)?.retorno.toFixed(2) || null);
 
   if (window.rolagemChart) window.rolagemChart.destroy();
 
@@ -151,9 +148,7 @@ function desenharGrafico(curta, longa, prazoCurta, prazoLonga) {
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: { labels: { color: "#333" } }
-      },
+      plugins: { legend: { labels: { color: "#333" } } },
       scales: {
         y: { ticks: { callback: v => v + "%", color: "#444" } },
         x: { ticks: { color: "#444" } }
@@ -162,19 +157,23 @@ function desenharGrafico(curta, longa, prazoCurta, prazoLonga) {
   });
 }
 
-function desenharTabelaResumo(curta, longa, prazoCurta, prazoLonga) {
+function desenharTabelaResumo(curvaCurta, curvaLonga, prazoCurta, prazoLonga, curta, longa) {
   const div = document.getElementById("resultado-final");
   if (!div) return;
 
-  const retornoCurta = (curta.find(p => p.t === prazoCurta)?.retorno || 0) / prazoCurta;
-  const retornoLonga = (longa.find(p => p.t === prazoLonga)?.retorno || 0) / prazoLonga;
+  const retornoCurta = (curvaCurta.find(p => p.t === prazoCurta)?.retorno || 0) / prazoCurta;
+  const retornoLonga = (curvaLonga.find(p => p.t === prazoLonga)?.retorno || 0) / prazoLonga;
   const entre = prazoLonga - prazoCurta;
-  const diff = ((longa.find(p => p.t === prazoLonga)?.retorno || 0) - (curta.find(p => p.t === prazoCurta)?.retorno || 0)) / entre;
+  const diff = ((curvaLonga.find(p => p.t === prazoLonga)?.retorno || 0) - (curvaCurta.find(p => p.t === prazoCurta)?.retorno || 0)) / entre;
+
+  const breakEven = calcularBreakEven(curvaCurta, curvaLonga, prazoCurta, prazoLonga);
 
   const ipca = window.premissasFinalArray.ipca.slice(0, prazoLonga * 2);
   const cdi = window.premissasFinalArray.cdi.slice(0, prazoLonga * 2);
   const ipcaMedia = ipca.reduce((a, b) => a + b, 0) / ipca.length;
   const cdiMedia = cdi.reduce((a, b) => a + b, 0) / cdi.length;
+
+  const texto = gerarNarrativa(curta, longa, diff, breakEven);
 
   div.innerHTML = `
     <div class="box-premissas">
@@ -184,7 +183,18 @@ function desenharTabelaResumo(curta, longa, prazoCurta, prazoLonga) {
         <tr><td>Papel</td><td>${retornoCurta.toFixed(2)}%</td><td>${retornoLonga.toFixed(2)}%</td><td>${diff.toFixed(2)}%</td></tr>
         <tr><td>CDI</td><td colspan="3">${cdiMedia.toFixed(2)}%</td></tr>
         <tr><td>IPCA</td><td colspan="3">${ipcaMedia.toFixed(2)}%</td></tr>
+        <tr><td>CDI Break-even</td><td colspan="3">${breakEven.toFixed(2)}%</td></tr>
       </table>
+      <div style="margin-top: 12px;">
+        <strong>Narração:</strong>
+        <p id="narrativa-texto">${texto}</p>
+        <button class="button" onclick="copiarNarrativa()">Copiar Texto</button>
+      </div>
     </div>
   `;
+}
+
+function copiarNarrativa() {
+  const texto = document.getElementById("narrativa-texto").innerText;
+  navigator.clipboard.writeText(texto).then(() => alert("Narração copiada!"));
 }
