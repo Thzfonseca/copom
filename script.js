@@ -2,10 +2,21 @@ document.getElementById('simular').addEventListener('click', simular);
 
 function simular() {
   try {
-    const taxaCurta = parseFloat(document.getElementById('taxaCurto').value);
-    const prazoCurta = parseFloat(document.getElementById('prazoCurto').value);
-    const taxaLonga = parseFloat(document.getElementById('taxaLongo').value);
-    const prazoLonga = parseFloat(document.getElementById('prazoLongo').value);
+    const taxaCurta = parseFloat(document.getElementById('taxaCurto').value.replace(',', '.'));
+    const prazoCurta = parseFloat(document.getElementById('prazoCurto').value.replace(',', '.'));
+    const taxaLonga = parseFloat(document.getElementById('taxaLongo').value.replace(',', '.'));
+    const prazoLonga = parseFloat(document.getElementById('prazoLongo').value.replace(',', '.'));
+
+    if (
+      isNaN(taxaCurta) || isNaN(prazoCurta) ||
+      isNaN(taxaLonga) || isNaN(prazoLonga) ||
+      taxaCurta <= 0 || prazoCurta <= 0 ||
+      taxaLonga <= 0 || prazoLonga <= 0
+    ) {
+      registrarErro("Preencha corretamente todas as taxas e prazos com valores positivos.");
+      return;
+    }
+
     const premissas = getPremissas();
 
     const anos = [];
@@ -44,7 +55,7 @@ function simular() {
     const acumLongoFinal = acumLongo;
 
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
-    mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurto, prazoLonga);
+    mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurta, prazoLonga);
   } catch (e) {
     registrarErro(e.message);
   }
@@ -55,8 +66,8 @@ function getPremissas() {
   const premissas = {};
   linhas.forEach(linha => {
     const ano = parseInt(linha.children[0].innerText);
-    const ipca = parseFloat(linha.children[1].children[0].value);
-    const cdi = parseFloat(linha.children[2].children[0].value);
+    const ipca = parseFloat(linha.children[1].children[0].value.replace(',', '.'));
+    const cdi = parseFloat(linha.children[2].children[0].value.replace(',', '.'));
     premissas[ano] = { ipca, cdi };
   });
   return premissas;
@@ -143,8 +154,8 @@ function usarCurvaProjetada() {
 
   linhas.forEach(linha => {
     const dataStr = linha.children[0].children[0].value;
-    const selic = parseFloat(linha.children[1].children[0].value);
-    const match = dataStr.match(/([A-Za-z]{3})\/(\\d{2})/);
+    const selic = parseFloat(linha.children[1].children[0].value.replace(',', '.'));
+    const match = dataStr.match(/([A-Za-z]{3})\/(\d{2})/);
     if (match) {
       const ano = parseInt("20" + match[2]);
       dados.push({ ano, selic });
