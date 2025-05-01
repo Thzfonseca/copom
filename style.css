@@ -1,205 +1,143 @@
+/* style.css - Simulador COPOM Dashboard */
 
-/* === Reset básico === */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f5f5;
   color: #333;
 }
 
-/* === Estrutura === */
 .app-container {
   display: flex;
   height: 100vh;
-  overflow: hidden;
 }
 
 .sidebar {
   width: 220px;
-  background-color: #002244;
-  color: white;
+  background-color: #1c2b36;
+  color: #fff;
   padding: 20px;
-  flex-shrink: 0;
 }
 
 .sidebar h2 {
   margin-top: 0;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.sidebar nav ul {
+.sidebar ul {
   list-style: none;
   padding: 0;
 }
 
-.sidebar nav ul li {
-  margin-bottom: 15px;
+.sidebar ul li {
+  margin-bottom: 10px;
 }
 
-.sidebar nav ul li a {
-  color: white;
+.sidebar ul li a {
+  color: #fff;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 500;
 }
 
-.sidebar nav ul li a:hover {
+.sidebar ul li a:hover {
   text-decoration: underline;
 }
 
 .main-content {
   flex-grow: 1;
-  padding: 20px;
+  padding: 30px;
   overflow-y: auto;
-  background: #f4f4f4;
+  background-color: #ffffff;
 }
 
-.tab-content {
-  display: none;
+.rolagem-container h2 {
+  font-size: 1.75rem;
+  margin-bottom: 20px;
 }
 
-.mt-3 {
-  margin-top: 1.5rem;
-}
-
-.mt-5 {
-  margin-top: 3rem;
-}
-
-/* === Dashboard === */
-.grafico-selic-container {
-  margin-top: 30px;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-
-/* === Grid de inputs === */
 .grid.grid-2 {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-.box-opcao,
-.box-premissas {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 10px;
-  flex: 1 1 300px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.03);
+.box-opcao, .box-premissas {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
-.box-opcao h3,
-.box-premissas h3 {
+.box-opcao h3, .box-premissas h3 {
   margin-top: 0;
-  font-size: 1.1rem;
-  color: #222;
+  font-size: 1.2rem;
 }
 
 label {
   display: block;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-  color: #444;
+  margin-top: 10px;
+  font-weight: 500;
 }
 
-input[type="number"],
-select,
-input[type="file"] {
+input[type="number"], select {
   width: 100%;
-  padding: 6px 8px;
-  margin-top: 3px;
-  border: 1px solid #ccc;
+  padding: 8px;
+  margin-top: 4px;
   border-radius: 6px;
-  font-size: 0.9rem;
-  box-sizing: border-box;
-}
-
-/* === Botões === */
-.botoes-container {
-  display: flex;
-  gap: 20px;
-  margin: 30px 0;
-}
-
-.button {
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  border: none;
+  border: 1px solid #ccc;
   font-size: 0.95rem;
 }
 
-.button-simular {
-  background-color: #0077b6;
-  color: white;
-}
-
-.button-resetar {
-  background-color: #adb5bd;
-  color: white;
-}
-
-.button:hover {
-  opacity: 0.9;
-}
-
-/* === Container da aba de rolagem === */
-.rolagem-container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-
-/* === Gráficos === */
-.chart-container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.03);
-  margin-bottom: 30px;
-}
-
-canvas {
-  max-width: 100%;
-}
-
-/* === Box de resultado final === */
-#resultado-final {
-  margin-top: 2rem;
-}
-
-#resultado-final .box-premissas {
-  background-color: #e6f4ea;
-  border-left: 5px solid #2e7d32;
-  color: #2e7d32;
-}
-
-/* === Tabela de premissas === */
 .tabela-premissas {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
 
-.tabela-premissas th,
-.tabela-premissas td {
+.tabela-premissas th, .tabela-premissas td {
   border: 1px solid #ccc;
   padding: 8px;
   text-align: center;
+  font-size: 0.95rem;
 }
 
-.tabela-premissas input {
-  width: 80px;
-  text-align: right;
+.botoes-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-/* === Responsivo === */
+.button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.button-simular {
+  background-color: #0077b6;
+  color: #fff;
+}
+
+.button-resetar {
+  background-color: #adb5bd;
+  color: #fff;
+}
+
+.chart-container {
+  background: #f1f1f1;
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
   .grid.grid-2 {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .sidebar {
@@ -207,7 +145,10 @@ canvas {
   }
 
   .main-content {
-    margin: 0;
     padding: 15px;
   }
+}
+
+.mt-3 {
+  margin-top: 1.5rem;
 }
