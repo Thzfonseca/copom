@@ -39,7 +39,8 @@ function simular() {
       const taxaRealCurta = taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0);
       const taxaRealLonga = taxaLonga + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0);
 
-      if (t <= prazoCurta) {
+      // CORREÇÃO: usar t < prazoCurta para separar retorno anualizado da curta
+      if (t < prazoCurta) {
         acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
         acumCurtoFinal *= 1 + taxaRealCurta / 100 / 2;
       } else {
@@ -81,8 +82,8 @@ function plotarGrafico(labels, serie1, serie2) {
     data: {
       labels,
       datasets: [
-        { label: 'Opção Curta', data: serie1, fill: false, borderWidth: 2 },
-        { label: 'Opção Longa', data: serie2, fill: false, borderWidth: 2 }
+        { label: 'Opção Curta', data: serie1, fill: false, borderWidth: 2, borderColor: '#2196f3' },
+        { label: 'Opção Longa', data: serie2, fill: false, borderWidth: 2, borderColor: '#e91e63' }
       ]
     },
     options: {
