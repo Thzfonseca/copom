@@ -1,83 +1,134 @@
-// js/script.js
+document.getElementById('simular').addEventListener('click', simular);
 
-function mostrarLoading() {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.style.display = 'flex';
+function simular() {
+  try {
+    const taxaCurta = parseFloat(document.getElementById('taxaCurto').value);
+    const prazoCurta = parseFloat(document.getElementById('prazoCurto').value);
+    const taxaLonga = parseFloat(document.getElementById('taxaLongo').value);
+    const prazoLonga = parseFloat(document.getElementById('prazoLongo').value);
+    const premissas = getPremissas();
+
+    const anos = [];
+    const rentabilidadeCurta = [];
+    const rentabilidadeLonga = [];
+    const intervalos = Math.ceil(prazoLonga * 2);
+
+    let acumuladoCurto = 1;
+    let acumuladoLongo = 1;
+    let acumuladoCurtoFinal = 1;
+    let acumuladoLongoFinal = 1;
+
+    for (let i = 0; i <= intervalos; i++) {
+      const t = i * 0.5;
+      const ano = 2025 + Math.floor(t);
+      anos.push(t.toFixed(1));
+
+      const ipca = premissas[ano]?.ipca ?? premissas[2028].ipca;
+      const cdi = premissas[ano]?.cdi ?? premissas[2028].cdi;
+
+      if (t <= prazoCurta) {
+        acumuladoCurto *= 1 + (taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0)) / 100 / 2;
+      } else {
+        acumuladoCurto *= 1 + cdi / 100 / 2;
+      }
+
+      acumuladoLongo *= 1 + (taxaLonga + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0)) / 100 / 2;
+
+      rentabilidadeCurta.push((acumuladoCurto - 1) * 100);
+      rentabilidadeLonga.push((acumuladoLongo - 1) * 100);
+
+      if (Math.abs(t - prazoCurta) < 0.001) {
+        acumuladoCurtoFinal = acumuladoCurto;
+      }
+      if (Math.abs(t - prazoLonga) < 0.001) {
+        acumuladoLongoFinal = acumuladoLongo;
+      }
     }
+
+    plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
+    mostrarResumo(acumuladoCurtoFinal, acumuladoLongoFinal, prazoCurta, prazoLonga);
+  } catch (e) {
+    registrarErro(e.message);
+  }
 }
 
-function esconderLoading() {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.style.display = 'none';
-    }
+function getPremissas() {
+  const linhas = document.querySelectorAll('#premissas tbody tr');
+  const premissas = {};
+  linhas.forEach(linha => {
+    const ano = parseInt(linha.children[0].innerText);
+    const ipca = parseFloat(linha.children[1].children[0].value);
+    const cdi = parseFloat(linha.children[2].children[0].value);
+    premissas[ano] = { ipca, cdi };
+  });
+  return premissas;
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    mostrarLoading();
-    setTimeout(() => {
-        esconderLoading();
-    }, 1200);
-});
-
-function showTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => {
-        tab.style.display = 'none';
-    });
-
-    const selectedTab = document.getElementById(tabId);
-    if (selectedTab) {
-        selectedTab.style.display = 'block';
-    } else {
-        console.error(`Aba ${tabId} não encontrada.`);
+function plotarGrafico(labels, serie1, serie2) {
+  if (window.graficoRentab) window.graficoRentab.destroy();
+  const ctx = document.getElementById('grafico').getContext('2d');
+  window.graficoRentab = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Opção Curta', data: serie1, fill: false, borderWidth: 2 },
+        { label: 'Opção Longa', data: serie2, fill: false, borderWidth: 2 }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Rentabilidade Acumulada (%)' }
+      }
     }
-
-    initializeTabComponents(tabId);
+  });
 }
 
-function initializeTabComponents(tabId) {
+function mostrarResumo(acumCurto, acumLongo, prazoCurto, prazoLongo) {
+  const retornoCurto = Math.pow(acumCurto, 1 / prazoCurto) - 1;
+  const retornoLongo = Math.pow(acumLongo, 1 / prazoLongo) - 1;
+
+  let cdiBreakEven = '-';
+  const tempoRestante = prazoLongo - prazoCurto;
+  if (tempoRestante > 0) {
     try {
-        switch (tabId) {
-            case 'dashboard':
-                if (typeof window.renderizarDashboard === 'function') window.renderizarDashboard();
-                break;
-            case 'modelos-avancados':
-                if (typeof window.renderizarModelosAvancados === 'function') window.renderizarModelosAvancados();
-                break;
-            case 'modelos-preditivos':
-                if (typeof window.renderizarModelosPreditivos === 'function') window.renderizarModelosPreditivos();
-                break;
-            case 'simulador':
-                if (typeof window.renderizarSimulador === 'function') window.renderizarSimulador();
-                break;
-            case 'analise-atas':
-                if (typeof window.renderizarAnaliseAtas === 'function') window.renderizarAnaliseAtas(window.dadosAnaliseAtas || null);
-                break;
-            case 'focus':
-                if (typeof window.renderizarFocusAnalytics === 'function') window.renderizarFocusAnalytics(window.dadosFocus || null);
-                break;
-            case 'agenda-copom':
-                if (typeof window.renderizarAgendaCopom === 'function') window.renderizarAgendaCopom();
-                break;
-            case 'taylor-dinamico':
-                // Painel de Taylor é carregado automático via script próprio
-                break;
-            default:
-                console.warn(`Nenhuma função específica para inicializar a aba ${tabId}.`);
-        }
-    } catch (error) {
-        console.error(`Erro ao inicializar componentes da aba ${tabId}:`, error);
+      cdiBreakEven = (
+        Math.pow(acumLongo / acumCurto, 1 / tempoRestante) - 1
+      ) * 100;
+      cdiBreakEven = cdiBreakEven.toFixed(2) + '%';
+    } catch (e) {
+      registrarErro("Erro ao calcular CDI break-even: " + e.message);
     }
+  } else {
+    cdiBreakEven = 'N/A';
+  }
+
+  const resumo = `
+    <p><strong>Retorno Anualizado Curto:</strong> ${(retornoCurto * 100).toFixed(2)}%</p>
+    <p><strong>Retorno Anualizado Longo:</strong> ${(retornoLongo * 100).toFixed(2)}%</p>
+    <p><strong>CDI Break-even:</strong> ${cdiBreakEven}</p>
+  `;
+  document.getElementById('resumo').innerHTML = resumo;
 }
 
-window.addEventListener('hashchange', () => {
-    const hash = window.location.hash.substring(1);
-    showTab(hash || 'dashboard');
-});
+// Coletor de erros
+function registrarErro(msg) {
+  console.error("[SIMULADOR-ERRO]", msg);
+  window.__errosDebug = window.__errosDebug || [];
+  window.__errosDebug.push(msg);
+  const div = document.getElementById("relatorio-erros");
+  if (div) {
+    div.innerHTML += `<div>[!] ${msg}</div>`;
+    div.scrollTop = div.scrollHeight;
+  }
+}
 
-window.addEventListener('load', () => {
-    const initialHash = window.location.hash.substring(1);
-    showTab(initialHash || 'dashboard');
-});
+function copiarRelatorioErros() {
+  const erros = window.__errosDebug || [];
+  const texto = erros.length ? erros.map(e => `[!] ${e}`).join('\n') : 'Nenhum erro registrado.';
+  navigator.clipboard.writeText(texto).then(() => {
+    alert("Relatório copiado para a área de transferência.");
+  });
+}
