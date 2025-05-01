@@ -1,5 +1,48 @@
 document.getElementById('simular').addEventListener('click', simular);
 
+const anosPremissas = [2025, 2026, 2027, 2028];
+const defaultPremissas = {
+  2025: { ipca: 5.00, cdi: 15.00 },
+  2026: { ipca: 4.50, cdi: 12.00 },
+  2027: { ipca: 4.00, cdi: 10.00 },
+  2028: { ipca: 4.00, cdi: 9.00 },
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('sliders-premissas');
+  anosPremissas.forEach(ano => {
+    const bloco = document.createElement('div');
+    bloco.className = 'slider-bloco';
+    bloco.innerHTML = `
+      <div class="slider-ano"><strong>${ano}</strong></div>
+      <label>IPCA: <span id="ipca-val-${ano}">${defaultPremissas[ano].ipca.toFixed(2)}%</span>
+        <input type="range" min="0" max="20" step="0.1" value="${defaultPremissas[ano].ipca}" id="ipca-${ano}" />
+      </label>
+      <label>CDI: <span id="cdi-val-${ano}">${defaultPremissas[ano].cdi.toFixed(2)}%</span>
+        <input type="range" min="0" max="20" step="0.1" value="${defaultPremissas[ano].cdi}" id="cdi-${ano}" />
+      </label>
+    `;
+    container.appendChild(bloco);
+
+    document.getElementById(`ipca-${ano}`).addEventListener('input', (e) => {
+      document.getElementById(`ipca-val-${ano}`).innerText = parseFloat(e.target.value).toFixed(2) + '%';
+    });
+    document.getElementById(`cdi-${ano}`).addEventListener('input', (e) => {
+      document.getElementById(`cdi-val-${ano}`).innerText = parseFloat(e.target.value).toFixed(2) + '%';
+    });
+  });
+});
+
+function getPremissas() {
+  const premissas = {};
+  anosPremissas.forEach(ano => {
+    const ipca = parseFloat(document.getElementById(`ipca-${ano}`).value);
+    const cdi = parseFloat(document.getElementById(`cdi-${ano}`).value);
+    premissas[ano] = { ipca, cdi };
+  });
+  return premissas;
+}
+
 function simular() {
   try {
     const taxaCurta = parseFloat(document.getElementById('taxaCurto').value.replace(',', '.'));
@@ -36,8 +79,8 @@ function simular() {
       const ipca = premissas[ano]?.ipca ?? premissas[2028].ipca;
       const cdi = premissas[ano]?.cdi ?? premissas[2028].cdi;
 
-      const taxaRealCurta = taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0);
-      const taxaRealLonga = taxaLonga + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0);
+      const taxaRealCurta = taxaCurta + ipca;
+      const taxaRealLonga = taxaLonga + ipca;
 
       if (t < prazoCurta) {
         acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
@@ -57,18 +100,6 @@ function simular() {
   } catch (e) {
     registrarErro(e.message);
   }
-}
-
-function getPremissas() {
-  const linhas = document.querySelectorAll('#premissas tbody tr');
-  const premissas = {};
-  linhas.forEach(linha => {
-    const ano = parseInt(linha.children[0].innerText);
-    const ipca = parseFloat(linha.children[1].children[0].value.replace(',', '.'));
-    const cdi = parseFloat(linha.children[2].children[0].value.replace(',', '.'));
-    premissas[ano] = { ipca, cdi };
-  });
-  return premissas;
 }
 
 function plotarGrafico(labels, serie1, serie2) {
@@ -171,12 +202,11 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
     <p>A Opção Curta oferece <strong>IPCA+${document.getElementById('taxaCurto').value}%</strong> e, ao final do prazo, assume reinvestimento em CDI. A Opção Longa entrega <strong>IPCA+${document.getElementById('taxaLongo').value}%</strong> por todo o período.</p>
     <p>Considerando suas premissas para inflação e juros, a rentabilidade anualizada até ${prazoLongo} anos foi de:</p>
     <ul>
-      <li><strong>Opção Curta:</strong> ${isNaN(retornoAnualCurto) ? '-' : (retornoAnualCurto * 100).toFixed(2) + '%'} ao ano</li>
-      <li><strong>Opção Longa:</strong> ${isNaN(retornoAnualLongo) ? '-' : (retornoAnualLongo * 100).toFixed(2) + '%'} ao ano</li>
+      <li><strong>Opção Curta:</strong> ${(retornoAnualCurto * 100).toFixed(2)}% ao ano</li>
+      <li><strong>Opção Longa:</strong> ${(retornoAnualLongo * 100).toFixed(2)}% ao ano</li>
       <li><strong>CDI Break-even:</strong> ${cdiBreakEven} ao ano</li>
     </ul>
-    <p>Em outras palavras, o investimento na opção curta só superará a opção longa se o CDI médio entre os anos ${prazoCurto} e ${prazoLongo} for maior que ${cdiBreakEven} ao ano.</p>
-    <p><em>Ao final, a escolha depende não apenas da taxa, mas da sua visão sobre o tempo, os juros e sua estratégia de alocação.</em></p>
+    <p><em>Ou seja, a decisão entre as opções depende da sua visão sobre o comportamento do CDI ao longo do tempo.</em></p>
   `;
   document.getElementById("narrativa").innerHTML = narrativa;
 }
