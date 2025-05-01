@@ -121,6 +121,20 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
     <p><strong>CDI Break-even:</strong> ${cdiBreakEven}</p>
   `;
   document.getElementById('resumo').innerHTML = resumo;
+
+  const narrativa = `
+    <p><strong>Simulação:</strong> Esta comparação avalia dois caminhos de investimento indexado ao IPCA+: uma opção curta com vencimento em ${prazoCurto} anos e uma opção longa com vencimento em ${prazoLongo} anos.</p>
+    <p>A Opção Curta oferece <strong>IPCA+${document.getElementById('taxaCurto').value}%</strong> e, ao final do prazo, assume reinvestimento em CDI. A Opção Longa entrega <strong>IPCA+${document.getElementById('taxaLongo').value}%</strong> por todo o período.</p>
+    <p>Considerando suas premissas para inflação e juros, a rentabilidade anualizada até ${prazoLongo} anos foi de:</p>
+    <ul>
+      <li><strong>Opção Curta:</strong> ${isNaN(retornoAnualCurto) ? '-' : (retornoAnualCurto * 100).toFixed(2) + '%'} ao ano</li>
+      <li><strong>Opção Longa:</strong> ${isNaN(retornoAnualLongo) ? '-' : (retornoAnualLongo * 100).toFixed(2) + '%'} ao ano</li>
+      <li><strong>CDI Break-even:</strong> ${cdiBreakEven} ao ano</li>
+    </ul>
+    <p>Em outras palavras, o investimento na opção curta só superará a opção longa se o CDI médio entre os anos ${prazoCurto} e ${prazoLongo} for maior que ${cdiBreakEven} ao ano.</p>
+    <p><em>Ao final, a escolha depende não apenas da taxa, mas da sua visão sobre o tempo, os juros e sua estratégia de alocação.</em></p>
+  `;
+  document.getElementById("narrativa").innerHTML = narrativa;
 }
 
 function registrarErro(msg) {

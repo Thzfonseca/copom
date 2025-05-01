@@ -1,111 +1,82 @@
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 1rem;
-  background-color: #f9f9f9;
-  color: #333;
+  margin: 40px;
+  background: #fafafa;
+  color: #222;
 }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
 }
 
-h1, h2, h3 {
-  color: #1a1a1a;
+h2 {
+  margin-top: 2rem;
 }
 
-.inputs {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.option-box {
+.box {
   background: white;
-  padding: 1rem;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  flex: 1 1 48%;
-  min-width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  margin: 1rem 0;
+  max-width: 600px;
 }
 
-.option-box label {
+label {
   display: block;
   margin: 0.5rem 0;
 }
 
-.premissas,
-.curva-selic {
-  background: white;
-  padding: 1rem;
-  border-radius: 12px;
-  margin-top: 2rem;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+input, select {
+  padding: 0.4rem;
+  margin-left: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-.premissas table,
-.curva-selic table {
-  width: 100%;
-  margin-top: 1rem;
-  border-collapse: collapse;
-  background: #fff;
-}
-
-.premissas th,
-.premissas td,
-.curva-selic th,
-.curva-selic td {
-  padding: 0.5rem;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
-}
-
-.premissas input,
-.curva-selic input {
-  width: 100%;
-  padding: 0.3rem;
-  box-sizing: border-box;
-}
-
-#simular,
-.curva-selic button {
-  margin-top: 1rem;
-  padding: 0.6rem 2rem;
-  font-weight: bold;
-  background: #1976d2;
+button {
+  background-color: #007bff;
   color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  margin-top: 1rem;
 }
 
-#simular:hover,
-.curva-selic button:hover {
-  background: #125aaa;
+button:hover {
+  background-color: #0056b3;
 }
 
-.resultado,
-#log-erros {
+canvas {
   margin-top: 2rem;
-  background: white;
+  max-width: 100%;
+}
+
+.erros {
+  background: #ffe0e0;
   padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  margin-top: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #900;
 }
 
-#relatorio-erros {
-  font-family: monospace;
-  color: red;
-  max-height: 200px;
-  overflow-y: auto;
+.narrativa-explicativa {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  margin-top: 1rem;
+}
+
+.narrativa-explicativa ul {
   margin-top: 0.5rem;
-  white-space: pre-wrap;
+  margin-left: 1.2rem;
 }
 
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.narrativa-explicativa em {
+  color: #555;
+  font-style: italic;
 }
