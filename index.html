@@ -19,15 +19,20 @@
     </aside>
 
     <main class="main-content">
+      <!-- Botão de modo compacto -->
+      <button class="toggle-compact" onclick="document.body.classList.toggle('compact-mode')">
+        🧪 Modo Compacto
+      </button>
+
       <!-- ROLAGEM IPCA+ -->
       <section id="rolagem-ipca" class="tab-content">
         <div class="rolagem-container">
           <h2>Simulador de Rolagem IPCA+</h2>
 
           <div class="grid grid-2">
-            <div>
+            <details class="accordion" open>
+              <summary>Opção Curta</summary>
               <div class="box-opcao">
-                <h3>Opção Curta</h3>
                 <label>Indexador:
                   <select id="curta-indexador">
                     <option value="ipca">IPCA+</option>
@@ -41,11 +46,11 @@
                   <input type="number" id="curta-prazo" value="2.0" step="0.5" />
                 </label>
               </div>
-            </div>
+            </details>
 
-            <div>
+            <details class="accordion" open>
+              <summary>Opção Longa</summary>
               <div class="box-opcao">
-                <h3>Opção Longa</h3>
                 <label>Indexador:
                   <select id="longa-indexador">
                     <option value="ipca">IPCA+</option>
@@ -59,16 +64,18 @@
                   <input type="number" id="longa-prazo" value="5.0" step="0.5" />
                 </label>
               </div>
-            </div>
+            </details>
           </div>
 
-          <div class="box-premissas mt-3">
-            <h3>Premissas de IPCA e CDI (% a.a.)</h3>
-            <table class="tabela-premissas">
-              <thead><tr><th>Ano</th><th>IPCA</th><th>CDI</th></tr></thead>
-              <tbody id="tabela-premissas-body"></tbody>
-            </table>
-          </div>
+          <details class="accordion mt-3" open>
+            <summary>Premissas de IPCA e CDI (% a.a.)</summary>
+            <div class="box-premissas">
+              <table class="tabela-premissas">
+                <thead><tr><th>Ano</th><th>IPCA</th><th>CDI</th></tr></thead>
+                <tbody id="tabela-premissas-body"></tbody>
+              </table>
+            </div>
+          </details>
 
           <div class="botoes-container">
             <button class="button button-simular" id="btn-simular-rolagem">Simular Rolagem</button>
