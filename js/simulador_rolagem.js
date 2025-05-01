@@ -21,11 +21,6 @@ function copiarRelatorioErros() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("rolagem-ipca");
-  if (!container) return;
-
-  container.innerHTML = `...`; // conteúdo HTML inserido previamente
-
   preencherTabelaPremissas();
 
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
@@ -38,6 +33,8 @@ function preencherTabelaPremissas() {
   const cdiFocus = [10.25, 9.5, 9.0, 8.75];
 
   const tbody = document.getElementById("tabela-premissas-body");
+  if (!tbody) return registrarErro("Elemento 'tabela-premissas-body' não encontrado.");
+
   anos.forEach((ano, i) => {
     const row = document.createElement("tr");
     row.innerHTML = `
