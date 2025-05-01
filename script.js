@@ -79,15 +79,51 @@ function plotarGrafico(labels, serie1, serie2) {
     data: {
       labels,
       datasets: [
-        { label: 'Opção Curta', data: serie1, fill: false, borderWidth: 2, borderColor: '#2196f3' },
-        { label: 'Opção Longa', data: serie2, fill: false, borderWidth: 2, borderColor: '#e91e63' }
+        {
+          label: 'Opção Curta',
+          data: serie1,
+          fill: true,
+          backgroundColor: 'rgba(33, 150, 243, 0.08)',
+          borderColor: '#2196f3',
+          tension: 0.3,
+          borderWidth: 2
+        },
+        {
+          label: 'Opção Longa',
+          data: serie2,
+          fill: true,
+          backgroundColor: 'rgba(233, 30, 99, 0.08)',
+          borderColor: '#e91e63',
+          tension: 0.3,
+          borderWidth: 2
+        }
       ]
     },
     options: {
       responsive: true,
       plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Rentabilidade Acumulada (%)' }
+        legend: {
+          position: 'top',
+          labels: { color: '#333', font: { size: 14 } }
+        },
+        tooltip: {
+          backgroundColor: '#ffffff',
+          titleColor: '#111',
+          bodyColor: '#333',
+          borderColor: '#ccc',
+          borderWidth: 1,
+          padding: 10
+        },
+        title: {
+          display: true,
+          text: 'Rentabilidade Acumulada (%)',
+          font: { size: 16 },
+          color: '#0a2540'
+        }
+      },
+      scales: {
+        y: { ticks: { callback: val => val + '%' } },
+        x: { ticks: { color: '#555' } }
       }
     }
   });
@@ -115,12 +151,20 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
     registrarErro("Erro ao calcular retornos ou CDI break-even: " + e.message);
   }
 
-  const resumo = `
-    <p><strong>Retorno Anualizado Curto:</strong> ${isNaN(retornoAnualCurto) ? 'NaN%' : (retornoAnualCurto * 100).toFixed(2) + '%'}</p>
-    <p><strong>Retorno Anualizado Longo:</strong> ${isNaN(retornoAnualLongo) ? 'NaN%' : (retornoAnualLongo * 100).toFixed(2) + '%'}</p>
-    <p><strong>CDI Break-even:</strong> ${cdiBreakEven}</p>
+  document.getElementById('resumo').innerHTML = `
+    <div class="card">
+      <h3>Retorno Anualizado Curto</h3>
+      <p>${isNaN(retornoAnualCurto) ? '-' : (retornoAnualCurto * 100).toFixed(2) + '%'}</p>
+    </div>
+    <div class="card">
+      <h3>Retorno Anualizado Longo</h3>
+      <p>${isNaN(retornoAnualLongo) ? '-' : (retornoAnualLongo * 100).toFixed(2) + '%'}</p>
+    </div>
+    <div class="card">
+      <h3>CDI Break-even</h3>
+      <p>${cdiBreakEven}</p>
+    </div>
   `;
-  document.getElementById('resumo').innerHTML = resumo;
 
   const narrativa = `
     <p><strong>Simulação:</strong> Esta comparação avalia dois caminhos de investimento indexado ao IPCA+: uma opção curta com vencimento em ${prazoCurto} anos e uma opção longa com vencimento em ${prazoLongo} anos.</p>
@@ -146,45 +190,4 @@ function registrarErro(msg) {
     div.innerHTML += `<div>[!] ${msg}</div>`;
     div.scrollTop = div.scrollHeight;
   }
-}
-
-function copiarRelatorioErros() {
-  const erros = window.__errosDebug || [];
-  const texto = erros.length ? erros.map(e => `[!] ${e}`).join('\n') : 'Nenhum erro registrado.';
-  navigator.clipboard.writeText(texto).then(() => {
-    alert("Relatório copiado para a área de transferência.");
-  });
-}
-
-function usarCurvaProjetada() {
-  const linhas = document.querySelectorAll('#tabelaSelic tbody tr');
-  const dados = [];
-
-  linhas.forEach(linha => {
-    const dataStr = linha.children[0].children[0].value;
-    const selic = parseFloat(linha.children[1].children[0].value.replace(',', '.'));
-    const match = dataStr.match(/([A-Za-z]{3})\/(\d{2})/);
-    if (match) {
-      const ano = parseInt("20" + match[2]);
-      dados.push({ ano, selic });
-    }
-  });
-
-  const porAno = {};
-  dados.forEach(({ ano, selic }) => {
-    porAno[ano] = porAno[ano] || [];
-    porAno[ano].push(selic);
-  });
-
-  const tabelaPremissas = document.querySelectorAll('#premissas tbody tr');
-  tabelaPremissas.forEach(linha => {
-    const ano = parseInt(linha.children[0].innerText);
-    if (porAno[ano]) {
-      const mediaSelic = porAno[ano].reduce((a, b) => a + b, 0) / porAno[ano].length;
-      const estimativaCDI = mediaSelic - 0.10;
-      linha.children[2].children[0].value = estimativaCDI.toFixed(2);
-    }
-  });
-
-  alert("Curva projetada aplicada com sucesso.");
 }
