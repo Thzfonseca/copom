@@ -13,10 +13,9 @@ function simular() {
     const rentabilidadeLonga = [];
     const intervalos = Math.ceil(prazoLonga * 2);
 
-    let acumuladoCurto = 1;
-    let acumuladoLongo = 1;
-    let acumuladoCurtoFinal = 1;
-    let acumuladoLongoFinal = 1;
+    let acumCurtoAteVencimento = 1;   // acumulado só até o vencimento do papel curto
+    let acumCurtoFinal = 1;           // acumulado até o fim com CDI depois do curto
+    let acumLongoFinal = 1;
 
     for (let i = 0; i <= intervalos; i++) {
       const t = i * 0.5;
@@ -26,27 +25,24 @@ function simular() {
       const ipca = premissas[ano]?.ipca ?? premissas[2028].ipca;
       const cdi = premissas[ano]?.cdi ?? premissas[2028].cdi;
 
+      const taxaRealCurta = taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0);
+      const taxaRealLonga = taxaLongo + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0);
+
       if (t <= prazoCurta) {
-        acumuladoCurto *= 1 + (taxaCurta + (document.getElementById('indexadorCurto').value === 'ipca' ? ipca : 0)) / 100 / 2;
+        acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
+        acumCurtoFinal *= 1 + taxaRealCurta / 100 / 2;
       } else {
-        acumuladoCurto *= 1 + cdi / 100 / 2;
+        acumCurtoFinal *= 1 + cdi / 100 / 2;
       }
 
-      acumuladoLongo *= 1 + (taxaLonga + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0)) / 100 / 2;
+      acumLongoFinal *= 1 + taxaRealLonga / 100 / 2;
 
-      rentabilidadeCurta.push((acumuladoCurto - 1) * 100);
-      rentabilidadeLonga.push((acumuladoLongo - 1) * 100);
-
-      if (Math.abs(t - prazoCurta) < 0.001) {
-        acumuladoCurtoFinal = acumuladoCurto;
-      }
-      if (Math.abs(t - prazoLonga) < 0.001) {
-        acumuladoLongoFinal = acumuladoLongo;
-      }
+      rentabilidadeCurta.push((acumCurtoFinal - 1) * 100);
+      rentabilidadeLonga.push((acumLongoFinal - 1) * 100);
     }
 
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
-    mostrarResumo(acumuladoCurtoFinal, acumuladoLongoFinal, prazoCurta, prazoLonga);
+    mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurta, prazoLonga);
   } catch (e) {
     registrarErro(e.message);
   }
@@ -86,16 +82,16 @@ function plotarGrafico(labels, serie1, serie2) {
   });
 }
 
-function mostrarResumo(acumCurto, acumLongo, prazoCurto, prazoLongo) {
-  const retornoCurto = Math.pow(acumCurto, 1 / prazoCurto) - 1;
-  const retornoLongo = Math.pow(acumLongo, 1 / prazoLongo) - 1;
+function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurto, prazoLongo) {
+  const retornoCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
+  const retornoLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
 
   let cdiBreakEven = '-';
   const tempoRestante = prazoLongo - prazoCurto;
   if (tempoRestante > 0) {
     try {
       cdiBreakEven = (
-        Math.pow(acumLongo / acumCurto, 1 / tempoRestante) - 1
+        Math.pow(acumLongoFinal / acumCurtoAteVencimento, 1 / tempoRestante) - 1
       ) * 100;
       cdiBreakEven = cdiBreakEven.toFixed(2) + '%';
     } catch (e) {
