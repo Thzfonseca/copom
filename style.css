@@ -11,7 +11,7 @@ body {
   margin: auto;
 }
 
-h1, h2 {
+h1, h2, h3 {
   color: #1a1a1a;
 }
 
@@ -19,6 +19,7 @@ h1, h2 {
   display: flex;
   justify-content: space-between;
   gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .option-box {
@@ -26,7 +27,8 @@ h1, h2 {
   padding: 1rem;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  flex: 1;
+  flex: 1 1 48%;
+  min-width: 300px;
 }
 
 .option-box label {
@@ -34,36 +36,64 @@ h1, h2 {
   margin: 0.5rem 0;
 }
 
-.premissas table {
+.premissas,
+.curva-selic {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+.premissas table,
+.curva-selic table {
   width: 100%;
   margin-top: 1rem;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  border-collapse: collapse;
+  background: #fff;
 }
 
-.premissas th, .premissas td {
+.premissas th,
+.premissas td,
+.curva-selic th,
+.curva-selic td {
   padding: 0.5rem;
   text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
-#simular {
+.premissas input,
+.curva-selic input {
+  width: 100%;
+  padding: 0.3rem;
+  box-sizing: border-box;
+}
+
+#simular,
+.curva-selic button {
   margin-top: 1rem;
-  padding: 0.5rem 2rem;
+  padding: 0.6rem 2rem;
   font-weight: bold;
   background: #1976d2;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.resultado, #log-erros {
+#simular:hover,
+.curva-selic button:hover {
+  background: #125aaa;
+}
+
+.resultado,
+#log-erros {
   margin-top: 2rem;
   background: white;
   padding: 1rem;
   border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
 }
 
 #relatorio-erros {
@@ -71,4 +101,11 @@ h1, h2 {
   color: red;
   max-height: 200px;
   overflow-y: auto;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }

@@ -44,7 +44,7 @@ function simular() {
     const acumLongoFinal = acumLongo;
 
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
-    mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurta, prazoLonga);
+    mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurto, prazoLonga);
   } catch (e) {
     registrarErro(e.message);
   }
@@ -97,7 +97,7 @@ function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, p
 
   let cdiBreakEven = '-';
   const tempoRestante = prazoLongo - prazoCurto;
-  const n = tempoRestante * 2; // semestres
+  const n = tempoRestante * 2;
 
   if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
     try {
@@ -135,4 +135,37 @@ function copiarRelatorioErros() {
   navigator.clipboard.writeText(texto).then(() => {
     alert("Relatório copiado para a área de transferência.");
   });
+}
+
+function usarCurvaProjetada() {
+  const linhas = document.querySelectorAll('#tabelaSelic tbody tr');
+  const dados = [];
+
+  linhas.forEach(linha => {
+    const dataStr = linha.children[0].children[0].value;
+    const selic = parseFloat(linha.children[1].children[0].value);
+    const match = dataStr.match(/([A-Za-z]{3})\/(\\d{2})/);
+    if (match) {
+      const ano = parseInt("20" + match[2]);
+      dados.push({ ano, selic });
+    }
+  });
+
+  const porAno = {};
+  dados.forEach(({ ano, selic }) => {
+    porAno[ano] = porAno[ano] || [];
+    porAno[ano].push(selic);
+  });
+
+  const tabelaPremissas = document.querySelectorAll('#premissas tbody tr');
+  tabelaPremissas.forEach(linha => {
+    const ano = parseInt(linha.children[0].innerText);
+    if (porAno[ano]) {
+      const mediaSelic = porAno[ano].reduce((a, b) => a + b, 0) / porAno[ano].length;
+      const estimativaCDI = mediaSelic - 0.10;
+      linha.children[2].children[0].value = estimativaCDI.toFixed(2);
+    }
+  });
+
+  alert("Curva projetada aplicada com sucesso.");
 }
