@@ -113,12 +113,27 @@ function calcularCurva({ indexador, taxa, prazo }, tipo) {
   return pontos;
 }
 
-function calcularBreakEven(curvaCurta, curvaLonga, prazoCurta, prazoLonga) {
-  const entre = prazoLonga - prazoCurta;
-  const retornoCurta = curvaCurta.find(p => p.t === prazoCurta)?.retorno || 0;
-  const retornoLonga = curvaLonga.find(p => p.t === prazoLonga)?.retorno || 0;
-  const retornoEntre = (retornoLonga - retornoCurta) / entre;
-  return retornoEntre;
+function calcularBreakEvenComposto(curta, longa, curvaCurta, curvaLonga) {
+  const prazoCurta = curta.prazo;
+  const prazoLonga = longa.prazo;
+
+  const valorCurto = Math.pow(1 + curvaCurta.find(p => p.t === prazoCurta).retorno / 100, 1);
+  const valorLongo = Math.pow(1 + curvaLonga.find(p => p.t === prazoLonga).retorno / 100, 1);
+
+  let reinvestimentoCDI = 0;
+  let erro = 1;
+  const target = valorLongo / valorCurto;
+
+  let min = 0.01, max = 0.3;
+  while (erro > 0.00001) {
+    reinvestimentoCDI = (min + max) / 2;
+    const composto = Math.pow(1 + reinvestimentoCDI, prazoLonga - prazoCurta);
+    erro = Math.abs(composto - target);
+    if (composto > target) max = reinvestimentoCDI;
+    else min = reinvestimentoCDI;
+  }
+
+  return reinvestimentoCDI * 100;
 }
 
 function gerarNarrativa(curta, longa, diff, breakEven) {
@@ -129,7 +144,6 @@ function desenharGrafico(curta, longa, prazoCurta, prazoLonga) {
   const ctx = document.getElementById("grafico-rolagem-ipca").getContext("2d");
   const labels = [];
   const maxPrazo = Math.max(prazoCurta, prazoLonga);
-
   for (let t = 0.5; t <= maxPrazo; t += 0.5) labels.push(t.toFixed(1) + "a");
 
   const dadosCurta = labels.map(l => curta.find(p => p.t.toFixed(1) + "a" === l)?.retorno.toFixed(2) || null);
@@ -166,7 +180,7 @@ function desenharTabelaResumo(curvaCurta, curvaLonga, prazoCurta, prazoLonga, cu
   const entre = prazoLonga - prazoCurta;
   const diff = ((curvaLonga.find(p => p.t === prazoLonga)?.retorno || 0) - (curvaCurta.find(p => p.t === prazoCurta)?.retorno || 0)) / entre;
 
-  const breakEven = calcularBreakEven(curvaCurta, curvaLonga, prazoCurta, prazoLonga);
+  const breakEven = calcularBreakEvenComposto(curta, longa, curvaCurta, curvaLonga);
 
   const ipca = window.premissasFinalArray.ipca.slice(0, prazoLonga * 2);
   const cdi = window.premissasFinalArray.cdi.slice(0, prazoLonga * 2);
