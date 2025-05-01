@@ -23,7 +23,6 @@ function preencherTabelaPremissas() {
   const ipca = [3.7, 3.6, 3.5, 3.4];
   const cdi = [10.25, 9.5, 9.0, 8.75];
   const tbody = document.getElementById("tabela-premissas-body");
-  if (!tbody) return registrarErro("Elemento 'tabela-premissas-body' não encontrado.");
   tbody.innerHTML = "";
   anos.forEach((ano, i) => {
     const row = document.createElement("tr");
@@ -33,6 +32,53 @@ function preencherTabelaPremissas() {
       <td><input type="number" class="cdi-input" value="${cdi[i]}" step="0.01"></td>
     `;
     tbody.appendChild(row);
+  });
+}
+
+function preencherTabelaCopom() {
+  const tabela = document.getElementById("tabela-copom");
+  if (!tabela) return;
+  const hoje = new Date();
+  const datas = [];
+  let data = new Date(hoje);
+  while (datas.length < 6) {
+    if (data.getDay() === 3) datas.push(new Date(data));
+    data.setDate(data.getDate() + 14);
+  }
+  tabela.innerHTML = `
+    <h3>Cenário de Política Monetária (Selic após cada reunião)</h3>
+    <table class="tabela-copom">
+      <thead><tr><th>Data</th><th>Selic esperada (%)</th></tr></thead>
+      <tbody>
+        ${datas.map((d, i) => `
+          <tr>
+            <td>${d.toLocaleDateString('pt-BR')}</td>
+            <td><input type="number" class="copom-selic" data-indice="${i}" value="${10.5 - i * 0.25}" step="0.25"></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    <button class="button" onclick="usarCurvaCopom()">Usar curva projetada</button>
+  `;
+}
+
+function usarCurvaCopom() {
+  const inputs = Array.from(document.querySelectorAll('.copom-selic'));
+  const selics = inputs.map(input => parseFloat(input.value));
+  const datas = inputs.map((_, i) => new Date(Date.now() + i * 30 * 24 * 3600 * 1000));
+  const cdiMensal = [];
+  for (let i = 0; i < datas.length - 1; i++) {
+    const media = (selics[i] + selics[i + 1]) / 2;
+    for (let m = 0; m < 2; m++) cdiMensal.push(media); // bimestral
+  }
+  const cdiAnual = [];
+  for (let i = 0; i < cdiMensal.length; i += 2) {
+    const ano = cdiMensal.slice(i, i + 2);
+    const mediaAno = ano.reduce((a, b) => a + b, 0) / ano.length;
+    cdiAnual.push(+mediaAno.toFixed(2));
+  }
+  document.querySelectorAll(".cdi-input").forEach((el, i) => {
+    el.value = cdiAnual[i] ?? cdiAnual[cdiAnual.length - 1];
   });
 }
 
@@ -92,16 +138,51 @@ function desenharGrafico(curvaCurta, curvaLonga, prazoMax) {
     data: {
       labels,
       datasets: [
-        { label: "Opção Curta", data: dadosCurta, borderColor: "#0077b6", borderWidth: 2 },
-        { label: "Opção Longa", data: dadosLonga, borderColor: "#f77f00", borderWidth: 2 }
+        {
+          label: "Opção Curta",
+          data: dadosCurta,
+          borderColor: "#0077b6",
+          backgroundColor: "rgba(0, 119, 182, 0.1)",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: true,
+          borderWidth: 2
+        },
+        {
+          label: "Opção Longa",
+          data: dadosLonga,
+          borderColor: "#f77f00",
+          backgroundColor: "rgba(247, 127, 0, 0.1)",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: true,
+          borderWidth: 2
+        }
       ]
     },
     options: {
       responsive: true,
-      plugins: { legend: { labels: { color: "#333" } } },
+      plugins: {
+        legend: {
+          labels: { color: "#333", font: { size: 14, family: 'Arial' } }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw}% acumulado`
+          }
+        }
+      },
       scales: {
-        y: { ticks: { callback: v => v + "%", color: "#444" } },
-        x: { ticks: { color: "#444" } }
+        y: {
+          ticks: { callback: v => v + "%", color: "#444" },
+          title: { display: true, text: "% Acumulado", color: "#666", font: { size: 13 } }
+        },
+        x: {
+          ticks: { color: "#444" },
+          title: { display: true, text: "Prazo", color: "#666", font: { size: 13 } }
+        }
       }
     }
   });
@@ -137,6 +218,7 @@ function desenharTabelaResumo(curta, longa, prazoCurta, prazoLonga) {
 
 document.addEventListener("DOMContentLoaded", () => {
   preencherTabelaPremissas();
+  preencherTabelaCopom();
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
 });
