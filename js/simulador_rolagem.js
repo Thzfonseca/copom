@@ -107,3 +107,26 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
   exibirTabelaCopom();
 });
+function preencherTabelaPremissas() {
+  const anos = [2025, 2026, 2027, 2028];
+  const ipcaFocus = [3.7, 3.6, 3.5, 3.5];
+  const cdiFocus = [10.25, 9.5, 9.0, 8.75];
+
+  const tbody = document.getElementById("tabela-premissas-body");
+  if (!tbody) {
+    registrarErro("Elemento 'tabela-premissas-body' não encontrado.");
+    return;
+  }
+
+  tbody.innerHTML = ""; // limpa antes de preencher
+  anos.forEach((ano, i) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${ano}</td>
+      <td><input type="number" class="ipca-input" data-ano="${ano}" value="${ipcaFocus[i]}" step="0.01"></td>
+      <td><input type="number" class="cdi-input" data-ano="${ano}" value="${cdiFocus[i]}" step="0.01"></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
