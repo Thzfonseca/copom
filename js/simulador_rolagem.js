@@ -138,51 +138,16 @@ function desenharGrafico(curvaCurta, curvaLonga, prazoMax) {
     data: {
       labels,
       datasets: [
-        {
-          label: "Opção Curta",
-          data: dadosCurta,
-          borderColor: "#0077b6",
-          backgroundColor: "rgba(0, 119, 182, 0.1)",
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          tension: 0.3,
-          fill: true,
-          borderWidth: 2
-        },
-        {
-          label: "Opção Longa",
-          data: dadosLonga,
-          borderColor: "#f77f00",
-          backgroundColor: "rgba(247, 127, 0, 0.1)",
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          tension: 0.3,
-          fill: true,
-          borderWidth: 2
-        }
+        { label: "Opção Curta", data: dadosCurta, borderColor: "#0077b6", backgroundColor: "rgba(0,119,182,0.1)", fill: true },
+        { label: "Opção Longa", data: dadosLonga, borderColor: "#f77f00", backgroundColor: "rgba(247,127,0,0.1)", fill: true }
       ]
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: {
-          labels: { color: "#333", font: { size: 14, family: 'Arial' } }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => `${ctx.dataset.label}: ${ctx.raw}% acumulado`
-          }
-        }
-      },
+      plugins: { legend: { labels: { color: "#333" } } },
       scales: {
-        y: {
-          ticks: { callback: v => v + "%", color: "#444" },
-          title: { display: true, text: "% Acumulado", color: "#666", font: { size: 13 } }
-        },
-        x: {
-          ticks: { color: "#444" },
-          title: { display: true, text: "Prazo", color: "#666", font: { size: 13 } }
-        }
+        y: { ticks: { callback: v => v + "%" } },
+        x: { ticks: { color: "#444" } }
       }
     }
   });
@@ -215,10 +180,3 @@ function desenharTabelaResumo(curta, longa, prazoCurta, prazoLonga) {
     </div>
   `;
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  preencherTabelaPremissas();
-  preencherTabelaCopom();
-  document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
-  document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
-});

@@ -41,7 +41,6 @@
                 </label>
               </div>
             </div>
-
             <div>
               <div class="box-opcao">
                 <h3>Opção Longa</h3>
@@ -94,8 +93,25 @@
     </main>
   </div>
 
-  <!-- Carrega JS depois de todo o HTML -->
   <script src="js/simulador_rolagem.js"></script>
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+      const selected = document.getElementById(tabId);
+      if (selected) selected.style.display = 'block';
+    }
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.substring(1);
+      showTab(hash || 'rolagem-ipca');
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const initialTab = window.location.hash.substring(1) || 'rolagem-ipca';
+      showTab(initialTab);
+    });
+  </script>
 
   <footer style="text-align:center; padding: 10px; font-size: 0.9rem; color: #888;">
     Desenvolvido por Thomaz Fonseca • sem direitos reservados — o conhecimento foi feito para ser compartilhado
