@@ -50,10 +50,8 @@ function simular() {
       rentabilidadeLonga.push((acumLongo - 1) * 100);
     }
 
-    const acumLongoFinal = acumLongo;
-
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
-    mostrarResumo(acumCurtoFinal, acumLongoFinal, prazoLonga);
+    mostrarResumo(acumCurtoFinal, acumLongo, prazoLonga);
   } catch (e) {
     registrarErro(e.message);
   }
