@@ -20,150 +20,34 @@ function copiarRelatorioErros() {
   });
 }
 
-function normalizarReferenciaTrimestre(valor) {
-  if (!valor) return null;
-
-  if (typeof valor === 'number' && valor > 40000) {
-    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
-    const date = new Date(excelEpoch.getTime() + valor * 86400 * 1000);
-    const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${meses[date.getMonth()]}-${date.getFullYear().toString().slice(2)}`;
-  }
-
-  if (typeof valor === 'object' && valor instanceof Date) {
-    const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${meses[valor.getMonth()]}-${valor.getFullYear().toString().slice(2)}`;
-  }
-
-  let ref = valor.toString().trim().toLowerCase().replace(/\s+/g, '').replace('.', '/');
-
-  const mapPT = { 'mar': 'Mar', 'abr': 'Apr', 'mai': 'May', 'jun': 'Jun', 'jul': 'Jul', 'ago': 'Aug', 'set': 'Sep', 'out': 'Oct', 'nov': 'Nov', 'dez': 'Dec' };
-  for (let [pt, en] of Object.entries(mapPT)) {
-    ref = ref.replace(pt, en.toLowerCase());
-  }
-
-  const regex = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[^\d]*(\d{2,4})/i;
-  const match = ref.match(regex);
-  if (!match) return null;
-
-  const mes = match[1].charAt(0).toUpperCase() + match[1].slice(1,3).toLowerCase();
-  let ano = match[2];
-  if (ano.length === 4) ano = ano.slice(2);
-  return `${mes}-${ano}`;
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("rolagem-ipca");
   if (!container) return;
 
-  container.innerHTML = `
-    <div class="rolagem-container">
-      <h2>Simulador de Rolagem IPCA+</h2>
-      <div class="grid grid-2">
-        <div>
-          <div class="box-opcao">
-            <h3>Opção Curta</h3>
-            <label>Indexador:
-              <select id="curta-indexador">
-                <option value="ipca">IPCA+</option>
-                <option value="pre">Pré</option>
-              </select>
-            </label>
-            <label>Taxa (% a.a.):
-              <input type="number" id="curta-taxa" value="6.00" step="0.01" />
-            </label>
-            <label>Prazo (anos):
-              <input type="number" id="curta-prazo" value="2.0" step="0.5" />
-            </label>
-          </div>
-        </div>
+  container.innerHTML = `...`; // conteúdo HTML inserido previamente
 
-        <div>
-          <div class="box-opcao">
-            <h3>Opção Longa</h3>
-            <label>Indexador:
-              <select id="longa-indexador">
-                <option value="ipca">IPCA+</option>
-                <option value="pre">Pré</option>
-              </select>
-            </label>
-            <label>Taxa (% a.a.):
-              <input type="number" id="longa-taxa" value="6.50" step="0.01" />
-            </label>
-            <label>Prazo (anos):
-              <input type="number" id="longa-prazo" value="5.0" step="0.5" />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="box-premissas mt-3">
-        <h3>Premissas por Ano (a partir de 2025)</h3>
-        <input type="file" id="input-arquivo" accept=".xlsx" />
-      </div>
-
-      <div class="botoes-container">
-        <button class="button button-simular" id="btn-simular-rolagem">Simular Rolagem</button>
-        <button class="button button-resetar" id="btn-resetar-rolagem">Resetar</button>
-      </div>
-
-      <div class="chart-container">
-        <canvas id="grafico-rolagem-ipca" height="100"></canvas>
-      </div>
-
-      <div id="resultado-final"></div>
-    </div>
-  `;
+  preencherTabelaPremissas();
 
   document.getElementById("btn-simular-rolagem").addEventListener("click", simularRolagem);
   document.getElementById("btn-resetar-rolagem").addEventListener("click", () => location.reload());
-
-  document.getElementById("input-arquivo").addEventListener("change", async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data);
-    const sheet = workbook.Sheets["Brasil_Trimestral"];
-    if (!sheet) return registrarErro("Aba 'Brasil_Trimestral' não encontrada.");
-
-    const linhas = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    const hoje = new Date();
-    const trimestres = ["Mar", "Jun", "Sep", "Dec"];
-    const mesAtual = hoje.getMonth();
-    const anoAtual = hoje.getFullYear();
-    const trimestreIndex = Math.floor((mesAtual + 3) / 3) % 4;
-    const anoRef = (trimestreIndex === 0 && mesAtual >= 9) ? anoAtual + 1 : anoAtual;
-    const refInicial = `${trimestres[trimestreIndex]}-${anoRef.toString().slice(2)}`;
-
-    for (let i = 0; i < Math.min(50, linhas.length); i++) {
-      const raw = linhas[i][0];
-      const normalizado = normalizarReferenciaTrimestre(raw);
-      console.log(`[Linha ${i}] Valor bruto:`, raw, "| Normalizado:", normalizado);
-    }
-
-    const idxInicio = linhas.findIndex(l => normalizarReferenciaTrimestre(l[0]) === refInicial);
-    if (idxInicio === -1) return registrarErro(`Início dos trimestres (${refInicial}) não encontrado. Verifique a aba Brasil_Trimestral.`);
-
-    const ipca = [], cdi = [];
-    for (let i = idxInicio; i < linhas.length; i++) {
-      const row = linhas[i];
-      const ipcaAnual = parseFloat(row[17]);
-      const selicAnual = parseFloat(row[11]);
-      if (isNaN(ipcaAnual) || isNaN(selicAnual)) break;
-
-      ipca.push(Math.pow(1 + ipcaAnual, 0.5) - 1);
-      cdi.push(Math.pow(1 + selicAnual, 0.5) - 1);
-    }
-
-    window.premissasFinalArray = {
-      ipca: ipca.map(x => +(x * 100).toFixed(2)),
-      cdi: cdi.map(x => +(x * 100).toFixed(2))
-    };
-
-    console.log("Premissas carregadas:", window.premissasFinalArray);
-  });
 });
+
+function preencherTabelaPremissas() {
+  const anos = [2025, 2026, 2027, 2028];
+  const ipcaFocus = [3.7, 3.6, 3.5, 3.5];
+  const cdiFocus = [10.25, 9.5, 9.0, 8.75];
+
+  const tbody = document.getElementById("tabela-premissas-body");
+  anos.forEach((ano, i) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${ano}</td>
+      <td><input type="number" class="ipca-input" data-ano="${ano}" value="${ipcaFocus[i]}" step="0.01"></td>
+      <td><input type="number" class="cdi-input" data-ano="${ano}" value="${cdiFocus[i]}" step="0.01"></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
 
 function getDados(prefixo) {
   return {
@@ -173,11 +57,32 @@ function getDados(prefixo) {
   };
 }
 
+function lerPremissasDigitadas() {
+  const ipcaInputs = Array.from(document.querySelectorAll(".ipca-input"));
+  const cdiInputs = Array.from(document.querySelectorAll(".cdi-input"));
+
+  const ipca = ipcaInputs.map(input => parseFloat(input.value));
+  const cdi = cdiInputs.map(input => parseFloat(input.value));
+
+  const maxAno = Math.max(...ipcaInputs.map(i => +i.dataset.ano));
+  const anos = ipcaInputs.map(i => +i.dataset.ano);
+
+  return { ipca, cdi, maxAno, anos };
+}
+
 function simularRolagem() {
-  if (!window.premissasFinalArray || !window.premissasFinalArray.ipca) {
-    registrarErro("Premissas não carregadas. Importe o Excel antes de simular.");
+  const { ipca, cdi, maxAno, anos } = lerPremissasDigitadas();
+  if (!ipca.length || !cdi.length) {
+    registrarErro("Premissas não preenchidas.");
     return;
   }
+
+  window.premissasFinalArray = {
+    ipca,
+    cdi,
+    maxAno,
+    anos
+  };
 
   const curta = getDados("curta");
   const longa = getDados("longa");
@@ -190,22 +95,24 @@ function simularRolagem() {
 }
 
 function calcularCurva({ indexador, taxa, prazo }, tipo) {
-  const ipca = window.premissasFinalArray.ipca;
-  const cdi = window.premissasFinalArray.cdi;
+  const { ipca, cdi } = window.premissasFinalArray;
 
   const pontos = [];
   let acumulado = 1;
 
   for (let i = 0; i < prazo * 2; i++) {
     let rent;
+    const ipcaAno = ipca[i] ?? ipca[ipca.length - 1];
+    const cdiAno = cdi[i] ?? cdi[cdi.length - 1];
+
     if (indexador === "ipca") {
-      rent = (1 + (ipca[i] || ipca[ipca.length - 1]) / 100) * (1 + taxa / 100);
+      rent = (1 + ipcaAno / 100) * (1 + taxa / 100);
     } else {
       rent = 1 + taxa / 100;
     }
 
     if (tipo === "curta" && i >= prazo * 2) {
-      rent = 1 + (cdi[i] || cdi[cdi.length - 1]) / 100;
+      rent = 1 + cdiAno / 100;
     }
 
     acumulado *= Math.pow(rent, 0.5);
