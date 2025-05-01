@@ -25,6 +25,7 @@ function simular() {
     const intervalos = Math.ceil(prazoLonga * 2);
 
     let acumCurtoFinal = 1;
+    let acumCurtoAteVencimento = 1;
     let acumLongo = 1;
 
     for (let i = 0; i <= intervalos; i++) {
@@ -39,6 +40,7 @@ function simular() {
       const taxaRealLonga = taxaLonga + (document.getElementById('indexadorLongo').value === 'ipca' ? ipca : 0);
 
       if (t < prazoCurta) {
+        acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
         acumCurtoFinal *= 1 + taxaRealCurta / 100 / 2;
       } else {
         acumCurtoFinal *= 1 + cdi / 100 / 2;
@@ -51,7 +53,7 @@ function simular() {
     }
 
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
-    mostrarResumo(acumCurtoFinal, acumLongo, prazoLonga);
+    mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLonga);
   } catch (e) {
     registrarErro(e.message);
   }
@@ -91,7 +93,7 @@ function plotarGrafico(labels, serie1, serie2) {
   });
 }
 
-function mostrarResumo(acumCurtoFinal, acumLongoFinal, prazoLongo) {
+function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurto, prazoLongo) {
   let retornoAnualCurto = NaN;
   let retornoAnualLongo = NaN;
   let cdiBreakEven = '-';
@@ -100,14 +102,17 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, prazoLongo) {
     retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
     retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
 
-    if (acumCurtoFinal > 0 && acumLongoFinal > 0) {
-      const fator = acumLongoFinal / acumCurtoFinal;
-      const taxaSemestral = Math.pow(fator, 1 / (prazoLongo * 2)) - 1;
+    const tempoRestante = prazoLongo - prazoCurto;
+    const n = tempoRestante * 2;
+
+    if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
+      const fator = acumLongoFinal / acumCurtoAteVencimento;
+      const taxaSemestral = Math.pow(fator, 1 / n) - 1;
       const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
       cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
     }
   } catch (e) {
-    registrarErro("Erro ao calcular retornos anualizados: " + e.message);
+    registrarErro("Erro ao calcular retornos ou CDI break-even: " + e.message);
   }
 
   const resumo = `
