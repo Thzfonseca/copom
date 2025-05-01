@@ -53,6 +53,64 @@ body {
   background-color: #ffffff;
 }
 
+.toggle-compact {
+  background: none;
+  border: 1px solid #0077b6;
+  color: #0077b6;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.compact-mode .rolagem-container h2,
+.compact-mode .box-opcao h3,
+.compact-mode .box-premissas h3 {
+  font-size: 1rem;
+}
+
+.compact-mode .box-opcao,
+.compact-mode .box-premissas,
+.compact-mode .chart-container {
+  padding: 10px;
+}
+
+.compact-mode input[type="number"],
+.compact-mode select {
+  padding: 4px;
+  font-size: 0.75rem;
+}
+
+.compact-mode .tabela-premissas th,
+.compact-mode .tabela-premissas td {
+  padding: 4px;
+  font-size: 0.75rem;
+}
+
+.accordion {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.accordion summary {
+  background: #eaeaea;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion[open] summary {
+  background-color: #d6eaf8;
+}
+
 .rolagem-container h2 {
   font-size: 1.5rem;
   margin-bottom: 20px;
