@@ -24,36 +24,40 @@
           <h2>Simulador de Rolagem IPCA+</h2>
 
           <div class="grid grid-2">
-            <div class="box-opcao">
-              <h3>Opção Curta</h3>
-              <label>Indexador:
-                <select id="curta-indexador">
-                  <option value="ipca">IPCA+</option>
-                  <option value="pre">Pré</option>
-                </select>
-              </label>
-              <label>Taxa (% a.a.):
-                <input type="number" id="curta-taxa" value="6.00" step="0.01" />
-              </label>
-              <label>Prazo (anos):
-                <input type="number" id="curta-prazo" value="2.0" step="0.5" />
-              </label>
+            <div>
+              <div class="box-opcao">
+                <h3>Opção Curta</h3>
+                <label>Indexador:
+                  <select id="curta-indexador">
+                    <option value="ipca">IPCA+</option>
+                    <option value="pre">Pré</option>
+                  </select>
+                </label>
+                <label>Taxa (% a.a.):
+                  <input type="number" id="curta-taxa" value="6.00" step="0.01" />
+                </label>
+                <label>Prazo (anos):
+                  <input type="number" id="curta-prazo" value="2.0" step="0.5" />
+                </label>
+              </div>
             </div>
 
-            <div class="box-opcao">
-              <h3>Opção Longa</h3>
-              <label>Indexador:
-                <select id="longa-indexador">
-                  <option value="ipca">IPCA+</option>
-                  <option value="pre">Pré</option>
-                </select>
-              </label>
-              <label>Taxa (% a.a.):
-                <input type="number" id="longa-taxa" value="6.50" step="0.01" />
-              </label>
-              <label>Prazo (anos):
-                <input type="number" id="longa-prazo" value="5.0" step="0.5" />
-              </label>
+            <div>
+              <div class="box-opcao">
+                <h3>Opção Longa</h3>
+                <label>Indexador:
+                  <select id="longa-indexador">
+                    <option value="ipca">IPCA+</option>
+                    <option value="pre">Pré</option>
+                  </select>
+                </label>
+                <label>Taxa (% a.a.):
+                  <input type="number" id="longa-taxa" value="6.50" step="0.01" />
+                </label>
+                <label>Prazo (anos):
+                  <input type="number" id="longa-prazo" value="5.0" step="0.5" />
+                </label>
+              </div>
             </div>
           </div>
 
@@ -76,15 +80,25 @@
             <canvas id="grafico-rolagem-ipca" height="100"></canvas>
           </div>
 
-          <div id="resultado-final" class="mt-3"></div>
-
-          <button onclick="copiarRelatorioErros()" style="float:right;background:#f88;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;">Copiar Logs</button>
-          <div id="relatorio-erros" style="margin-top: 20px; background:#fee;border:1px solid #f88;padding:10px;border-radius:8px;font-family:monospace;font-size:0.9rem;color:#900;max-height:150px;overflow:auto;display:none;"></div>
+          <div id="resultado-final"></div>
         </div>
       </section>
+
+      <div>
+        <button onclick="copiarRelatorioErros()" style="float:right;background:#f88;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;">Copiar Logs</button>
+      </div>
+      <div id="relatorio-erros" style="position:fixed;bottom:10px;left:240px;right:10px;
+        background:#fee;border:1px solid #f88;padding:10px;border-radius:8px;
+        font-family:monospace;font-size:0.9rem;color:#900;max-height:150px;
+        overflow:auto;display:none;z-index:1000;"></div>
     </main>
   </div>
 
+  <!-- Carrega JS depois de todo o HTML -->
   <script src="js/simulador_rolagem.js"></script>
+
+  <footer style="text-align:center; padding: 10px; font-size: 0.9rem; color: #888;">
+    Desenvolvido por Thomaz Fonseca • sem direitos reservados — o conhecimento foi feito para ser compartilhado
+  </footer>
 </body>
 </html>
