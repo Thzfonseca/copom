@@ -13,8 +13,8 @@ function simular() {
     const rentabilidadeLonga = [];
     const intervalos = Math.ceil(prazoLonga * 2);
 
-    let acumCurtoAteVencimento = 1;   // acumulado só até o vencimento do papel curto
-    let acumCurtoFinal = 1;           // acumulado até o fim com CDI depois do curto
+    let acumCurtoAteVencimento = 1;
+    let acumCurtoFinal = 1;
     let acumLongoFinal = 1;
 
     for (let i = 0; i <= intervalos; i++) {
@@ -83,27 +83,27 @@ function plotarGrafico(labels, serie1, serie2) {
 }
 
 function mostrarResumo(acumCurtoAteVencimento, acumCurtoFinal, acumLongoFinal, prazoCurto, prazoLongo) {
-  const retornoCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
-  const retornoLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+  const retornoAnualCurto = Math.pow(acumCurtoAteVencimento, 1 / prazoCurto) - 1;
+  const retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
 
   let cdiBreakEven = '-';
   const tempoRestante = prazoLongo - prazoCurto;
-  if (tempoRestante > 0) {
+  const n = tempoRestante * 2; // semestres
+
+  if (n > 0) {
     try {
-      cdiBreakEven = (
-        Math.pow(acumLongoFinal / acumCurtoAteVencimento, 1 / tempoRestante) - 1
-      ) * 100;
-      cdiBreakEven = cdiBreakEven.toFixed(2) + '%';
+      const fatorCDI = acumLongoFinal / acumCurtoAteVencimento;
+      const rSemestral = Math.pow(fatorCDI, 1 / n) - 1;
+      const rAnual = Math.pow(1 + rSemestral, 2) - 1;
+      cdiBreakEven = (rAnual * 100).toFixed(2) + '%';
     } catch (e) {
       registrarErro("Erro ao calcular CDI break-even: " + e.message);
     }
-  } else {
-    cdiBreakEven = 'N/A';
   }
 
   const resumo = `
-    <p><strong>Retorno Anualizado Curto:</strong> ${(retornoCurto * 100).toFixed(2)}%</p>
-    <p><strong>Retorno Anualizado Longo:</strong> ${(retornoLongo * 100).toFixed(2)}%</p>
+    <p><strong>Retorno Anualizado Curto:</strong> ${(retornoAnualCurto * 100).toFixed(2)}%</p>
+    <p><strong>Retorno Anualizado Longo:</strong> ${(retornoAnualLongo * 100).toFixed(2)}%</p>
     <p><strong>CDI Break-even:</strong> ${cdiBreakEven}</p>
   `;
   document.getElementById('resumo').innerHTML = resumo;
