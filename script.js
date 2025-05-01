@@ -200,9 +200,9 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
     </div>
   `;
 
-  lucide.createIcons();
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 
-  const narrativa = `
+  const narrativaBase = `
     <p><strong>Simulação:</strong> Esta comparação avalia dois caminhos de investimento indexado ao IPCA+: uma opção curta com vencimento em ${prazoCurto} anos e uma opção longa com vencimento em ${prazoLongo} anos.</p>
     <p>A Opção Curta oferece <strong>IPCA+${document.getElementById('taxaCurto').value}%</strong> e, ao final do prazo, assume reinvestimento em CDI. A Opção Longa entrega <strong>IPCA+${document.getElementById('taxaLongo').value}%</strong> por todo o período.</p>
     <p>Considerando suas premissas para inflação e juros, a rentabilidade anualizada até ${prazoLongo} anos foi de:</p>
@@ -211,16 +211,43 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
       <li><strong>Opção Longa:</strong> ${(retornoAnualLongo * 100).toFixed(2)}% ao ano</li>
       <li><strong>CDI Break-even:</strong> ${cdiBreakEven} ao ano</li>
     </ul>
-    <p><em>Ou seja, a decisão entre as opções depende da sua visão sobre o comportamento do CDI ao longo do tempo.</em></p>
   `;
-  document.getElementById("narrativa").innerHTML = narrativa;
+
+  let interpretacao = '';
+  try {
+    const premissas = getPremissas();
+    const anoInicio = 2025 + Math.floor(prazoCurto);
+    const anoFim = 2025 + Math.floor(prazoLongo - 0.01);
+    let somaCDI = 0;
+    let anosContados = 0;
+    for (let ano = anoInicio; ano <= anoFim; ano++) {
+      const cdi = premissas[ano]?.cdi ?? premissas[2028].cdi;
+      somaCDI += cdi;
+      anosContados++;
+    }
+    const cdiProjetado = somaCDI / anosContados;
+    const breakEvenNum = parseFloat(cdiBreakEven.replace('%', ''));
+    if (!isNaN(breakEvenNum) && !isNaN(cdiProjetado)) {
+      if (cdiProjetado > breakEvenNum) {
+        interpretacao = `Neste cenário, o CDI médio entre ${anoInicio} e ${anoFim} é de <strong>${cdiProjetado.toFixed(2)}%</strong>, acima do break-even de <strong>${cdiBreakEven}</strong>. Isso sugere vantagem na rolagem para o papel curto.`;
+      } else if (cdiProjetado < breakEvenNum) {
+        interpretacao = `Neste cenário, o CDI médio entre ${anoInicio} e ${anoFim} é de <strong>${cdiProjetado.toFixed(2)}%</strong>, abaixo do break-even de <strong>${cdiBreakEven}</strong>. Isso favorece o papel longo no horizonte considerado.`;
+      } else {
+        interpretacao = `O CDI projetado está muito próximo do break-even. Ambos os caminhos tendem a entregar retornos similares.`;
+      }
+    }
+  } catch (e) {
+    registrarErro(\"Erro ao interpretar o cenário: \" + e.message);
+  }
+
+  document.getElementById(\"narrativa\").innerHTML = narrativaBase + `<p>${interpretacao}</p>`;
 }
 
 function registrarErro(msg) {
-  console.error("[SIMULADOR-ERRO]", msg);
+  console.error(\"[SIMULADOR-ERRO]\", msg);
   window.__errosDebug = window.__errosDebug || [];
   window.__errosDebug.push(msg);
-  const div = document.getElementById("relatorio-erros");
+  const div = document.getElementById(\"relatorio-erros\");
   if (div) {
     div.innerHTML += `<div>[!] ${msg}</div>`;
     div.scrollTop = div.scrollHeight;
