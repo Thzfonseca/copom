@@ -23,6 +23,15 @@ function copiarRelatorioErros() {
 function normalizarReferenciaTrimestre(valor) {
   if (!valor) return null;
 
+  // Caso seja número de série do Excel (data)
+  if (typeof valor === 'number' && valor > 40000) {
+    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+    const date = new Date(excelEpoch.getTime() + valor * 86400 * 1000);
+    const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${meses[date.getMonth()]}-${date.getFullYear().toString().slice(2)}`;
+  }
+
+  // Caso seja objeto Date direto
   if (typeof valor === 'object' && valor instanceof Date) {
     const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return `${meses[valor.getMonth()]}-${valor.getFullYear().toString().slice(2)}`;
