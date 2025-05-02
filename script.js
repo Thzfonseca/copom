@@ -96,7 +96,7 @@ function simular() {
         }
 
         plotarGrafico(anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
-        mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo); // Passando as taxas também
+        mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo);
     } catch (e) {
         registrarErro(e.message);
     }
@@ -132,7 +132,7 @@ function plotarGrafico(labels, serie1, serie2) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false, // Permite ajustar a altura sem manter a proporção
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'top',
@@ -209,7 +209,7 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
 
         <p><strong>Estratégia de Curto Prazo (Opção Azul):</strong> Inicialmente, alocamos em um título IPCA+ com uma taxa de retorno de <strong>${taxaCurta}% ao ano</strong> e prazo de <strong>${prazoCurta} anos</strong>. Ao vencimento, simulamos uma realocação para um investimento atrelado à taxa CDI.</p>
 
-        <p><strong>Estratégia de Longo Prazo (Opção Rosa):</strong> Mantemos a alocação em um título IPCA+ com uma taxa de retorno de <strong>${taxaLonga}% ao ano</strong> durante todo o horizonte de <strong>${prazoLongo} anos</strong>.</p>
+        <p><strong>Estratégia de Longo Prazo (Opção Rosa):</strong> Mantemos a alocação em um título IPCA+ com uma taxa de retorno de <strong>${taxaLongo}% ao ano</strong> durante todo o horizonte de <strong>${prazoLongo} anos</strong>.</p>
 
         <p><strong>Análise da Simulação:</strong></p>
 
