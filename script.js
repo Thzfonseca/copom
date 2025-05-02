@@ -169,7 +169,7 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
     retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
     retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
 
-    const tempoRestante = prazoLongo - prazoCurto;
+    const tempoRestante = prazoLongo - prazoCurta;
     const n = tempoRestante * 2;
 
     if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
@@ -237,17 +237,17 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
       }
     }
   } catch (e) {
-    registrarErro(\"Erro ao interpretar o cenário: \" + e.message);
+    registrarErro("Erro ao interpretar o cenário: " + e.message);
   }
 
-  document.getElementById(\"narrativa\").innerHTML = narrativaBase + `<p>${interpretacao}</p>`;
+  document.getElementById("narrativa").innerHTML = narrativaBase + `<p>${interpretacao}</p>`;
 }
 
 function registrarErro(msg) {
-  console.error(\"[SIMULADOR-ERRO]\", msg);
+  console.error("[SIMULADOR-ERRO]", msg);
   window.__errosDebug = window.__errosDebug || [];
   window.__errosDebug.push(msg);
-  const div = document.getElementById(\"relatorio-erros\");
+  const div = document.getElementById("relatorio-erros");
   if (div) {
     div.innerHTML += `<div>[!] ${msg}</div>`;
     div.scrollTop = div.scrollHeight;

@@ -5,20 +5,24 @@ body {
   margin: 0;
   padding: 2rem;
 }
+
 h1, h2 {
   color: #0a2540;
   margin-bottom: 1rem;
 }
+
 .container {
   max-width: 1200px;
   margin: auto;
 }
+
 .cards-opcoes {
   display: flex;
   gap: 2rem;
   flex-wrap: wrap;
   margin-bottom: 2rem;
 }
+
 .card-input {
   background: #fff;
   padding: 1.5rem;
@@ -27,10 +31,12 @@ h1, h2 {
   flex: 1;
   min-width: 300px;
 }
+
 .card-input label {
   display: block;
   margin-bottom: 1rem;
 }
+
 .card-input input,
 .card-input select {
   width: 100%;
@@ -40,6 +46,7 @@ h1, h2 {
   border: 1px solid #ccc;
   border-radius: 8px;
 }
+
 button#simular {
   background-color: #2b6cb0;
   color: white;
@@ -51,21 +58,25 @@ button#simular {
   margin-top: 1.5rem;
   transition: background-color 0.3s;
 }
+
 button#simular:hover {
   background-color: #234e89;
 }
+
 canvas#grafico {
   width: 100%;
   max-width: 1000px;
   margin: 2rem auto;
   display: block;
 }
+
 .resumo-cards {
   display: flex;
   gap: 1rem;
   margin: 2rem 0;
   flex-wrap: wrap;
 }
+
 .card {
   background: #ffffff;
   padding: 1rem 1.5rem;
@@ -75,12 +86,15 @@ canvas#grafico {
   min-width: 200px;
   text-align: center;
 }
-.card i {
+
+.card i,
+.card svg {
   width: 24px;
   height: 24px;
-  color: #0a2540;
+  stroke: #2b6cb0;
   margin-bottom: 0.5rem;
 }
+
 .narrativa-box {
   background: #fdfdfd;
   border-left: 4px solid #2b6cb0;
@@ -88,7 +102,9 @@ canvas#grafico {
   border-radius: 8px;
   max-width: 900px;
   margin-bottom: 2rem;
+  line-height: 1.6;
 }
+
 .slider-bloco {
   background: white;
   padding: 1rem;
@@ -96,15 +112,18 @@ canvas#grafico {
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
+
 .slider-bloco label {
   display: block;
   margin: 0.8rem 0;
 }
+
 .slider-ano {
   font-weight: bold;
   font-size: 1.1rem;
   margin-bottom: 0.4rem;
 }
+
 .premissas-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
