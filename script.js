@@ -109,7 +109,7 @@ function plotarGrafico(labels, serie1, serie2) {
     if (window.graficoRentab) {
         console.log('Gráfico existente, destruindo...');
         window.graficoRentab.destroy();
-        window.graficoRentab = null; // Adicionando para garantir que a referência seja limpa
+        window.graficoRentab = null;
     }
     const ctx = document.getElementById('grafico').getContext('2d');
     console.log('Contexto do canvas:', ctx);
@@ -139,18 +139,62 @@ function plotarGrafico(labels, serie1, serie2) {
             ]
         },
         options: {
-            responsive: true,
+            responsive: true, // Tente comentar esta linha temporariamente
             maintainAspectRatio: false,
-            // Removi todas as outras opções para teste
+            animation: false // Adicionando para desativar animações
         }
     });
     console.log('Gráfico instanciado:', window.graficoRentab);
 }
 
 function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo) {
-    // ... (seu código da função mostrarResumo)
+    let retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
+    let retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+    let cdiBreakEven = '-';
+
+    const tempoRestante = prazoLongo - prazoCurta;
+    const n = tempoRestante * 2;
+
+    if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
+        const fator = acumLongoFinal / acumCurtoAteVencimento;
+        const taxaSemestral = Math.pow(fator, 1 / n) - 1;
+        const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
+        cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
+    }
+
+    document.getElementById('resumo').innerHTML = `
+        <div class="card"><h3>Retorno Anualizado Curto</h3><p>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p></div>
+        <div class="card"><h3>Retorno Anualizado Longo</h3><p>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p></div>
+        <div class="card"><h3>CDI Break-even</h3><p>${cdiBreakEven}</p></div>
+    `;
+
+    const narrativa = `
+        <p>Prezado cliente, esta simulação ilustra duas estratégias de investimento indexadas à inflação (IPCA+), considerando suas expectativas de mercado para os próximos anos.</p>
+
+        <p><strong>Estratégia de Curto Prazo (Opção Azul):</strong> Inicialmente, alocamos em um título IPCA+ com uma taxa de retorno de <strong>${taxaCurta}% ao ano</strong> e prazo de <strong>${prazoCurta} anos</strong>. Ao vencimento, simulamos uma realocação para um investimento atrelado à taxa CDI.</p>
+
+        <p><strong>Estratégia de Longo Prazo (Opção Rosa):</strong> Mantemos a alocação em um título IPCA+ com uma taxa de retorno de <strong>${taxaLongo}% ao ano</strong> durante todo o horizonte de <strong>${prazoLongo} anos</strong>.</p>
+
+        <p><strong>Análise da Simulação:</strong></p>
+
+        <ul>
+            <li><strong>Retorno Anualizado (Opção Curta):</strong> Visualizamos um retorno médio anual de <strong>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong> ao longo do período simulado. Este resultado incorpora a rentabilidade do IPCA+ inicial e a performance estimada do CDI na fase de reinvestimento.</li>
+            <li><strong>Retorno Anualizado (Opção Longa):</strong> A estratégia de longo prazo projeta um retorno médio anual de <strong>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong>, refletindo a taxa fixa de IPCA+ durante todo o período.</li>
+            <li><strong>Ponto de Equilíbrio do CDI:</strong> Para que a estratégia de curto prazo iguale o retorno da opção de longo prazo, o CDI médio no período de reinvestimento precisaria ser de aproximadamente <strong>${cdiBreakEven}</strong>. Este é um indicador importante para avaliar a atratividade relativa das duas abordagens.</li>
+        </ul>
+
+        <p><strong>Considerações Estratégicas:</strong> A escolha entre estas estratégias dependerá da sua visão sobre a trajetória futura das taxas de juros (CDI) após o período inicial do investimento de curto prazo. A opção de longo prazo oferece uma previsibilidade maior, enquanto a de curto prazo pode se beneficiar de um cenário de taxas de juros crescentes após o vencimento inicial.</p>
+    `;
+    document.getElementById('narrativa').innerHTML = narrativa;
 }
 
 function registrarErro(msg) {
-    // ... (seu código da função registrarErro)
+    console.error("[SIMULADOR-ERRO]", msg);
+    window.__errosDebug = window.__errosDebug || [];
+    window.__errosDebug.push(msg);
+    const div = document.getElementById("relatorio-erros");
+    if (div) {
+        div.innerHTML += `<div>[!] ${msg}</div>`;
+        div.scrollTop = div.scrollHeight;
+    }
 }
