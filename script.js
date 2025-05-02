@@ -1,4 +1,4 @@
-xxdocument.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM completamente carregado e parseado.');
 
     const simularBotao = document.getElementById('simular');
