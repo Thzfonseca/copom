@@ -1082,7 +1082,7 @@ function randomNormDist(mean, stddev) {
 // --- Function to Run Monte Carlo Simulation ---
 function runMonteCarloSimulation() {
     if (!lastCalculationResults || !currentInputs || !currentAssumptions) {
-        alert("Por favor, execute o cálculo principal primeiro.");
+        alert("Erro: É necessário executar o cálculo principal de rentabilidade primeiro (botão 'Calcular Rentabilidade') antes de rodar a simulação Monte Carlo.");
         return;
     }
 
@@ -1254,26 +1254,34 @@ function displayAdvancedAnalyses(results, assumptions, shortRate, shortTerm, lon
 
     // Carry Analysis
     try {
+        // Ensure assumptions and longRate are valid before calculating
+        if (!assumptions || !assumptions.ipca || !assumptions.cdi || assumptions.ipca.length === 0 || assumptions.cdi.length === 0 || typeof longRate === 'undefined' || isNaN(longRate)) {
+             throw new Error("Dados de premissas ou taxa longa inválidos/ausentes para análise de carregamento.");
+        }
+        console.log("Calculando Análise de Carregamento..."); // Debug log
         const carryResults = calculateCarryAnalysis(longRate, assumptions);
+        console.log("Exibindo Análise de Carregamento..."); // Debug log
         displayCarryAnalysis(carryResults);
     } catch (error) {
         console.error("Erro ao calcular/exibir Análise de Carregamento:", error);
-        if (carryNarrativeEl) carryNarrativeEl.textContent = "Erro ao gerar a análise de carregamento.";
-        if (carryChart) carryChart.destroy();
+        if (carryNarrativeEl) carryNarrativeEl.textContent = `Erro ao gerar a análise de carregamento: ${error.message}`;
+        if (carryChart) {
+             try { carryChart.destroy(); } catch (e) { console.error("Erro ao destruir gráfico de carregamento:", e); }
+             carryChart = null;
+        }
     }
 
     // Reset Monte Carlo Results (calculation triggered separately)
     if (monteCarloNarrativeEl) monteCarloNarrativeEl.textContent = "Aguardando simulação...";
     if (monteCarloChart) {
-        monteCarloChart.destroy();
+        try { monteCarloChart.destroy(); } catch(e) { console.error("Erro ao destruir gráfico Monte Carlo:", e); }
         monteCarloChart = null;
     }
 
     // Reset Stress Test Results
-    stressTestResultsEl.innerHTML = 
-'<p>Aguardando teste...</p>';
+    stressTestResultsEl.innerHTML = '<p>Aguardando teste...</p>';
     if (stressTestChart) {
-        stressTestChart.destroy();
+        try { stressTestChart.destroy(); } catch(e) { console.error("Erro ao destruir gráfico de teste de estresse:", e); }
         stressTestChart = null;
     }
 }
