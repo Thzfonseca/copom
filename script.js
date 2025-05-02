@@ -68,14 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const taxaCurta = parseFloat(taxaCurtaElement.value.replace(',', '.'));
             const prazoCurta = parseFloat(prazoCurtaElement.value.replace(',', '.'));
-            const taxaLonga = parseFloat(taxaLongoElement.value.replace(',', '.'));
+            const taxaLongo = parseFloat(taxaLongoElement.value.replace(',', '.'));
             const prazoLongo = parseFloat(prazoLongoElement.value.replace(',', '.'));
+
+            console.log('Valores lidos:', { taxaCurta, prazoCurta, taxaLongo, prazoLongo }); // LOG PARA VER OS VALORES
 
             if (
                 isNaN(taxaCurta) || isNaN(prazoCurta) ||
                 isNaN(taxaLongo) || isNaN(prazoLongo) ||
                 taxaCurta <= 0 || prazoCurta <= 0 ||
-                taxaLonga <= 0 || prazoLongo <= 0
+                taxaLongo <= 0 || prazoLongo <= 0
             ) {
                 registrarErro("Preencha corretamente todas as taxas e prazos com valores positivos.");
                 return;
@@ -101,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cdi = premissas[ano]?.cdi ?? premissas[anosPremissas[anosPremissas.length - 1]].cdi;
 
                 const taxaRealCurta = taxaCurta + ipca;
-                const taxaRealLonga = taxaLonga + ipca;
+                const taxaRealLonga = taxaLongo + ipca;
 
                 if (t < prazoCurta) {
                     acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
@@ -174,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo) {
         let retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
-        let retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+        let retorno AnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
         let cdiBreakEven = '-';
 
         const tempoRestante = prazoLongo - prazoCurta;
