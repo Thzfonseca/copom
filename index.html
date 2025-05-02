@@ -9,7 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
-    <script>dayjs.extend(window.dayjs_plugin_customParseFormat);</script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/dayOfYear.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isLeapYear.js"></script>
+    <script>dayjs.extend(window.dayjs_plugin_customParseFormat); dayjs.extend(window.dayjs_plugin_dayOfYear); dayjs.extend(window.dayjs_plugin_isLeapYear);</script>
 </head>
 <body>
     <header>
@@ -45,7 +47,7 @@
 
         <section id="assumptions-section" style="display: none;">
             <h2>Premissas Futuras (% a.a.)</h2>
-            <p>Defina as projeções anuais para IPCA (0-15%, passo 0.5) e CDI (0-20%, passo 0.25). Os cálculos consideram o período pro-rata para o primeiro ano e perpetuidade após o 6º ano.</p>
+            <p>Defina as projeções anuais para IPCA (0-15%, passo 0.5) e CDI (0-20%, passo 0.25). Os cálculos consideram o período pro-rata para o primeiro ano e perpetuidade após o 4º ano (usando os valores do último slider).</p>
             <div id="sliders-container">
                 <!-- Sliders serão gerados dinamicamente aqui pelo JS -->
             </div>
@@ -148,7 +150,7 @@
     </main>
 
     <footer>
-        <p>Ferramenta de simulação Trade IPCA+ | Desenvolvido por TF</p>
+        <p>Ferramenta de simulação Trade IPCA+ | Desenvolvido por Manus</p>
     </footer>
 
     <script src="script.js"></script>
