@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Simulando...');
         try {
             const taxaCurtaElement = document.getElementById('taxaCurto');
-            const prazoCurtaElement = document.getElementById('prazoCurto');
+            const prazoCurtaElement = document.getElementById('prazoCurta');
             const taxaLongoElement = document.getElementById('taxaLongo');
             const prazoLongoElement = document.getElementById('prazoLongo');
 
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (
                 isNaN(taxaCurta) || isNaN(prazoCurta) ||
-                isNaN(taxaLonga) || isNaN(prazoLongo) ||
+                isNaN(taxaLongo) || isNaN(prazoLongo) ||
                 taxaCurta <= 0 || prazoCurta <= 0 ||
                 taxaLonga <= 0 || prazoLongo <= 0
             ) {
@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function plotarGrafico(labels, serie1, serie2) {
         console.log('plotarGrafico chamado');
         if (window.graficoRentab) {
-            console.log('Gráfico existente, destruindo...');
             window.graficoRentab.destroy();
             window.graficoRentab = null;
         }
@@ -136,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
             graficoCanvas.width = graficoCanvas.offsetWidth;
             graficoCanvas.height = 150;
             const ctx = graficoCanvas.getContext('2d');
-            console.log('Contexto do canvas:', ctx);
             window.graficoRentab = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -163,12 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 },
                 options: {
-                    responsive: true,
+                    responsive: false, // DESATIVANDO A RESPONSIVIDADE
                     maintainAspectRatio: false,
                     animation: false
                 }
             });
-            console.log('Gráfico instanciado:', window.graficoRentab);
             window.graficoRentab.resize();
         } else {
             registrarErro("Erro: Elemento canvas 'grafico' não encontrado.");
