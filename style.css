@@ -21,6 +21,7 @@ h1, h2 {
   gap: 2rem;
   flex-wrap: wrap;
   margin-bottom: 2rem;
+  justify-content: space-between;
 }
 
 .card-input {
@@ -29,19 +30,22 @@ h1, h2 {
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   flex: 1;
-  min-width: 300px;
+  min-width: 280px;
+  max-width: 420px;
 }
 
 .card-input label {
   display: block;
   margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .card-input input,
 .card-input select {
   width: 100%;
   padding: 0.4rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   margin-top: 0.3rem;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -51,12 +55,15 @@ button#simular {
   background-color: #2b6cb0;
   color: white;
   border: none;
-  padding: 0.8rem 2rem;
+  padding: 0.7rem 1.5rem;
   font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
   margin-top: 1.5rem;
   transition: background-color 0.3s;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 button#simular:hover {
@@ -75,6 +82,7 @@ canvas#grafico {
   gap: 1rem;
   margin: 2rem 0;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .card {
@@ -84,14 +92,14 @@ canvas#grafico {
   box-shadow: 0 1px 8px rgba(0,0,0,0.08);
   flex: 1;
   min-width: 200px;
+  max-width: 300px;
   text-align: center;
 }
 
-.card i,
-.card svg {
+.card i {
   width: 24px;
   height: 24px;
-  stroke: #2b6cb0;
+  color: #0a2540;
   margin-bottom: 0.5rem;
 }
 
@@ -101,8 +109,8 @@ canvas#grafico {
   padding: 1rem 1.5rem;
   border-radius: 8px;
   max-width: 900px;
-  margin-bottom: 2rem;
-  line-height: 1.6;
+  margin: 1rem auto 2rem auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
 }
 
 .slider-bloco {
