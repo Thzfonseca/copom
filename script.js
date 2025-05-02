@@ -22,19 +22,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const analysisToggles = document.querySelectorAll('.analysis-toggle');
 
     // Advanced Analysis Elements
-    const shortDurationEl = document.getElementById('short-duration');
-    const shortConvexityEl = document.getElementById('short-convexity');
-    const longDurationEl = document.getElementById('long-duration');
-    const longConvexityEl = document.getElementById('long-convexity');
-    const durationConvexityNarrativeEl = document.getElementById('duration-convexity-narrative');
-    const breakEvenIpcaEl = document.getElementById('break-even-ipca');
-    const breakEvenIpcaNarrativeEl = document.getElementById('breakeven-ipca-narrative');
-    const stressIpcaChangeInput = document.getElementById('stress-ipca-change');
+    const shortDurationEl = document.getElementById("short-duration");
+    // const shortConvexityEl = document.getElementById("short-convexity"); // Removed
+    const longDurationEl = document.getElementById("long-duration");
+    // const longConvexityEl = document.getElementById("long-convexity"); // Removed
+    const durationNarrativeEl = document.getElementById("duration-narrative"); // ID updated
+    // const breakEvenIpcaEl = document.getElementById("break-even-ipca"); // Removed
+    // const breakEvenIpcaNarrativeEl = document.getElementById("breakeven-ipca-narrative"); // Removed
+    const stressIpcaChangeInput = document.getElementById("stress-ipca-change");
     const stressCdiChangeInput = document.getElementById('stress-cdi-change');
     const runStressTestBtn = document.getElementById('run-stress-test-btn');
     const stressTestResultsEl = document.getElementById('stress-test-results');
 
     let rentabilidadeChart = null; // Chart instance
+    let stressTestChart = null; // Stress test chart instance
     let simulationYears = 0;
     const MAX_SLIDER_YEARS = 4; // Current year + 3 future years (e.g., 2025-2028)
     let lastCalculationResults = null; // Store last results for toggles/export
@@ -42,13 +43,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentInputs = null; // Store current inputs
 
     // --- Event Listeners ---
-    updateAssumptionsBtn.addEventListener('click', setupAssumptionSliders);
-    calculateBtn.addEventListener('click', runSimulation);
-    copyReportBtn.addEventListener('click', copyNarrative);
-    exportCsvBtn.addEventListener('click', exportToCsv);
-    toggleRealReturnCheckbox.addEventListener('change', toggleRealReturn);
-    toggleHistoricalDataCheckbox.addEventListener('change', toggleHistoricalData); // Placeholder
-    runStressTestBtn.addEventListener('click', runStressTest);
+    if (updateAssumptionsBtn) {
+        updateAssumptionsBtn.addEventListener("click", setupAssumptionSliders);
+        console.log("Event listener added to updateAssumptionsBtn"); // Debug log
+    } else {
+        console.error("updateAssumptionsBtn element not found!"); // Debug log
+    }
+    // updateAssumptionsBtn.addEventListener("click", setupAssumptionSliders); // Original line
+    calculateBtn.addEventListener("click", runSimulation);
+    copyReportBtn.addEventListener("click", copyNarrative);
+    exportCsvBtn.addEventListener("click", exportToCsv);
+    toggleRealReturnCheckbox.addEventListener("change", toggleRealReturn);
+    toggleHistoricalDataCheckbox.disabled = true; // Disable until historical data source is implemented
 
     analysisToggles.forEach(button => {
         button.addEventListener('click', () => {
@@ -60,28 +66,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    runStressTestBtn.addEventListener("click", runStressTest);
+
     // --- Functions ---
 
     function setupAssumptionSliders() {
+        console.log("setupAssumptionSliders called"); // Debug log
         const shortTerm = parseFloat(shortTermInput.value);
         const longTerm = parseFloat(longTermInput.value);
+        console.log("Short Term:", shortTerm, "Long Term:", longTerm); // Debug log
 
         if (isNaN(shortTerm) || isNaN(longTerm) || shortTerm <= 0 || longTerm <= 0 || shortTerm >= longTerm) {
-            alert('Por favor, insira prazos válidos (curto < longo, ambos > 0).');
+            alert("Por favor, insira prazos válidos (curto < longo, ambos > 0).");
+            console.error("Invalid terms provided."); // Debug log
             return;
         }
 
         simulationYears = Math.ceil(longTerm);
-        slidersContainer.innerHTML = ''; // Clear previous sliders
+        console.log("Simulation Years:", simulationYears); // Debug log
+
+        if (!slidersContainer) {
+            console.error("slidersContainer element not found!"); // Debug log
+            return;
+        }
+        slidersContainer.innerHTML = ""; // Clear previous sliders
+        console.log("Cleared slidersContainer."); // Debug log
+
         const currentYear = dayjs().year();
-        const yearsToGenerate = Math.min(simulationYears + 1, MAX_SLIDER_YEARS); // +1 for current year, limit to MAX_SLIDER_YEARS
+        const yearsToGenerate = Math.min(simulationYears + 1, MAX_SLIDER_YEARS);
+        console.log("Years to generate sliders for:", yearsToGenerate); // Debug log
 
         for (let i = 0; i < yearsToGenerate; i++) {
             const year = currentYear + i;
             const isCurrentYear = i === 0;
             const yearLabel = isCurrentYear ? `${year} (Pro-rata)` : `${year}`;
-            const sliderGroup = document.createElement('div');
-            sliderGroup.classList.add('slider-group');
+            const sliderGroup = document.createElement("div");
+            sliderGroup.classList.add("slider-group");
             sliderGroup.innerHTML = `
                 <h4>${yearLabel}</h4>
                 <div class="slider-wrapper">
@@ -96,20 +116,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             slidersContainer.appendChild(sliderGroup);
+            console.log(`Generated slider for year ${year}`); // Debug log
 
             // Add event listeners for slider value display
             const ipcaSlider = sliderGroup.querySelector(`#ipca-${year}`);
             const ipcaValueSpan = sliderGroup.querySelector(`#ipca-${year}-value`);
-            ipcaSlider.addEventListener('input', () => ipcaValueSpan.textContent = `${parseFloat(ipcaSlider.value).toFixed(1)}%`);
+            ipcaSlider.addEventListener("input", () => ipcaValueSpan.textContent = `${parseFloat(ipcaSlider.value).toFixed(1)}%`);
 
             const cdiSlider = sliderGroup.querySelector(`#cdi-${year}`);
             const cdiValueSpan = sliderGroup.querySelector(`#cdi-${year}-value`);
-            cdiSlider.addEventListener('input', () => cdiValueSpan.textContent = `${parseFloat(cdiSlider.value).toFixed(2)}%`);
+            cdiSlider.addEventListener("input", () => cdiValueSpan.textContent = `${parseFloat(cdiSlider.value).toFixed(2)}%`);
         }
 
-        assumptionsSection.style.display = 'block';
-        outputSection.style.display = 'none'; // Hide results until calculated
-        advancedAnalysisSection.style.display = 'none'; // Hide advanced analysis
+        console.log("Finished generating sliders."); // Debug log
+
+        if (!assumptionsSection) {
+            console.error("assumptionsSection element not found!"); // Debug log
+            return;
+        }
+        assumptionsSection.style.display = "block";
+        console.log("Set assumptionsSection display to block."); // Debug log
+
+        outputSection.style.display = "none"; // Hide results until calculated
+        advancedAnalysisSection.style.display = "none"; // Hide advanced analysis
     }
 
     function getAssumption(type, year, assumptionsOverride = null) {
@@ -183,15 +212,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function calculateAllMetrics(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction) {
         const nominalReturns = calculateNominalReturns(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction);
         const realReturns = calculateRealReturns(nominalReturns.chartData, assumptions, firstYearFraction);
-        const durationConvexity = calculateDurationConvexity(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction);
-        const breakEvenIpcaResult = calculateBreakEvenIpca(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction, nominalReturns.shortScenario.finalValue, nominalReturns.longScenario.finalValue);
+        const durationMetrics = calculateDuration(shortRate, shortTerm, longRate, longTerm); // Updated function name
+        // const breakEvenIpcaResult = calculateBreakEvenIpca(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction, nominalReturns.shortScenario.finalValue, nominalReturns.longScenario.finalValue); // Removed
 
         return {
             ...nominalReturns,
             realChartData: realReturns.realChartData,
-            durationConvexity,
-            breakEvenIpca: breakEvenIpcaResult.breakEvenIpca,
-            breakEvenIpcaIterations: breakEvenIpcaResult.iterations
+            durationMetrics, // Updated property name
+            // breakEvenIpca: breakEvenIpcaResult.breakEvenIpca, // Removed
+            // breakEvenIpcaIterations: breakEvenIpcaResult.iterations // Removed
         };
     }
 
@@ -203,14 +232,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayAdvancedAnalyses(results, assumptions, shortRate, shortTerm, longRate, longTerm, firstYearFraction) {
-        // Duration & Convexity
-        shortDurationEl.textContent = `${results.durationConvexity.short.duration.toFixed(2)} anos`;
-        shortConvexityEl.textContent = `${results.durationConvexity.short.convexity.toFixed(2)}`;
-        longDurationEl.textContent = `${results.durationConvexity.long.duration.toFixed(2)} anos`;
-        longConvexityEl.textContent = `${results.durationConvexity.long.convexity.toFixed(2)}`;
-        durationConvexityNarrativeEl.textContent = generateDurationNarrative(results.durationConvexity);
+        // Duration
+        shortDurationEl.textContent = `${results.durationMetrics.short.duration.toFixed(2)} anos`;
+        // shortConvexityEl.textContent = `${results.durationConvexity.short.convexity.toFixed(2)}`; // Removed
+        longDurationEl.textContent = `${results.durationMetrics.long.duration.toFixed(2)} anos`;
+        // longConvexityEl.textContent = `${results.durationConvexity.long.convexity.toFixed(2)}`; // Removed
+        durationNarrativeEl.textContent = generateDurationNarrative(results.durationMetrics); // Updated function name and element ID
 
-        // Break-even IPCA
+        // Break-even IPCA section removed
+        /*
         if (results.breakEvenIpca !== null) {
             breakEvenIpcaEl.textContent = `${(results.breakEvenIpca * 100).toFixed(2)}% a.a.`;
             breakEvenIpcaNarrativeEl.textContent = `Se a inflação média futura (IPCA) for de aproximadamente ${(results.breakEvenIpca * 100).toFixed(2)}% a.a., ambas as estratégias teriam o mesmo retorno final. Acima disso, a Opção Longa tende a ser melhor (assumindo taxa real positiva); abaixo, a Opção Curta + CDI tende a performar melhor. (Calculado em ${results.breakEvenIpcaIterations} iterações).`;
@@ -218,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
             breakEvenIpcaEl.textContent = 'N/A';
             breakEvenIpcaNarrativeEl.textContent = 'Não foi possível calcular o IPCA de break-even (talvez a opção longa já seja inferior mesmo com IPCA zero, ou o cálculo não convergiu).';
         }
+        */
 
         // Reset Stress Test Results
         stressTestResultsEl.innerHTML = '<p>Aguardando teste...</p>';
@@ -374,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Advanced Calculation Functions (Placeholders/Simplified) ---
 
-    function calculateDurationConvexity(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction) {
+    function calculateDuration(shortRate, shortTerm, longRate, longTerm) {
         // --- Simplified Calculation: Macaulay Duration for Zero-Coupon Bond with Real Rate ---
         // This is a major simplification, ignoring IPCA impact on cash flows and timing.
         // A proper calculation requires projecting cash flows based on IPCA assumptions.
@@ -382,10 +413,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Helper function (simplified)
         const calculateMetrics = (rate, term) => {
             // Using the formula for duration of a zero-coupon bond: D = T
-            // Using a simplified convexity approximation
             const duration = term;
-            const convexity = term * (term + 1) / Math.pow(1 + rate, 2); // Very rough approximation
-            return { duration, convexity };
+            // const convexity = term * (term + 1) / Math.pow(1 + rate, 2); // Removed
+            return { duration }; // Return only duration
         };
 
         // We should use an effective discount rate combining real rate and expected IPCA,
@@ -397,17 +427,15 @@ document.addEventListener('DOMContentLoaded', () => {
             short: shortMetrics,
             long: longMetrics
         };
-    }
-
-    function generateDurationNarrative(durationConvexity) {
+    }    function generateDurationNarrative(durationMetrics) { // Parameter name updated
         let narrative = `A Duração de Macaulay estimada indica a sensibilidade do valor do título a variações nas taxas de juros. `; 
-        narrative += `A Opção Curta (${durationConvexity.short.duration.toFixed(2)} anos) é menos sensível que a Opção Longa (${durationConvexity.long.duration.toFixed(2)} anos). `;
-        narrative += `A Convexidade (${durationConvexity.short.convexity.toFixed(2)} vs ${durationConvexity.long.convexity.toFixed(2)}) reflete como essa sensibilidade muda; valores maiores indicam que o preço do título aumenta mais com quedas de juros do que cai com altas equivalentes. `;
-        narrative += `(Nota: Cálculo simplificado, desconsidera o impacto das projeções de IPCA nos fluxos de caixa para duration/convexidade).`;
+        narrative += `A Opção Curta (${durationMetrics.short.duration.toFixed(2)} anos) é menos sensível que a Opção Longa (${durationMetrics.long.duration.toFixed(2)} anos). `;
+        narrative += `Isso significa que, para uma mesma variação na taxa de juros esperada, o preço da Opção Longa tende a variar mais (positiva ou negativamente) do que o da Opção Curta.`;
+        // Convexity part removed
         return narrative;
     }
 
-    function calculateBreakEvenIpca(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction, targetShortFinalValue, targetLongFinalValue) {
+    function calculateBreakEvenIpca(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction, targetShortFinalValue) {targetLongFinalValue) {
         // Iterative approach to find IPCA that makes finalLongValue equal targetShortFinalValue
         let lowerBoundIpca = -0.10; // Allow for deflation
         let upperBoundIpca = 0.50; // 50% IPCA upper limit
@@ -464,12 +492,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function runStressTest() {
         if (!lastCalculationResults || !currentInputs || !currentAssumptions) {
-            alert('Por favor, execute o cálculo principal primeiro.');
+            alert("Por favor, execute o cálculo principal primeiro.");
             return;
         }
 
         const ipcaShock = parseFloat(stressIpcaChangeInput.value || 0) / 100;
         const cdiShock = parseFloat(stressCdiChangeInput.value || 0) / 100;
+
+        // Get durations from the main calculation results
+        const shortDuration = lastCalculationResults.durationMetrics.short.duration;
+        const longDuration = lastCalculationResults.durationMetrics.long.duration;
 
         const stressedAssumptions = {
             ipca: currentAssumptions.ipca.map(rate => Math.max(0, rate + ipcaShock)), // Ensure non-negative
@@ -487,17 +519,38 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         // Display stressed results
-        let stressNarrative = `Resultados com Choque (IPCA: ${ipcaShock >= 0 ? '+' : ''}${(ipcaShock * 100).toFixed(1)}%, CDI: ${cdiShock >= 0 ? '+' : ''}${(cdiShock * 100).toFixed(1)}%):\n`;
-        stressNarrative += `  - Novo Ret. Anual. Curto+CDI: ${(stressedResults.shortScenario.annualizedReturn * 100).toFixed(2)}% (Original: ${(lastCalculationResults.shortScenario.annualizedReturn * 100).toFixed(2)}%)\n`;
-        stressNarrative += `  - Novo Ret. Anual. Longo: ${(stressedResults.longScenario.annualizedReturn * 100).toFixed(2)}% (Original: ${(lastCalculationResults.longScenario.annualizedReturn * 100).toFixed(2)}%)\n`;
-        stressNarrative += `  - Novo CDI Break-even: ${(stressedResults.breakEvenCdi * 100).toFixed(2)}% (Original: ${(lastCalculationResults.breakEvenCdi * 100).toFixed(2)}%)\n`;
+        let stressNarrative = `**Resultados com Choque (IPCA: ${ipcaShock >= 0 ? "+" : ""}${(ipcaShock * 100).toFixed(1)}%, CDI: ${cdiShock >= 0 ? "+" : ""}${(cdiShock * 100).toFixed(1)}%):**\n\n`;
+        stressNarrative += `  - Novo Ret. Anual. Curto+CDI: **${(stressedResults.shortScenario.annualizedReturn * 100).toFixed(2)}%** (Original: ${(lastCalculationResults.shortScenario.annualizedReturn * 100).toFixed(2)}%)\n`;
+        stressNarrative += `  - Novo Ret. Anual. Longo: **${(stressedResults.longScenario.annualizedReturn * 100).toFixed(2)}%** (Original: ${(lastCalculationResults.longScenario.annualizedReturn * 100).toFixed(2)}%)\n`;
+        stressNarrative += `  - Novo CDI Break-even: **${(stressedResults.breakEvenCdi * 100).toFixed(2)}%** (Original: ${(lastCalculationResults.breakEvenCdi * 100).toFixed(2)}%)\n\n`;
+
+        // Explain impact based on duration (simplified)
+        stressNarrative += `**Impacto da Sensibilidade (Duração):**\n`;
+        if (cdiShock !== 0) {
+            stressNarrative += `  - O choque no CDI afeta diretamente a rentabilidade da rolagem da Opção Curta. 
+`;
+            stressNarrative += `  - Além disso, mudanças nas taxas de juros (refletidas no CDI) impactam o valor dos títulos IPCA+ no mercado secundário (embora esta simulação foque no carrego até o vencimento). A Opção Longa, com duração maior (${longDuration.toFixed(2)} anos), é teoricamente mais sensível a essas variações do que a Opção Curta (${shortDuration.toFixed(2)} anos). Um aumento nas taxas de juros tende a desvalorizar mais o título longo, enquanto uma queda tende a valorizá-lo mais.
+`;
+        }
+        if (ipcaShock !== 0) {
+             stressNarrative += `  - O choque no IPCA impacta diretamente a rentabilidade de ambos os títulos, pois são indexados à inflação. O efeito no retorno final dependerá da magnitude do choque e do prazo de cada opção.
+`;
+        }
+        stressNarrative += `\n`;
 
         const winnerChanged = (stressedResults.shortScenario.finalValue > stressedResults.longScenario.finalValue) !== (lastCalculationResults.shortScenario.finalValue > lastCalculationResults.longScenario.finalValue);
         if (winnerChanged) {
-            stressNarrative += `  - Atenção: O cenário de estresse alterou qual opção apresenta maior retorno final!\n`;
+            const newWinner = stressedResults.shortScenario.finalValue > stressedResults.longScenario.finalValue ? "Curta + CDI" : "Longa";
+            stressNarrative += `  - **Atenção:** O cenário de estresse **alterou** qual estratégia apresenta maior retorno final! A opção **${newWinner}** passou a ser a mais rentável neste cenário estressado.\n`;
+        } else {
+             const currentWinner = lastCalculationResults.shortScenario.finalValue > lastCalculationResults.longScenario.finalValue ? "Curta + CDI" : "Longa";
+             stressNarrative += `  - A estratégia **${currentWinner}** permaneceu como a mais rentável mesmo após o choque simulado.\n`;
         }
 
         stressTestResultsEl.innerHTML = `<pre>${stressNarrative}</pre>`; // Use pre for formatting
+
+        // Update stress test chart
+        updateStressTestChart(lastCalculationResults.chartData, stressedResults.chartData);
     }
 
     // --- Chart Functions ---
@@ -599,7 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleRealReturn() {
         if (lastCalculationResults) {
-            updateChart();
+            updateChart(toggleRealReturnCheckbox.checked); // Passa o estado do checkbox
         }
     }
 
@@ -621,60 +674,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateNarrative(shortRate, shortTerm, longRate, longTerm, assumptions, results, firstYearFraction) {
         const currentYear = dayjs().year();
-        let narrative = `Relatório da Simulação Trade IPCA+\n`;
-        narrative += `Data da Simulação: ${dayjs().format('DD/MM/YYYY')}\n\n`;
-        narrative += `Opção Curta: IPCA + ${(shortRate * 100).toFixed(2)}% a.a. por ${shortTerm} anos.\n`;
-        narrative += `Opção Longa: IPCA + ${(longRate * 100).toFixed(2)}% a.a. por ${longTerm} anos.\n\n`;
+        const showReal = toggleRealReturnCheckbox.checked;
+        const returnType = showReal ? "Real (acima da inflação)" : "Nominal (bruto)";
 
-        narrative += `Premissas Futuras Anuais:\n`;
+        // Use real or nominal results based on checkbox
+        const shortFinalValue = showReal ? results.realChartData.short[results.realChartData.short.length - 1] : results.shortScenario.finalValue;
+        const longFinalValue = showReal ? results.realChartData.long[results.realChartData.long.length - 1] : results.longScenario.finalValue;
+        const shortAnnualized = showReal ? Math.pow(shortFinalValue / 100, 1 / longTerm) - 1 : results.shortScenario.annualizedReturn;
+        const longAnnualized = showReal ? Math.pow(longFinalValue / 100, 1 / longTerm) - 1 : results.longScenario.annualizedReturn;
+
+        let narrative = `**Análise Simplificada: Comparando Investimentos IPCA+**\n\n`;
+        narrative += `Olá! Esta simulação compara duas opções de investimento que pagam a inflação (IPCA) mais uma taxa fixa ao ano. O objetivo é ver qual pode ser mais vantajosa no longo prazo, considerando suas projeções para a inflação e a taxa básica de juros (CDI).\n\n`;
+        narrative += `**As Opções:**\n`;
+        narrative += `1.  **Opção Curta:** Paga IPCA + ${(shortRate * 100).toFixed(2)}% ao ano, vencendo em ${shortTerm} anos. Após o vencimento, simulamos que o dinheiro é reinvestido a 100% do CDI até o final do prazo da Opção Longa.
+`;
+        narrative += `2.  **Opção Longa:** Paga IPCA + ${(longRate * 100).toFixed(2)}% ao ano, vencendo em ${longTerm} anos.
+\n`;
+
+        narrative += `**Suas Premissas (O que você acha que vai acontecer?):**\n`;
+        narrative += `Para os próximos anos, você projetou os seguintes cenários anuais:\n`;
         const yearsToShow = Math.min(simulationYears + 1, MAX_SLIDER_YEARS);
         for (let i = 0; i < yearsToShow; i++) {
             const year = currentYear + i;
-            // Read assumption directly from stored state for consistency
             const ipca = assumptions.ipca[i] !== undefined ? assumptions.ipca[i] : assumptions.ipca[assumptions.ipca.length - 1];
             const cdi = assumptions.cdi[i] !== undefined ? assumptions.cdi[i] : assumptions.cdi[assumptions.cdi.length - 1];
-            const yearLabel = i === 0 ? `${year} (Pro-rata ${Math.round(firstYearFraction*100)}%)` : `${year}`;
-            narrative += `  ${yearLabel}: IPCA = ${(ipca * 100).toFixed(1)}%, CDI = ${(cdi * 100).toFixed(2)}%\n`;
+            const yearLabel = i === 0 ? `${year} (Restante do ano)` : `${year}`;
+            narrative += `  - ${yearLabel}: Inflação (IPCA) de ${(ipca * 100).toFixed(1)}%, Taxa CDI de ${(cdi * 100).toFixed(2)}%\n`;
         }
         if (simulationYears >= MAX_SLIDER_YEARS) {
              const lastYearUsed = currentYear + MAX_SLIDER_YEARS - 1;
              const ipcaPerp = assumptions.ipca[assumptions.ipca.length - 1];
              const cdiPerp = assumptions.cdi[assumptions.cdi.length - 1];
-             narrative += `  Perpetuidade (após ${lastYearUsed}): IPCA = ${(ipcaPerp * 100).toFixed(1)}%, CDI = ${(cdiPerp * 100).toFixed(2)}%\n`;
+             narrative += `  - A partir de ${lastYearUsed + 1}: Inflação de ${(ipcaPerp * 100).toFixed(1)}%, CDI de ${(cdiPerp * 100).toFixed(2)}% (usado para anos futuros)\n`;
         }
-        narrative += `\nResultados da Simulação ao longo de ${longTerm} anos (Nominal):\n`;
-        narrative += `  - Rentabilidade Acumulada (Opção Curta + Rolagem CDI): ${(results.shortScenario.finalValue - 100).toFixed(2)}%\n`;
-        narrative += `  - Rentabilidade Acumulada (Opção Longa): ${(results.longScenario.finalValue - 100).toFixed(2)}%\n`;
-        narrative += `  - Rentabilidade Anualizada (Opção Curta + Rolagem CDI): ${(results.shortScenario.annualizedReturn * 100).toFixed(2)}% a.a.\n`;
-        narrative += `  - Rentabilidade Anualizada (Opção Longa): ${(results.longScenario.annualizedReturn * 100).toFixed(2)}% a.a.\n`;
-        narrative += `  - CDI Break-even (Taxa CDI média futura que igualaria os retornos): Aproximadamente ${(results.breakEvenCdi * 100).toFixed(2)}% a.a.\n\n`;
-
-        narrative += `Análise:\n`;
-        if (results.shortScenario.finalValue > results.longScenario.finalValue) {
-            narrative += `Considerando as premissas informadas, a estratégia de investir na Opção Curta (IPCA + ${(shortRate * 100).toFixed(2)}%) e rolar o montante em CDI após ${shortTerm} anos tende a gerar um retorno nominal acumulado maior (${(results.shortScenario.finalValue - 100).toFixed(2)}%) ao final de ${longTerm} anos, comparado à Opção Longa (${(results.longScenario.finalValue - 100).toFixed(2)}%).\n`;
-            narrative += `A rentabilidade anualizada nominal da estratégia curta + CDI (${(results.shortScenario.annualizedReturn * 100).toFixed(2)}% a.a.) supera a da opção longa (${(results.longScenario.annualizedReturn * 100).toFixed(2)}% a.a.). `;
-        } else if (results.longScenario.finalValue > results.shortScenario.finalValue) {
-            narrative += `Com base nas projeções de IPCA e CDI fornecidas, a Opção Longa (IPCA + ${(longRate * 100).toFixed(2)}%) apresenta um potencial de retorno nominal acumulado superior (${(results.longScenario.finalValue - 100).toFixed(2)}%) ao final dos ${longTerm} anos, em relação à estratégia de investir na Opção Curta e rolar em CDI (${(results.shortScenario.finalValue - 100).toFixed(2)}%).\n`;
-            narrative += `A rentabilidade anualizada nominal da opção longa (${(results.longScenario.annualizedReturn * 100).toFixed(2)}% a.a.) é maior que a da estratégia curta + CDI (${(results.shortScenario.annualizedReturn * 100).toFixed(2)}% a.a.). `;
-        } else {
-            narrative += `Nas condições simuladas, ambas as estratégias apresentam retornos nominais acumulados e anualizados praticamente idênticos ao final de ${longTerm} anos. A escolha pode depender de outros fatores, como liquidez ou perfil de risco.\n`;
-        }
-
-        narrative += `O CDI break-even de aproximadamente ${(results.breakEvenCdi * 100).toFixed(2)}% a.a. indica a taxa média de CDI futura que tornaria indiferente a escolha entre as duas opções. Se a expectativa para o CDI médio for superior a este valor, a estratégia curta + rolagem tende a ser mais vantajosa; se for inferior, a opção longa tende a ser melhor.\n\n`;
-
-        narrative += `Influência das Premissas:\n`;
-        narrative += `  - Projeções de IPCA mais elevadas beneficiam ambas as opções (indexadas ao IPCA). O impacto relativo depende das taxas reais e do prazo.
+        narrative += `\n**Resultado Simulado (Retorno ${returnType}):**\n`;
+        narrative += `Ao final dos ${longTerm} anos, a simulação indica o seguinte:\n`;
+        narrative += `  - **Estratégia Curta + CDI:** Seu dinheiro teria virado R$ ${shortFinalValue.toFixed(2)} (para cada R$ 100 investidos). Isso equivale a um ganho médio de **${(shortAnnualized * 100).toFixed(2)}% ao ano**.
 `;
-        narrative += `  - Projeções de CDI mais altas favorecem diretamente a estratégia de rolagem da opção curta após seu vencimento. O CDI break-even é um indicador chave dessa sensibilidade.
-`;
-        narrative += `  - A taxa real (acima do IPCA) de cada título é crucial. Diferenças significativas aqui podem direcionar a escolha independentemente de pequenas variações nas premissas de CDI/IPCA.
+        narrative += `  - **Estratégia Longa:** Seu dinheiro teria virado R$ ${longFinalValue.toFixed(2)} (para cada R$ 100 investidos). Isso equivale a um ganho médio de **${(longAnnualized * 100).toFixed(2)}% ao ano**.
 \n`;
-        narrative += `Observação: Esta simulação é um modelo simplificado e não considera impostos, taxas de custódia, reinvestimento de cupons (se houver) ou custos de transação. Os resultados dependem fortemente das premissas de IPCA e CDI futuras, que são incertas. Consulte um profissional financeiro antes de tomar decisões de investimento.`;
+
+        narrative += `**Conclusão da Simulação:**\n`;
+        const difference = shortFinalValue - longFinalValue;
+        if (Math.abs(difference) < 0.01) { // Consider near-equal results
+            narrative += `Com base nas suas projeções, as duas estratégias apresentaram resultados muito parecidos! O retorno final foi praticamente o mesmo. Neste caso, a escolha pode depender de outros fatores, como a sua preferência por ter o dinheiro de volta mais cedo (Opção Curta) ou travar uma taxa por mais tempo (Opção Longa).
+`;
+        } else if (difference > 0) {
+            narrative += `Considerando o cenário que você projetou, a **Estratégia Curta + CDI parece mais vantajosa**. Investir no título mais curto e depois aplicar no CDI rendeu mais (R$ ${shortFinalValue.toFixed(2)}) do que manter o título longo até o final (R$ ${longFinalValue.toFixed(2)}).
+`;
+            narrative += `Isso geralmente acontece quando a taxa CDI que você espera receber após o vencimento do título curto é alta o suficiente para compensar a taxa talvez menor do título curto.
+`;
+        } else {
+            narrative += `Com base nas suas projeções, a **Opção Longa se mostrou mais interessante**. Manter o investimento no título mais longo até o vencimento gerou um resultado melhor (R$ ${longFinalValue.toFixed(2)}) do que pegar o título curto e depois aplicar no CDI (R$ ${shortFinalValue.toFixed(2)}).
+`;
+            narrative += `Isso costuma ocorrer quando a taxa do título longo é significativamente maior que a do curto, ou quando a taxa CDI esperada para o período após o vencimento do título curto não é tão alta.
+`;
+        }
+        narrative += `\n**O Ponto de Equilíbrio (CDI Break-even):**\n`;
+        narrative += `Calculamos que a taxa CDI média futura que faria as duas estratégias empatarem é de aproximadamente **${(results.breakEvenCdi * 100).toFixed(2)}% ao ano**. 
+`;
+        narrative += `  - Se você acha que o CDI médio será **MAIOR** que isso, a estratégia Curta + CDI tende a ganhar.
+`;
+        narrative += `  - Se você acha que o CDI médio será **MENOR** que isso, a Opção Longa tende a ser melhor.
+`;
+        narrative += `Isso ajuda a entender o quão sensível o resultado é à sua expectativa para o CDI.
+\n`;
+
+        narrative += `**Como suas Premissas Influenciam:**\n`;
+        narrative += `  - **Inflação (IPCA):** Se a inflação for maior do que você previu, ambos os investimentos tendem a render mais (pois pagam IPCA + taxa). O contrário também é verdade.
+`;
+        narrative += `  - **Taxa CDI:** Se o CDI for maior do que o previsto, a estratégia de reinvestir o título curto no CDI fica mais atraente.
+`;
+        narrative += `  - **Taxa Fixa (o "%" acima do IPCA):** Uma diferença grande na taxa fixa entre os títulos curto e longo pode ser o fator decisivo, mesmo que suas previsões de IPCA/CDI mudem um pouco.
+\n`;
+        narrative += `**Importante:** Lembre-se que esta é apenas uma simulação! Ela não considera impostos (como Imposto de Renda), taxas (custódia, etc.) e o mercado pode se comportar de forma diferente do previsto. Use esta análise como um ponto de partida e converse com seu assessor financeiro antes de decidir.`;
 
         return narrative;
-    }
-
-    function copyNarrative() {
+    }   function copyNarrative() {
         narrativeOutputEl.select();
         try {
             document.execCommand('copy');
@@ -755,4 +831,103 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
+
+
+
+    function updateStressTestChart(baseData, stressedData) {
+        const ctx = document.getElementById("stressTestChart").getContext("2d");
+
+        if (stressTestChart) {
+            stressTestChart.destroy(); // Destroy previous chart instance
+        }
+
+        stressTestChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: baseData.labels, // Assuming labels are the same
+                datasets: [
+                    {
+                        label: "Curto+CDI (Base)",
+                        data: baseData.short,
+                        borderColor: "#007ACC", // Blue
+                        borderWidth: 2,
+                        pointRadius: 0, // Hide points for clarity
+                        tension: 0.1
+                    },
+                    {
+                        label: "Longo (Base)",
+                        data: baseData.long,
+                        borderColor: "#FF8C00", // Orange
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.1
+                    },
+                    {
+                        label: "Curto+CDI (Estresse)",
+                        data: stressedData.short,
+                        borderColor: "#87CEEB", // Light Blue
+                        borderWidth: 2,
+                        borderDash: [5, 5], // Dashed line for stressed
+                        pointRadius: 0,
+                        tension: 0.1
+                    },
+                    {
+                        label: "Longo (Estresse)",
+                        data: stressedData.long,
+                        borderColor: "#FFA07A", // Light Salmon (Light Orange)
+                        borderWidth: 2,
+                        borderDash: [5, 5], // Dashed line for stressed
+                        pointRadius: 0,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Comparativo: Cenário Base vs. Cenário Estressado (Nominal)",
+                        font: { size: 14 }
+                    },
+                    tooltip: {
+                        mode: "index",
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || "";
+                                if (label) {
+                                    label += ": ";
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += `${context.parsed.y.toFixed(2)}`;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: false // Keep it clean, main chart has title
+                        },
+                         ticks: {
+                           autoSkip: true,
+                           maxTicksLimit: 10 // Fewer ticks for smaller chart
+                       }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Valor Acumulado (Base 100)"
+                        },
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    }
 
