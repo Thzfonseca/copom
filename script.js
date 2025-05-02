@@ -48,13 +48,13 @@ function simular() {
     const taxaCurta = parseFloat(document.getElementById('taxaCurto').value.replace(',', '.'));
     const prazoCurta = parseFloat(document.getElementById('prazoCurto').value.replace(',', '.'));
     const taxaLonga = parseFloat(document.getElementById('taxaLongo').value.replace(',', '.'));
-    const prazoLonga = parseFloat(document.getElementById('prazoLongo').value.replace(',', '.'));
+    const prazoLongo = parseFloat(document.getElementById('prazoLongo').value.replace(',', '.'));
 
     if (
       isNaN(taxaCurta) || isNaN(prazoCurta) ||
-      isNaN(taxaLonga) || isNaN(prazoLonga) ||
+      isNaN(taxaLonga) || isNaN(prazoLongo) ||
       taxaCurta <= 0 || prazoCurta <= 0 ||
-      taxaLonga <= 0 || prazoLonga <= 0
+      taxaLonga <= 0 || prazoLongo <= 0
     ) {
       registrarErro("Preencha corretamente todas as taxas e prazos com valores positivos.");
       return;
@@ -65,7 +65,7 @@ function simular() {
     const anos = [];
     const rentabilidadeCurta = [];
     const rentabilidadeLonga = [];
-    const intervalos = Math.ceil(prazoLonga * 2);
+    const intervalos = Math.ceil(prazoLongo * 2);
 
     let acumCurtoFinal = 1;
     let acumCurtoAteVencimento = 1;
@@ -96,7 +96,7 @@ function simular() {
     }
 
     plotarGrafico(anos, rentabilidadeCurta, rentabilidadeLonga);
-    mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLonga);
+    mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo);
   } catch (e) {
     registrarErro(e.message);
   }
@@ -161,86 +161,37 @@ function plotarGrafico(labels, serie1, serie2) {
 }
 
 function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurto, prazoLongo) {
-  let retornoAnualCurto = NaN;
-  let retornoAnualLongo = NaN;
+  let retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
+  let retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
   let cdiBreakEven = '-';
 
-  try {
-    retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
-    retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+  const tempoRestante = prazoLongo - prazoCurto;
+  const n = tempoRestante * 2;
 
-    const tempoRestante = prazoLongo - prazoCurta;
-    const n = tempoRestante * 2;
-
-    if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
-      const fator = acumLongoFinal / acumCurtoAteVencimento;
-      const taxaSemestral = Math.pow(fator, 1 / n) - 1;
-      const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
-      cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
-    }
-  } catch (e) {
-    registrarErro("Erro ao calcular retornos ou CDI break-even: " + e.message);
+  if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
+    const fator = acumLongoFinal / acumCurtoAteVencimento;
+    const taxaSemestral = Math.pow(fator, 1 / n) - 1;
+    const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
+    cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
   }
 
   document.getElementById('resumo').innerHTML = `
-    <div class="card">
-      <i data-lucide="trending-down"></i>
-      <h3>Retorno Anualizado Curto</h3>
-      <p>${isNaN(retornoAnualCurto) ? '-' : (retornoAnualCurto * 100).toFixed(2) + '%'}</p>
-    </div>
-    <div class="card">
-      <i data-lucide="trending-up"></i>
-      <h3>Retorno Anualizado Longo</h3>
-      <p>${isNaN(retornoAnualLongo) ? '-' : (retornoAnualLongo * 100).toFixed(2) + '%'}</p>
-    </div>
-    <div class="card">
-      <i data-lucide="target"></i>
-      <h3>CDI Break-even</h3>
-      <p>${cdiBreakEven}</p>
-    </div>
+    <div class="card"><h3>Retorno Anualizado Curto</h3><p>${(retornoAnualCurto * 100).toFixed(2)}%</p></div>
+    <div class="card"><h3>Retorno Anualizado Longo</h3><p>${(retornoAnualLongo * 100).toFixed(2)}%</p></div>
+    <div class="card"><h3>CDI Break-even</h3><p>${cdiBreakEven}</p></div>
   `;
 
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-
-  const narrativaBase = `
-    <p><strong>Simulação:</strong> Esta comparação avalia dois caminhos de investimento indexado ao IPCA+: uma opção curta com vencimento em ${prazoCurto} anos e uma opção longa com vencimento em ${prazoLongo} anos.</p>
+  const narrativa = `
+    <p><strong>Simulação:</strong> Esta comparação avalia dois caminhos de investimento indexado ao IPCA+: uma opção curta com vencimento em ${prazoCurta} anos e uma opção longa com vencimento em ${prazoLongo} anos.</p>
     <p>A Opção Curta oferece <strong>IPCA+${document.getElementById('taxaCurto').value}%</strong> e, ao final do prazo, assume reinvestimento em CDI. A Opção Longa entrega <strong>IPCA+${document.getElementById('taxaLongo').value}%</strong> por todo o período.</p>
     <p>Considerando suas premissas para inflação e juros, a rentabilidade anualizada até ${prazoLongo} anos foi de:</p>
     <ul>
       <li><strong>Opção Curta:</strong> ${(retornoAnualCurto * 100).toFixed(2)}% ao ano</li>
       <li><strong>Opção Longa:</strong> ${(retornoAnualLongo * 100).toFixed(2)}% ao ano</li>
-      <li><strong>CDI Break-even:</strong> ${cdiBreakEven} ao ano</li>
+      <li><strong>CDI Break-even:</strong> ${cdiBreakEven}</li>
     </ul>
   `;
-
-  let interpretacao = '';
-  try {
-    const premissas = getPremissas();
-    const anoInicio = 2025 + Math.floor(prazoCurto);
-    const anoFim = 2025 + Math.floor(prazoLongo - 0.01);
-    let somaCDI = 0;
-    let anosContados = 0;
-    for (let ano = anoInicio; ano <= anoFim; ano++) {
-      const cdi = premissas[ano]?.cdi ?? premissas[2028].cdi;
-      somaCDI += cdi;
-      anosContados++;
-    }
-    const cdiProjetado = somaCDI / anosContados;
-    const breakEvenNum = parseFloat(cdiBreakEven.replace('%', ''));
-    if (!isNaN(breakEvenNum) && !isNaN(cdiProjetado)) {
-      if (cdiProjetado > breakEvenNum) {
-        interpretacao = `Neste cenário, o CDI médio entre ${anoInicio} e ${anoFim} é de <strong>${cdiProjetado.toFixed(2)}%</strong>, acima do break-even de <strong>${cdiBreakEven}</strong>. Isso sugere vantagem na rolagem para o papel curto.`;
-      } else if (cdiProjetado < breakEvenNum) {
-        interpretacao = `Neste cenário, o CDI médio entre ${anoInicio} e ${anoFim} é de <strong>${cdiProjetado.toFixed(2)}%</strong>, abaixo do break-even de <strong>${cdiBreakEven}</strong>. Isso favorece o papel longo no horizonte considerado.`;
-      } else {
-        interpretacao = `O CDI projetado está muito próximo do break-even. Ambos os caminhos tendem a entregar retornos similares.`;
-      }
-    }
-  } catch (e) {
-    registrarErro("Erro ao interpretar o cenário: " + e.message);
-  }
-
-  document.getElementById("narrativa").innerHTML = narrativaBase + `<p>${interpretacao}</p>`;
+  document.getElementById('narrativa').innerHTML = narrativa;
 }
 
 function registrarErro(msg) {
