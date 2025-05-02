@@ -47,7 +47,7 @@ function simular() {
     console.log('Simulando...');
     try {
         const taxaCurta = parseFloat(document.getElementById('taxaCurto').value.replace(',', '.'));
-        const prazoCurta = parseFloat(document.getElementById('prazoCurto').value.replace(',', '.'));
+        const prazoCurta = parseFloat(document.getElementById('prazoCurta').value.replace(',', '.'));
         const taxaLonga = parseFloat(document.getElementById('taxaLongo').value.replace(',', '.'));
         const prazoLongo = parseFloat(document.getElementById('prazoLongo').value.replace(',', '.'));
 
@@ -98,7 +98,7 @@ function simular() {
 
         console.log('Dados do gráfico:', anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
         plotarGrafico(anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
-        mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLonga);
+        mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo);
     } catch (e) {
         registrarErro(e.message);
     }
@@ -111,6 +111,10 @@ function plotarGrafico(labels, serie1, serie2) {
         window.graficoRentab.destroy();
         window.graficoRentab = null;
     }
+    const graficoCanvas = document.getElementById('grafico');
+    graficoCanvas.width = graficoCanvas.offsetWidth;
+    graficoCanvas.height = 150;
+
     const ctx = document.getElementById('grafico').getContext('2d');
     console.log('Contexto do canvas:', ctx);
     window.graficoRentab = new Chart(ctx, {
@@ -139,12 +143,13 @@ function plotarGrafico(labels, serie1, serie2) {
             ]
         },
         options: {
-            responsive: true, // Tente comentar esta linha temporariamente
+            responsive: true,
             maintainAspectRatio: false,
-            animation: false // Adicionando para desativar animações
+            animation: false
         }
     });
     console.log('Gráfico instanciado:', window.graficoRentab);
+    window.graficoRentab.resize();
 }
 
 function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo) {
