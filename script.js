@@ -614,10 +614,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Utility Functions ---
+    function countBusinessDays(startDate, endDate) {
+        let count = 0;
+        let currentDate = startDate.clone();
+        while (currentDate.isBefore(endDate, 'day') || currentDate.isSame(endDate, 'day')) {
+            const dayOfWeek = currentDate.day(); // 0 = Sunday, 6 = Saturday
+            if (dayOfWeek > 0 && dayOfWeek < 6) {
+                count++;
+            }
+            currentDate = currentDate.add(1, 'day');
+        }
+        return count;
+    }
+
     function calculateFirstYearFraction() {
-        const dayOfYear = dayjs().dayOfYear();
-        const daysInYear = dayjs().isLeapYear() ? 366 : 365;
-        return (daysInYear - dayOfYear) / daysInYear;
+        const today = dayjs();
+        const endOfYear = dayjs().endOf('year');
+        const BUSINESS_DAYS_IN_YEAR = 252; // Standard approximation
+
+        const remainingBusinessDays = countBusinessDays(today, endOfYear);
+
+        // Estimate total business days in the current year (can be refined)
+        // For simplicity, we use 252, but a more precise calculation could be done.
+        // const startOfYear = dayjs().startOf('year');
+        // const totalBusinessDaysInYear = countBusinessDays(startOfYear, endOfYear);
+
+        return remainingBusinessDays / BUSINESS_DAYS_IN_YEAR;
     }
 
     function generateNarrative(shortRate, shortTerm, longRate, longTerm, assumptions, results, firstYearFraction) {
