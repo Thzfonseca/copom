@@ -182,12 +182,12 @@ function plotarGrafico(labels, serie1, serie2) {
     });
 }
 
-function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurto, prazoLongo) {
+function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurta, prazoLongo) {
     let retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
     let retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
     let cdiBreakEven = '-';
 
-    const tempoRestante = prazoLongo - prazoCurto;
+    const tempoRestante = prazoLongo - prazoCurta;
     const n = tempoRestante * 2;
 
     if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
