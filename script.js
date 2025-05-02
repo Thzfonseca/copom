@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let rentabilidadeChart = null; // Chart instance
     let simulationYears = 0;
-    const MAX_SLIDER_YEARS = 6; // Current year + 5 future years
+    const MAX_SLIDER_YEARS = 4; // Current year + 3 future years (e.g., 2025-2028)
     let lastCalculationResults = null; // Store last results for toggles/export
     let currentAssumptions = null; // Store current assumptions
     let currentInputs = null; // Store current inputs
