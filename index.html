@@ -109,6 +109,39 @@
             <!-- Break-even IPCA section removed -->
 
             <div class="analysis-block">
+                <h3><button class="analysis-toggle" data-target="carry-content">Análise de Carregamento (Carry) &#9662;</button></h3>
+                <div id="carry-content" class="analysis-content" style="display:none;">
+                    <p><strong>Conceito:</strong> O "Carry" ou "Carregamento" representa o ganho (ou custo) esperado ao manter o título de prazo mais longo em vez de aplicar no CDI, considerando as taxas atuais e as projeções de IPCA e CDI.</p>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="carryChart"></canvas>
+                    </div>
+                    <p id="carry-narrative">Aguardando cálculo...</p>
+                </div>
+            </div>
+
+            <div class="analysis-block">
+                <h3><button class="analysis-toggle" data-target="montecarlo-content">Análise de Probabilidade (Monte Carlo) &#9662;</button></h3>
+                <div id="montecarlo-content" class="analysis-content" style="display:none;">
+                    <p><strong>Conceito:</strong> Simula milhares de cenários aleatórios para IPCA e CDI (baseado em volatilidades ou faixas definidas) para estimar a probabilidade de uma estratégia superar a outra.</p>
+                    <div class="montecarlo-input-container">
+                         <label for="mc-simulations">Nº de Simulações:</label>
+                         <input type="number" id="mc-simulations" value="1000" min="100" step="100">
+                         <label for="mc-ipca-vol">Volatilidade IPCA (% a.a.):</label>
+                         <input type="number" id="mc-ipca-vol" step="0.1" value="1.5" placeholder="Ex: 1.5">
+                         <label for="mc-cdi-vol">Volatilidade CDI (% a.a.):</label>
+                         <input type="number" id="mc-cdi-vol" step="0.1" value="2.0" placeholder="Ex: 2.0">
+                         <button id="run-montecarlo-btn">Rodar Simulação</button>
+                    </div>
+                    <div id="montecarlo-results" style="margin-top: 1rem;">
+                        <div class="chart-container" style="height: 250px;">
+                             <canvas id="montecarloChart"></canvas> <!-- Histogram -->
+                        </div>
+                        <p id="montecarlo-narrative">Aguardando simulação...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-block">
                 <h3><button class="analysis-toggle" data-target="stress-test-content">Teste de Estresse &#9662;</button></h3>
                 <div id="stress-test-content" class="analysis-content" style="display:none;">
                     <p><strong>Conceito:</strong> Simula o impacto de cenários adversos (ou favoráveis) específicos nas premissas de IPCA e CDI sobre o resultado final.</p>
