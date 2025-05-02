@@ -1,217 +1,422 @@
+/* Geral */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f4;
-    color: #333333;
-    line-height: 1.6;
     margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+    padding: 0;
+    background-color: #F0F2F5; /* Light Gray Background */
+    color: #333333; /* Dark Gray Text */
+    line-height: 1.6;
 }
 
-.app-container {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 90%;
+header {
+    background-color: #003A70; /* Dark Blue */
+    color: #FFFFFF;
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.2rem;
+    font-weight: 600;
+}
+
+header p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #E0E0E0;
+}
+
+main {
     max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
 }
 
-.app-header h1 {
+section {
+    background-color: #FFFFFF;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+section h2 {
+    color: #003A70; /* Dark Blue */
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #005A9C; /* Medium Blue */
+    padding-bottom: 0.5rem;
+    font-size: 1.6rem;
+}
+
+section h3 {
+    color: #005A9C; /* Medium Blue */
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+section h4 {
     color: #333333;
-    font-size: 2.2em;
-    margin-bottom: 30px;
-    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
 }
 
-.app-content {
+/* Input Section */
+.options-container {
     display: flex;
+    gap: 2rem;
     flex-wrap: wrap;
-    gap: 30px;
-    align-items: flex-start;
+    margin-bottom: 1.5rem;
 }
 
-.estrategias-section,
-.premissas-section {
-    flex: 1 1 45%;
-    background-color: #fff;
-    padding: 20px;
+.option-card {
+    flex: 1;
+    min-width: 280px;
+    background-color: #F8F9FA;
+    padding: 1.5rem;
     border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #DEE2E6;
 }
 
-.estrategia-box h2,
-.premissas-section h2 {
-    color: #333333;
-    font-size: 1.6em;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-group label {
+label {
     display: block;
-    color: #6c757d;
-    margin-bottom: 5px;
-    font-size: 0.95em;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
 }
 
-.input-group input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e9ecef;
+input[type="text"],
+input[type="number"] {
+    width: calc(100% - 22px); /* Account for padding */
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #CED4DA;
     border-radius: 4px;
-    font-size: 1em;
-    color: #333;
+    font-size: 1rem;
+    background-color: #FFFFFF;
 }
 
-.premissas-grid {
+input[type="text"]:disabled {
+    background-color: #E9ECEF;
+    cursor: not-allowed;
+}
+
+/* Assumptions Section */
+#sliders-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 1.5rem;
 }
 
-.premissa-ano {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 4px;
-    border: 1px solid #e9ecef;
+.slider-group {
+    margin-bottom: 1rem;
 }
 
-.premissa-ano h3 {
-    color: #333333;
-    font-size: 1.1em;
-    margin-top: 0;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-.premissa-item {
-    margin-bottom: 10px;
-    font-size: 0.9em;
-    color: #333;
-}
-
-.premissa-item label {
+.slider-group label {
     display: block;
-    color: #6c757d;
-    margin-bottom: 3px;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
 }
 
-.premissa-item input[type="range"] {
-    width: 100%;
+.slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.button-primary {
-    background-color: #007bff;
-    color: #fff;
-    padding: 12px 25px;
-    border: none;
+.slider-wrapper input[type="range"] {
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+.slider-wrapper span {
+    font-weight: bold;
+    min-width: 50px; /* Ensure consistent width */
+    text-align: right;
+}
+
+/* Output Section */
+.chart-container {
+    margin-bottom: 2rem;
+    max-width: 100%;
+    height: auto;
+}
+
+.summary-container {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    flex: 1;
+    min-width: 200px;
+    background-color: #E9F1FA; /* Light Accent Blue */
+    padding: 1.5rem;
     border-radius: 6px;
-    font-size: 1.1em;
+    text-align: center;
+    border: 1px solid #BDE0FE;
+}
+
+.summary-card p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #003A70; /* Dark Blue */
+    margin: 0.5rem 0 0 0;
+}
+
+.narrative-container textarea {
+    width: calc(100% - 22px); /* Account for padding */
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #CED4DA;
+    border-radius: 4px;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 150px;
+    background-color: #F8F9FA;
+}
+
+/* Buttons */
+button {
+    background-color: #005A9C; /* Medium Blue */
+    color: #FFFFFF;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: 30px;
-    width: fit-content;
+    display: inline-block; /* Ensure buttons align well */
+    margin-top: 1rem; /* Add some space above buttons */
 }
 
-.button-primary:hover {
-    background-color: #0056b3;
+button:hover {
+    background-color: #003A70; /* Dark Blue on hover */
 }
 
-.resultado-section,
-.resumo-section,
-.narrativa-section,
-.erro-section {
-    flex-basis: 100%;
-    background-color: #fff;
-    padding: 20px;
+#update-assumptions-btn,
+#calculate-btn {
+    display: block; /* Make these buttons block level */
+    width: fit-content; /* Adjust width to content */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 1.5rem;
+    color: #6C757D;
+    font-size: 0.9rem;
+    border-top: 1px solid #DEE2E6;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    main {
+        padding: 0 1rem;
+    }
+
+    .options-container {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .summary-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    header p {
+        font-size: 1rem;
+    }
+
+    section h2 {
+        font-size: 1.4rem;
+    }
+
+    section h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 15px;
+    }
+
+    header {
+        padding: 1rem 1.5rem;
+    }
+
+    section {
+        padding: 1.5rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    .narrative-container textarea {
+        font-size: 0.95rem;
+        padding: 0.6rem;
+    }
+
+    button {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
+    .summary-card p {
+        font-size: 1.5rem;
+    }
+}
+
+
+
+/* Advanced Analysis Section */
+#advanced-analysis-section h2 {
+    margin-bottom: 1rem; /* Less margin below main title */
+}
+
+.analysis-block {
+    background-color: #F8F9FA;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
     border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-    margin-top: 30px;
+    border: 1px solid #DEE2E6;
 }
 
-.resultado-section h2,
-.resumo-section h2,
-.narrativa-section h2,
-.erro-section h2 {
-    color: #333333;
-    font-size: 1.6em;
-    margin-top: 0;
-    margin-bottom: 20px;
+.analysis-block h3 {
+    margin: 0;
+    padding: 0;
 }
 
-#grafico {
+.analysis-toggle {
+    background: none;
+    border: none;
+    color: #005A9C; /* Medium Blue */
+    font-size: 1.3rem; /* Match h3 size */
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
     width: 100%;
-    height: auto;
-    max-height: 300px;
 }
 
-.resumo-cards {
+.analysis-toggle:hover {
+    text-decoration: underline;
+}
+
+.analysis-content {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #E0E0E0;
+}
+
+.analysis-content p {
+    margin-bottom: 1rem;
+}
+
+.analysis-content p strong {
+    color: #003A70; /* Dark Blue */
+}
+
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.metric-card {
+    background-color: #FFFFFF;
+    padding: 1rem;
+    border-radius: 4px;
+    text-align: center;
+    border: 1px solid #CED4DA;
+}
+
+.metric-card h4 {
+    font-size: 1rem;
+    color: #495057;
+    margin-bottom: 0.3rem;
+}
+
+.metric-card p {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #005A9C; /* Medium Blue */
+    margin: 0;
+}
+
+/* Stress Test Inputs */
+.stress-input-container {
     display: flex;
-    gap: 20px;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stress-input-container label {
+    margin-bottom: 0;
+    flex-basis: 150px; /* Align labels */
+}
+
+.stress-input-container input[type="number"] {
+    width: 100px;
+    margin-bottom: 0;
+}
+
+#run-stress-test-btn {
+    margin-top: 0; /* Remove default button margin */
+}
+
+#stress-test-results p {
+    font-style: italic;
+    color: #6C757D;
+}
+
+/* Chart Options */
+.chart-options {
+    margin-top: -1rem; /* Pull closer to chart */
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #F8F9FA;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    display: flex;
+    gap: 1.5rem;
     flex-wrap: wrap;
 }
 
-.resumo-cards .card {
-    flex: 1 1 200px;
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 4px;
-    border: 1px solid #e9ecef;
-    text-align: center;
-}
-
-.resumo-cards .card h3 {
-    color: #333333;
-    font-size: 1.1em;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.resumo-cards .card p {
-    font-size: 1em;
-    color: #333;
-}
-
-.narrativa-section p {
-    margin-bottom: 1em;
-}
-
-.narrativa-section ul {
-    padding-left: 20px;
-    margin-bottom: 1em;
-}
-
-.narrativa-section li {
-    margin-bottom: 0.5em;
-}
-
-.app-footer {
-    text-align: center;
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #e9ecef;
-    color: #6c757d;
-    font-size: 0.9em;
-}
-
-/* Estilos Adicionais para Melhorias Visuais */
-.estrategias-section {
+.chart-options label {
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    color: #333;
+    cursor: pointer;
 }
 
-.estrategia-box {
-    flex: 1;
+.chart-options input[type="checkbox"] {
+    cursor: pointer;
 }
 
-.premissas-section h2 {
-    margin-top: 30px;
+/* Ensure export button is aligned */
+.narrative-container #export-csv-btn {
+    margin-left: 1rem;
 }
+
+
