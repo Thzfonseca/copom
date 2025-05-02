@@ -435,19 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return narrative;
     }
 
-    function calculateBreakEvenIpca(shortRate, shortTerm, longRate, longTerm, assumptions, firstYearFraction, targetShortFinalValue) {targetLongFinalValue) {
-        // Iterative approach to find IPCA that makes finalLongValue equal targetShortFinalValue
-        let lowerBoundIpca = -0.10; // Allow for deflation
-        let upperBoundIpca = 0.50; // 50% IPCA upper limit
-        let bestGuessIpca = null;
-        let iterations = 0;
-        const MAX_ITERATIONS = 100;
-        const TOLERANCE = 0.01; // Tolerance in final value difference (e.g., 0.01 for base 100)
-
-        // Check if long is already worse even with zero IPCA
-        const assumptionsZeroIpca = { ...assumptions, ipca: assumptions.ipca.map(() => 0) };
-        const returnsZeroIpca = calculateNominalReturns(shortRate, shortTerm, longRate, longTerm, assumptionsZeroIpca, firstYearFraction);
-        if (returnsZeroIpca.longScenario.finalValue < targetShortFinalValue) {
+    // Function calculateBreakEvenIpca removed as requested.
              // If long is worse even at 0% IPCA, break-even might be negative or non-existent in practical terms
              // Try with lower bound
              const assumptionsLowerBoundIpca = { ...assumptions, ipca: assumptions.ipca.map(() => lowerBoundIpca) };
