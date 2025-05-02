@@ -68,51 +68,6 @@
         </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // ... (seu JavaScript permanece o mesmo, exceto a parte de criar os sliders de premissas)
-
-            const anosPremissas = [2025, 2026, 2027, 2028];
-            const defaultPremissas = {
-                2025: { ipca: 5.00, cdi: 15.00 },
-                2026: { ipca: 4.50, cdi: 12.00 },
-                2027: { ipca: 4.00, cdi: 10.00 },
-                2028: { ipca: 4.00, cdi: 9.00 },
-            };
-
-            const premissasGrid = document.querySelector('.premissas-grid');
-            if (premissasGrid) {
-                anosPremissas.forEach(ano => {
-                    const bloco = document.createElement('div');
-                    bloco.className = 'premissa-ano';
-                    bloco.innerHTML = `
-                        <h3>${ano}</h3>
-                        <div class="premissa-item">
-                            <label for="ipca-${ano}">IPCA:</label>
-                            <span id="ipca-val-${ano}">${defaultPremissas[ano].ipca.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</span>
-                            <input type="range" min="0" max="20" step="0.1" value="${defaultPremissas[ano].ipca}" id="ipca-${ano}" />
-                        </div>
-                        <div class="premissa-item">
-                            <label for="cdi-${ano}">CDI:</label>
-                            <span id="cdi-val-${ano}">${defaultPremissas[ano].cdi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</span>
-                            <input type="range" min="0" max="20" step="0.1" value="${defaultPremissas[ano].cdi}" id="cdi-${ano}" />
-                        </div>
-                    `;
-                    premissasGrid.appendChild(bloco);
-
-                    document.getElementById(`ipca-${ano}`).addEventListener('input', (e) => {
-                        document.getElementById(`ipca-val-${ano}`).innerText = parseFloat(e.target.value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
-                    });
-                    document.getElementById(`cdi-${ano}`).addEventListener('input', (e) => {
-                        document.getElementById(`cdi-val-${ano}`).innerText = parseFloat(e.target.value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
-                    });
-                });
-            } else {
-                registrarErro("Erro: Container de premissas (grid) não encontrado.");
-            }
-
-            // ... (o restante do seu JavaScript)
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
