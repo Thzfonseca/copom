@@ -89,44 +89,24 @@
             <h2>Análises Adicionais</h2>
 
             <div class="analysis-block">
-                <h3><button class="analysis-toggle" data-target="duration-convexity-content">Duração e Convexidade &#9662;</button></h3>
-                <div id="duration-convexity-content" class="analysis-content" style="display:none;">
-                    <p><strong>Conceito:</strong> Duração (Macaulay Duration) mede a sensibilidade do preço do título a mudanças na taxa de juros (quanto maior, mais sensível). Convexidade mede a curvatura dessa relação preço-taxa, ajustando a estimativa da Duração.</p>
+                <h3><button class="analysis-toggle" data-target="duration-content">Duração &#9662;</button></h3>
+                <div id="duration-content" class="analysis-content" style="display:none;">
+                    <p><strong>Conceito:</strong> Duração (Macaulay Duration) mede a sensibilidade do preço do título a mudanças na taxa de juros (quanto maior, mais sensível).</p>
                     <div class="metrics-container">
                         <div class="metric-card">
                             <h4>Duração (Opção Curta)</h4>
                             <p id="short-duration">-- anos</p>
                         </div>
                         <div class="metric-card">
-                            <h4>Convexidade (Opção Curta)</h4>
-                            <p id="short-convexity">--</p>
-                        </div>
-                        <div class="metric-card">
                             <h4>Duração (Opção Longa)</h4>
                             <p id="long-duration">-- anos</p>
                         </div>
-                        <div class="metric-card">
-                            <h4>Convexidade (Opção Longa)</h4>
-                            <p id="long-convexity">--</p>
-                        </div>
                     </div>
-                    <p id="duration-convexity-narrative">Aguardando cálculo...</p>
+                    <p id="duration-narrative">Aguardando cálculo...</p> <!-- ID updated -->
                 </div>
             </div>
 
-            <div class="analysis-block">
-                 <h3><button class="analysis-toggle" data-target="breakeven-ipca-content">Análise de Break-even (IPCA) &#9662;</button></h3>
-                 <div id="breakeven-ipca-content" class="analysis-content" style="display:none;">
-                    <p><strong>Conceito:</strong> Calcula qual seria a taxa média anual de IPCA futura necessária para que a rentabilidade final da Opção Longa iguale a rentabilidade final da Opção Curta + Rolagem CDI, mantendo as demais premissas (taxas e CDI).</p>
-                    <div class="metrics-container">
-                         <div class="metric-card">
-                            <h4>IPCA Break-even</h4>
-                            <p id="break-even-ipca">--% a.a.</p>
-                        </div>
-                    </div>
-                    <p id="breakeven-ipca-narrative">Aguardando cálculo...</p>
-                </div>
-            </div>
+            <!-- Break-even IPCA section removed -->
 
             <div class="analysis-block">
                 <h3><button class="analysis-toggle" data-target="stress-test-content">Teste de Estresse &#9662;</button></h3>
@@ -140,6 +120,7 @@
                          <button id="run-stress-test-btn">Rodar Teste</button>
                     </div>
                     <div id="stress-test-results" style="margin-top: 1rem;">
+                        <canvas id="stressTestChart" height="200"></canvas> <!-- Added canvas for chart -->
                         <p>Aguardando teste...</p>
                     </div>
                 </div>
@@ -150,7 +131,7 @@
     </main>
 
     <footer>
-        <p>Ferramenta de simulação Trade IPCA+ | Desenvolvido por Manus</p>
+        <p>Ferramenta de simulação Trade IPCA+ | Desenvolvido por Thomaz Fonseca</p>
     </footer>
 
     <script src="script.js"></script>
