@@ -16,21 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
         2028: { ipca: 4.00, cdi: 9.00 },
     };
 
-    const slidersContainer = document.getElementById('sliders-premissas');
-    if (slidersContainer) {
+    const premissasGrid = document.querySelector('.premissas-grid');
+    if (premissasGrid) {
         anosPremissas.forEach(ano => {
             const bloco = document.createElement('div');
-            bloco.className = 'slider-bloco';
+            bloco.className = 'premissa-ano';
             bloco.innerHTML = `
-                <div class="slider-ano"><strong>${ano}</strong></div>
-                <label for="ipca-${ano}">IPCA: <span id="ipca-val-${ano}">${defaultPremissas[ano].ipca.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</span>
+                <h3>${ano}</h3>
+                <div class="premissa-item">
+                    <label for="ipca-${ano}">IPCA:</label>
+                    <span id="ipca-val-${ano}">${defaultPremissas[ano].ipca.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</span>
                     <input type="range" min="0" max="20" step="0.1" value="${defaultPremissas[ano].ipca}" id="ipca-${ano}" />
-                </label>
-                <label for="cdi-${ano}">CDI: <span id="cdi-val-${ano}">${defaultPremissas[ano].cdi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</span>
+                </div>
+                <div class="premissa-item">
+                    <label for="cdi-${ano}">CDI:</label>
+                    <span id="cdi-val-${ano}">${defaultPremissas[ano].cdi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</span>
                     <input type="range" min="0" max="20" step="0.1" value="${defaultPremissas[ano].cdi}" id="cdi-${ano}" />
-                </label>
+                </div>
             `;
-            slidersContainer.appendChild(bloco);
+            premissasGrid.appendChild(bloco);
 
             document.getElementById(`ipca-${ano}`).addEventListener('input', (e) => {
                 document.getElementById(`ipca-val-${ano}`).innerText = parseFloat(e.target.value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
@@ -40,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     } else {
-        registrarErro("Erro: Container de sliders de premissas não encontrado.");
+        registrarErro("Erro: Container de premissas (grid) não encontrado.");
     }
 
     function getPremissas() {
@@ -71,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const taxaLongo = parseFloat(taxaLongoElement.value.replace(',', '.'));
             const prazoLongo = parseFloat(prazoLongoElement.value.replace(',', '.'));
 
-            console.log('Valores lidos:', { taxaCurta, prazoCurta, taxaLongo, prazoLongo }); // LOG PARA VER OS VALORES
+            console.log('Valores lidos:', { taxaCurta, prazoCurta, taxaLongo, prazoLongo });
 
             if (
                 isNaN(taxaCurta) || isNaN(prazoCurta) ||
@@ -163,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 },
                 options: {
-                    responsive: false, // DESATIVANDO A RESPONSIVIDADE
+                    responsive: false,
                     maintainAspectRatio: false,
                     animation: false
                 }
