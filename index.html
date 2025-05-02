@@ -1,73 +1,156 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Rentabilidade IPCA+</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Trade IPCA+</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Incluir Chart.js via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+    <script>dayjs.extend(window.dayjs_plugin_customParseFormat);</script>
 </head>
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <h1>Simulador de Rentabilidade IPCA+</h1>
-        </header>
+    <header>
+        <h1>Trade IPCA+</h1>
+        <p>Compare investimentos IPCA+ com prazos diferentes e simule a rolagem.</p>
+    </header>
 
-        <main class="app-content">
-            <section class="estrategias-section">
-                <div class="estrategia-box estrategia-curta">
-                    <h2>Estratégia Curta</h2>
-                    <div class="input-group">
-                        <label for="taxaCurto">Taxa IPCA+ (% a.a.):</label>
-                        <input type="number" id="taxaCurto" value="7.00">
+    <main>
+        <section id="input-section">
+            <h2>Configuração dos Títulos</h2>
+            <div class="options-container">
+                <div class="option-card" id="short-option-card">
+                    <h3>Opção Curta</h3>
+                    <label for="short-indexer">Indexador:</label>
+                    <input type="text" id="short-indexer" value="IPCA+" disabled>
+                    <label for="short-rate">Taxa (% a.a.):</label>
+                    <input type="number" id="short-rate" step="0.01" placeholder="Ex: 6.50">
+                    <label for="short-term">Prazo (anos):</label>
+                    <input type="number" id="short-term" step="0.1" placeholder="Ex: 2">
+                </div>
+                <div class="option-card" id="long-option-card">
+                    <h3>Opção Longa</h3>
+                    <label for="long-indexer">Indexador:</label>
+                    <input type="text" id="long-indexer" value="IPCA+" disabled>
+                    <label for="long-rate">Taxa (% a.a.):</label>
+                    <input type="number" id="long-rate" step="0.01" placeholder="Ex: 7.00">
+                    <label for="long-term">Prazo (anos):</label>
+                    <input type="number" id="long-term" step="0.1" placeholder="Ex: 9">
+                </div>
+            </div>
+            <button id="update-assumptions-btn">Atualizar Premissas</button>
+        </section>
+
+        <section id="assumptions-section" style="display: none;">
+            <h2>Premissas Futuras (% a.a.)</h2>
+            <p>Defina as projeções anuais para IPCA (0-15%, passo 0.5) e CDI (0-20%, passo 0.25). Os cálculos consideram o período pro-rata para o primeiro ano e perpetuidade após o 6º ano.</p>
+            <div id="sliders-container">
+                <!-- Sliders serão gerados dinamicamente aqui pelo JS -->
+            </div>
+             <button id="calculate-btn">Calcular Rentabilidade</button>
+        </section>
+
+        <section id="output-section" style="display: none;">
+            <h2>Resultados da Simulação</h2>
+            <div class="chart-container">
+                <canvas id="rentabilidadeChart"></canvas>
+            </div>
+            <div class="chart-options">
+                 <label><input type="checkbox" id="toggle-real-return"> Exibir Retorno Real (descontado IPCA)</label>
+                 <label><input type="checkbox" id="toggle-historical-data"> Sobrepor Dados Históricos (IPCA/CDI)</label>
+            </div>
+            <div class="summary-container">
+                <div class="summary-card">
+                    <h4>Retorno Anualizado (Curto + CDI)</h4>
+                    <p id="short-annualized-return">--%</p>
+                </div>
+                <div class="summary-card">
+                    <h4>Retorno Anualizado (Longo)</h4>
+                    <p id="long-annualized-return">--%</p>
+                </div>
+                <div class="summary-card">
+                    <h4>CDI Break-even</h4>
+                    <p id="break-even-cdi">--%</p>
+                </div>
+            </div>
+            <div class="narrative-container">
+                <h3>Interpretação dos Resultados</h3>
+                <textarea id="narrativeOutput" rows="10" readonly>Aguardando cálculo...</textarea>
+                <button id="copy-report-btn">Copiar Relatório</button>
+                <button id="export-csv-btn">Exportar Dados (CSV)</button>
+            </div>
+        </section>
+
+        <section id="advanced-analysis-section" style="display: none;">
+            <h2>Análises Adicionais</h2>
+
+            <div class="analysis-block">
+                <h3><button class="analysis-toggle" data-target="duration-convexity-content">Duração e Convexidade &#9662;</button></h3>
+                <div id="duration-convexity-content" class="analysis-content" style="display:none;">
+                    <p><strong>Conceito:</strong> Duração (Macaulay Duration) mede a sensibilidade do preço do título a mudanças na taxa de juros (quanto maior, mais sensível). Convexidade mede a curvatura dessa relação preço-taxa, ajustando a estimativa da Duração.</p>
+                    <div class="metrics-container">
+                        <div class="metric-card">
+                            <h4>Duração (Opção Curta)</h4>
+                            <p id="short-duration">-- anos</p>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Convexidade (Opção Curta)</h4>
+                            <p id="short-convexity">--</p>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Duração (Opção Longa)</h4>
+                            <p id="long-duration">-- anos</p>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Convexidade (Opção Longa)</h4>
+                            <p id="long-convexity">--</p>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="prazoCurta">Prazo (anos):</label>
-                        <input type="number" id="prazoCurta" value="2">
+                    <p id="duration-convexity-narrative">Aguardando cálculo...</p>
+                </div>
+            </div>
+
+            <div class="analysis-block">
+                 <h3><button class="analysis-toggle" data-target="breakeven-ipca-content">Análise de Break-even (IPCA) &#9662;</button></h3>
+                 <div id="breakeven-ipca-content" class="analysis-content" style="display:none;">
+                    <p><strong>Conceito:</strong> Calcula qual seria a taxa média anual de IPCA futura necessária para que a rentabilidade final da Opção Longa iguale a rentabilidade final da Opção Curta + Rolagem CDI, mantendo as demais premissas (taxas e CDI).</p>
+                    <div class="metrics-container">
+                         <div class="metric-card">
+                            <h4>IPCA Break-even</h4>
+                            <p id="break-even-ipca">--% a.a.</p>
+                        </div>
+                    </div>
+                    <p id="breakeven-ipca-narrative">Aguardando cálculo...</p>
+                </div>
+            </div>
+
+            <div class="analysis-block">
+                <h3><button class="analysis-toggle" data-target="stress-test-content">Teste de Estresse &#9662;</button></h3>
+                <div id="stress-test-content" class="analysis-content" style="display:none;">
+                    <p><strong>Conceito:</strong> Simula o impacto de cenários adversos (ou favoráveis) específicos nas premissas de IPCA e CDI sobre o resultado final.</p>
+                    <div class="stress-input-container">
+                         <label for="stress-ipca-change">Choque no IPCA (% a.a.):</label>
+                         <input type="number" id="stress-ipca-change" step="0.1" placeholder="Ex: +2.0 ou -1.0">
+                         <label for="stress-cdi-change">Choque no CDI (% a.a.):</label>
+                         <input type="number" id="stress-cdi-change" step="0.1" placeholder="Ex: +3.0 ou -2.0">
+                         <button id="run-stress-test-btn">Rodar Teste</button>
+                    </div>
+                    <div id="stress-test-results" style="margin-top: 1rem;">
+                        <p>Aguardando teste...</p>
                     </div>
                 </div>
+            </div>
 
-                <div class="estrategia-box estrategia-longa">
-                    <h2>Estratégia Longa</h2>
-                    <div class="input-group">
-                        <label for="taxaLongo">Taxa IPCA+ (% a.a.):</label>
-                        <input type="number" id="taxaLongo" value="6.00">
-                    </div>
-                    <div class="input-group">
-                        <label for="prazoLongo">Prazo (anos):</label>
-                        <input type="number" id="prazoLongo" value="9">
-                    </div>
-                </div>
-            </section>
+        </section>
 
-            <section class="premissas-section">
-                <h2>Premissas de Mercado (% a.a.)</h2>
-                <div class="premissas-grid">
-                    </div>
-            </section>
+    </main>
 
-            <button id="simular" class="button-primary">Simular</button>
+    <footer>
+        <p>Ferramenta de simulação Trade IPCA+ | Desenvolvido por Manus</p>
+    </footer>
 
-            <section class="resultado-section">
-                <h2>Resultado da Simulação</h2>
-                <canvas id="grafico"></canvas>
-            </section>
-
-            <section class="resumo-section" id="resumo">
-                </section>
-
-            <section class="narrativa-section" id="narrativa">
-                </section>
-
-            <section class="erro-section" id="relatorio-erros">
-                </section>
-        </main>
-
-        <footer class="app-footer">
-            <p>© 2025 Simulador Financeiro</p>
-        </footer>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
