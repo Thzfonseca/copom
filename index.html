@@ -111,7 +111,7 @@
             <div class="analysis-block">
                 <h3><button class="analysis-toggle" data-target="carry-content">Análise de Carregamento (Carry) &#9662;</button></h3>
                 <div id="carry-content" class="analysis-content" style="display:none;">
-                    <p><strong>Conceito:</strong> O "Carry" ou "Carregamento" representa o ganho (ou custo) esperado ao manter o título de prazo mais longo em vez de aplicar no CDI, considerando as taxas atuais e as projeções de IPCA e CDI.</p>
+                    <p><strong>Conceito Detalhado:</strong> O "Carry" ou "Carregamento" de um título de renda fixa representa o retorno que um investidor espera obter ao simplesmente manter (carregar) o título em sua carteira por um período, sem considerar ganhos ou perdas por mudanças no preço de mercado do título. No contexto desta ferramenta, a Análise de Carregamento compara o retorno anual esperado da "Opção Longa" (calculado como a taxa real contratada mais a sua projeção de inflação para o ano) com o retorno esperado de uma aplicação alternativa na taxa CDI (baseado na sua projeção de CDI para o mesmo ano). Um carry positivo indica que o retorno esperado do título longo supera o CDI projetado para aquele ano, sugerindo uma vantagem em manter o título. Um carry negativo indica o contrário. Esta análise ajuda a entender se a taxa do título longo compensa o custo de oportunidade de não estar investido no CDI, ano a ano, com base nas suas premissas.</p>
                     <div class="chart-container" style="height: 250px;">
                         <canvas id="carryChart"></canvas>
                     </div>
@@ -122,7 +122,7 @@
             <div class="analysis-block">
                 <h3><button class="analysis-toggle" data-target="montecarlo-content">Análise de Probabilidade (Monte Carlo) &#9662;</button></h3>
                 <div id="montecarlo-content" class="analysis-content" style="display:none;">
-                    <p><strong>Conceito:</strong> Simula milhares de cenários aleatórios para IPCA e CDI (baseado em volatilidades ou faixas definidas) para estimar a probabilidade de uma estratégia superar a outra.</p>
+                    <p><strong>Conceito Detalhado:</strong> A Análise de Probabilidade (Monte Carlo) é uma técnica computacional que ajuda a entender o impacto da incerteza em um resultado. Em vez de usar apenas uma projeção fixa para IPCA e CDI, esta análise considera que esses valores podem variar. Você define uma "volatilidade" (uma medida de quanto você acha que o IPCA e o CDI podem variar para cima ou para baixo a cada ano, em torno da sua projeção inicial). A ferramenta então cria milhares de cenários futuros alternativos, sorteando valores para IPCA e CDI dentro dessas volatilidades esperadas. Para cada cenário, ela calcula qual estratégia (Curta+CDI ou Longa) teria sido a vencedora. O resultado final mostra a porcentagem de vezes que a Opção Longa ganhou nesses milhares de cenários simulados (a "probabilidade" dela ser melhor) e um histograma que visualiza a distribuição das diferenças de resultado entre as duas estratégias. Isso ajuda a avaliar o risco: mesmo que sua projeção inicial favoreça uma opção, a análise Monte Carlo pode mostrar se essa vantagem é robusta ou se pequenas variações nas premissas podem levar a um resultado diferente.</p>
                     <div class="montecarlo-input-container">
                          <label for="mc-simulations">Nº de Simulações:</label>
                          <input type="number" id="mc-simulations" value="1000" min="100" step="100">
@@ -164,7 +164,7 @@
     </main>
 
     <footer>
-        <p>Ferramenta de simulação Trade IPCA+ | Desenvolvido por Thomaz Fonseca</p>
+        <p>Ferramenta de simulação Trade IPCA+ | Desenvolvido por Thomaz Fonseca/p>
     </footer>
 
     <script src="script.js"></script>
