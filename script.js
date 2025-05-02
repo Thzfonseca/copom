@@ -901,3 +901,381 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+// --- Carry Analysis Elements ---
+const carryChartCanvas = document.getElementById('carryChart');
+const carryNarrativeEl = document.getElementById('carry-narrative');
+let carryChart = null; // Chart instance for carry analysis
+
+// --- Function to Calculate Carry ---
+function calculateCarryAnalysis(longRate, assumptions) {
+    const carryData = { labels: [], values: [] };
+    const currentYear = dayjs().year();
+    const numYears = assumptions.ipca.length;
+
+    for (let i = 0; i < numYears; i++) {
+        const year = currentYear + i;
+        const ipcaRate = assumptions.ipca[i];
+        const cdiRate = assumptions.cdi[i];
+
+        // Carry = Expected Long Bond Return - Expected CDI Return
+        // Expected Long Bond Return = (1 + Real Rate) * (1 + Expected IPCA) - 1
+        const expectedLongReturn = (1 + longRate) * (1 + ipcaRate) - 1;
+        const carry = expectedLongReturn - cdiRate;
+
+        carryData.labels.push(`${year}`);
+        carryData.values.push(carry * 100); // Store as percentage
+    }
+    return carryData;
+}
+
+// --- Function to Display Carry Analysis ---
+function displayCarryAnalysis(carryData) {
+    if (!carryChartCanvas) return;
+    const ctx = carryChartCanvas.getContext('2d');
+
+    if (carryChart) {
+        carryChart.destroy();
+    }
+
+    carryChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: carryData.labels,
+            datasets: [{
+                label: 'Carregamento Anual (%)',
+                data: carryData.values,
+                backgroundColor: carryData.values.map(v => v >= 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)'), // Green for positive, Red for negative
+                borderColor: carryData.values.map(v => v >= 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Análise de Carregamento (Carry) Anual',
+                    font: { size: 14 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += `${context.parsed.y.toFixed(2)}%`;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Ano'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Carry (% a.a.)'
+                    },
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // --- Generate Carry Narrative ---
+    let narrative = `O gráfico acima mostra o "Carregamento" (Carry) anual esperado. Ele representa a diferença entre o retorno projetado do título IPCA+ Longo (Taxa Real + Projeção IPCA) e a projeção da Taxa CDI para cada ano.\n\n`;
+    const positiveYears = carryData.values.filter(v => v > 0).length;
+    const negativeYears = carryData.values.filter(v => v < 0).length;
+    const averageCarry = carryData.values.reduce((a, b) => a + b, 0) / carryData.values.length;
+
+    if (positiveYears > negativeYears) {
+        narrative += `Na maioria dos anos (${positiveYears} de ${carryData.labels.length}), o retorno esperado do título longo supera a projeção do CDI (carry positivo). Isso sugere um benefício em "carregar" o título mais longo nesses períodos.`;
+    } else if (negativeYears > positiveYears) {
+        narrative += `Na maioria dos anos (${negativeYears} de ${carryData.labels.length}), a projeção do CDI supera o retorno esperado do título longo (carry negativo). Isso indica um custo em "carregar" o título mais longo nesses períodos, sendo potencialmente mais vantajoso estar aplicado no CDI.`;
+    } else {
+        narrative += `Há um equilíbrio entre os anos com carry positivo e negativo (${positiveYears} de cada). A decisão entre carregar o título longo ou ficar no CDI dependerá da magnitude do carry em cada período e de outros fatores.`;
+    }
+    narrative += ` Em média, o carregamento anual projetado é de ${averageCarry.toFixed(2)}%.\n\n`;
+    narrative += `**Interpretação:** Um carry consistentemente positivo favorece a Opção Longa. Um carry negativo sugere que a Opção Curta + Rolagem CDI pode ser mais atrativa, especialmente se o CDI projetado for significativamente maior que o retorno esperado do título longo. Lembre-se que isso depende fortemente das suas projeções de IPCA e CDI.`;
+
+    if (carryNarrativeEl) {
+        carryNarrativeEl.textContent = narrative;
+    } else {
+        console.error("Elemento carry-narrative não encontrado!");
+    }
+}
+
+// --- Modify displayAdvancedAnalyses to include Carry ---
+function displayAdvancedAnalyses(results, assumptions, shortRate, shortTerm, longRate, longTerm, firstYearFraction) {
+    // Duration
+    shortDurationEl.textContent = `${results.durationMetrics.short.duration.toFixed(2)} anos`;
+    longDurationEl.textContent = `${results.durationMetrics.long.duration.toFixed(2)} anos`;
+    durationNarrativeEl.textContent = generateDurationNarrative(results.durationMetrics);
+
+    // *** ADD CARRY ANALYSIS CALLS ***
+    try {
+        const carryResults = calculateCarryAnalysis(longRate, assumptions);
+        displayCarryAnalysis(carryResults);
+    } catch (error) {
+        console.error("Erro ao calcular/exibir Análise de Carregamento:", error);
+        if (carryNarrativeEl) carryNarrativeEl.textContent = "Erro ao gerar a análise de carregamento.";
+        if (carryChart) carryChart.destroy(); // Clear chart on error
+    }
+    // *** END CARRY ANALYSIS CALLS ***
+
+    // Reset Stress Test Results
+    stressTestResultsEl.innerHTML = '<p>Aguardando teste...</p>';
+    if (stressTestChart) {
+        stressTestChart.destroy(); // Clear previous stress test chart
+        stressTestChart = null;
+    }
+}
+
+
+
+// --- Monte Carlo Analysis Elements ---
+const mcSimulationsInput = document.getElementById("mc-simulations");
+const mcIpcaVolInput = document.getElementById("mc-ipca-vol");
+const mcCdiVolInput = document.getElementById("mc-cdi-vol");
+const runMonteCarloBtn = document.getElementById("run-montecarlo-btn");
+const monteCarloResultsEl = document.getElementById("montecarlo-results");
+const monteCarloChartCanvas = document.getElementById("montecarloChart");
+const monteCarloNarrativeEl = document.getElementById("montecarlo-narrative");
+let monteCarloChart = null; // Chart instance for Monte Carlo
+
+// --- Event Listener for Monte Carlo Button ---
+if (runMonteCarloBtn) {
+    runMonteCarloBtn.addEventListener("click", runMonteCarloSimulation);
+} else {
+    console.error("runMonteCarloBtn element not found!");
+}
+
+// --- Helper: Generate Normally Distributed Random Number (Box-Muller transform) ---
+// Standard normal distribution (mean 0, stddev 1)
+function randomNorm() {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while(v === 0) v = Math.random();
+    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+}
+
+// Generate random number with specified mean and stddev
+function randomNormDist(mean, stddev) {
+    return mean + stddev * randomNorm();
+}
+
+// --- Function to Run Monte Carlo Simulation ---
+function runMonteCarloSimulation() {
+    if (!lastCalculationResults || !currentInputs || !currentAssumptions) {
+        alert("Por favor, execute o cálculo principal primeiro.");
+        return;
+    }
+
+    const numSimulations = parseInt(mcSimulationsInput.value);
+    const ipcaVol = parseFloat(mcIpcaVolInput.value) / 100;
+    const cdiVol = parseFloat(mcCdiVolInput.value) / 100;
+
+    if (isNaN(numSimulations) || numSimulations <= 0 || isNaN(ipcaVol) || ipcaVol < 0 || isNaN(cdiVol) || cdiVol < 0) {
+        alert("Por favor, insira valores válidos para a simulação Monte Carlo (Nº Simulações > 0, Volatilidades >= 0).");
+        return;
+    }
+
+    monteCarloNarrativeEl.textContent = `Rodando ${numSimulations} simulações... Por favor, aguarde.`;
+    if (monteCarloChart) monteCarloChart.destroy(); // Clear previous chart
+
+    // Use setTimeout to avoid blocking the UI thread during calculation
+    setTimeout(() => {
+        const resultsDifferences = [];
+        let longWins = 0;
+        const firstYearFraction = calculateFirstYearFraction();
+
+        for (let i = 0; i < numSimulations; i++) {
+            // Generate randomized assumptions for this simulation run
+            const randomAssumptions = { ipca: [], cdi: [] };
+            for (let y = 0; y < currentAssumptions.ipca.length; y++) {
+                // Use base assumption as mean, input volatility as stddev
+                const randomIpca = randomNormDist(currentAssumptions.ipca[y], ipcaVol);
+                const randomCdi = randomNormDist(currentAssumptions.cdi[y], cdiVol);
+                // Ensure rates don't go below a reasonable floor (e.g., 0% or slightly negative)
+                randomAssumptions.ipca.push(Math.max(-0.02, randomIpca)); // Allow small negative IPCA (deflation)
+                randomAssumptions.cdi.push(Math.max(0, randomCdi)); // CDI usually non-negative
+            }
+
+            // Run the core calculation with randomized assumptions
+            const simResults = calculateNominalReturns(
+                currentInputs.shortRate,
+                currentInputs.shortTerm,
+                currentInputs.longRate,
+                currentInputs.longTerm,
+                randomAssumptions,
+                firstYearFraction
+            );
+
+            const difference = simResults.longScenario.finalValue - simResults.shortScenario.finalValue;
+            resultsDifferences.push(difference);
+
+            if (difference > 0) {
+                longWins++;
+            }
+        }
+
+        const longWinProbability = longWins / numSimulations;
+        displayMonteCarloResults(resultsDifferences, longWinProbability, numSimulations);
+
+    }, 10); // Small delay to allow UI update
+}
+
+// --- Function to Display Monte Carlo Results ---
+function displayMonteCarloResults(differences, probability, numSimulations) {
+    if (!monteCarloChartCanvas) return;
+
+    // --- Prepare Histogram Data ---
+    differences.sort((a, b) => a - b);
+    const minDiff = differences[0];
+    const maxDiff = differences[differences.length - 1];
+    const numBins = Math.min(Math.max(10, Math.floor(numSimulations / 50)), 50); // Dynamic number of bins
+    const binSize = (maxDiff - minDiff) / numBins;
+
+    const histogramData = { labels: [], counts: [] };
+    for (let i = 0; i < numBins; i++) {
+        const binStart = minDiff + i * binSize;
+        const binEnd = binStart + binSize;
+        const binLabel = `${binStart.toFixed(1)} a ${binEnd.toFixed(1)}`;
+        histogramData.labels.push(binLabel);
+        histogramData.counts.push(0);
+    }
+
+    differences.forEach(diff => {
+        let binIndex = Math.floor((diff - minDiff) / binSize);
+        // Handle edge case where diff equals maxDiff
+        if (binIndex >= numBins) binIndex = numBins - 1;
+        // Handle potential floating point issues near minDiff
+        if (binIndex < 0) binIndex = 0;
+        histogramData.counts[binIndex]++;
+    });
+
+    // --- Update Chart ---
+    const ctx = monteCarloChartCanvas.getContext("2d");
+    if (monteCarloChart) {
+        monteCarloChart.destroy();
+    }
+
+    monteCarloChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: histogramData.labels,
+            datasets: [{
+                label: 'Frequência',
+                data: histogramData.counts,
+                backgroundColor: 'rgba(153, 102, 255, 0.6)', // Purple
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Distribuição da Diferença de Retorno Final (Longa - Curta) - ${numSimulations} Simulações`,
+                    font: { size: 14 }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return `Faixa: ${context[0].label}`;
+                        },
+                        label: function(context) {
+                            return `Simulações: ${context.parsed.y}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Diferença no Valor Final (R$)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Número de Simulações'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // --- Generate Narrative ---
+    let narrative = `Após rodar ${numSimulations} simulações com variações aleatórias nas projeções de IPCA e CDI (baseadas nas volatilidades informadas), observamos o seguinte:\n\n`;
+    narrative += `*   **Probabilidade da Opção Longa ser Melhor:** Em **${(probability * 100).toFixed(1)}%** das simulações, a estratégia de manter o título longo até o vencimento resultou em um valor final maior do que a estratégia de investir no título curto e rolar no CDI.\n`;
+    narrative += `*   **Distribuição dos Resultados:** O histograma acima mostra quantas vezes cada faixa de diferença de resultado final (Opção Longa menos Opção Curta+CDI) ocorreu. Valores à direita de zero indicam cenários onde a Opção Longa ganhou; valores à esquerda indicam onde a Opção Curta+CDI ganhou.\n\n`;
+
+    const medianDiff = differences[Math.floor(numSimulations / 2)];
+    const meanDiff = differences.reduce((a, b) => a + b, 0) / numSimulations;
+
+    narrative += `*   **Resultado Médio e Mediano:** Em média, a diferença de valor final foi de R$ ${meanDiff.toFixed(2)}. O resultado mediano (o valor do meio) foi uma diferença de R$ ${medianDiff.toFixed(2)}.\n\n`;
+
+    narrative += `**Interpretação:** Uma probabilidade acima de 50% sugere que, considerando as incertezas (volatilidades) que você definiu, a Opção Longa tem uma chance maior de superar a estratégia Curta+CDI. A forma do histograma também é importante: \n`;
+    narrative += `  - Se a maior parte da distribuição está à direita do zero, reforça a vantagem da Opção Longa.\n`;
+    narrative += `  - Se a distribuição está mais concentrada à esquerda, a estratégia Curta+CDI parece mais robusta.\n`;
+    narrative += `  - Uma distribuição muito larga indica que o resultado é muito sensível às variações de IPCA e CDI.\n\n`;
+    narrative += `**Importante:** Esta análise de probabilidade depende crucialmente das volatilidades que você informou. Volatilidades maiores gerarão resultados mais dispersos. Use como uma ferramenta para entender o risco e a robustez da sua escolha inicial, não como uma previsão definitiva.`;
+
+    monteCarloNarrativeEl.textContent = narrative;
+}
+
+// Modify displayAdvancedAnalyses to reset Monte Carlo on main calculation
+// (The actual calculation is triggered by its own button)
+function displayAdvancedAnalyses(results, assumptions, shortRate, shortTerm, longRate, longTerm, firstYearFraction) {
+    // Duration
+    shortDurationEl.textContent = `${results.durationMetrics.short.duration.toFixed(2)} anos`;
+    longDurationEl.textContent = `${results.durationMetrics.long.duration.toFixed(2)} anos`;
+    durationNarrativeEl.textContent = generateDurationNarrative(results.durationMetrics);
+
+    // Carry Analysis
+    try {
+        const carryResults = calculateCarryAnalysis(longRate, assumptions);
+        displayCarryAnalysis(carryResults);
+    } catch (error) {
+        console.error("Erro ao calcular/exibir Análise de Carregamento:", error);
+        if (carryNarrativeEl) carryNarrativeEl.textContent = "Erro ao gerar a análise de carregamento.";
+        if (carryChart) carryChart.destroy();
+    }
+
+    // Reset Monte Carlo Results (calculation triggered separately)
+    if (monteCarloNarrativeEl) monteCarloNarrativeEl.textContent = "Aguardando simulação...";
+    if (monteCarloChart) {
+        monteCarloChart.destroy();
+        monteCarloChart = null;
+    }
+
+    // Reset Stress Test Results
+    stressTestResultsEl.innerHTML = 
+'<p>Aguardando teste...</p>';
+    if (stressTestChart) {
+        stressTestChart.destroy();
+        stressTestChart = null;
+    }
+}
+
+
