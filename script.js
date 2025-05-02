@@ -436,47 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Function calculateBreakEvenIpca removed as requested.
-             // If long is worse even at 0% IPCA, break-even might be negative or non-existent in practical terms
-             // Try with lower bound
-             const assumptionsLowerBoundIpca = { ...assumptions, ipca: assumptions.ipca.map(() => lowerBoundIpca) };
-             const returnsLowerBoundIpca = calculateNominalReturns(shortRate, shortTerm, longRate, longTerm, assumptionsLowerBoundIpca, firstYearFraction);
-             if (returnsLowerBoundIpca.longScenario.finalValue < targetShortFinalValue) {
-                 return { breakEvenIpca: null, iterations: 0 }; // Break-even likely negative, return null
-             }
-        }
-         // Check if long is better even with high IPCA
-        const assumptionsUpperBoundIpca = { ...assumptions, ipca: assumptions.ipca.map(() => upperBoundIpca) };
-        const returnsUpperBoundIpca = calculateNominalReturns(shortRate, shortTerm, longRate, longTerm, assumptionsUpperBoundIpca, firstYearFraction);
-        if (returnsUpperBoundIpca.longScenario.finalValue > targetShortFinalValue) {
-             // If long is still better at high IPCA, maybe break-even is higher?
-             // Keep iterating, but this suggests high sensitivity or high real rate difference.
-        }
 
-
-        while (iterations < MAX_ITERATIONS) {
-            iterations++;
-            const midIpca = (lowerBoundIpca + upperBoundIpca) / 2;
-            const tempAssumptions = { ...assumptions, ipca: assumptions.ipca.map(() => midIpca) };
-
-            const tempReturns = calculateNominalReturns(shortRate, shortTerm, longRate, longTerm, tempAssumptions, firstYearFraction);
-            const difference = tempReturns.longScenario.finalValue - targetShortFinalValue;
-
-            if (Math.abs(difference) < TOLERANCE) {
-                bestGuessIpca = midIpca;
-                break;
-            }
-
-            if (difference < 0) {
-                // Long value is too low, need higher IPCA
-                lowerBoundIpca = midIpca;
-            } else {
-                // Long value is too high, need lower IPCA
-                upperBoundIpca = midIpca;
-            }
-        }
-
-        return { breakEvenIpca: bestGuessIpca, iterations };
-    }
 
     function runStressTest() {
         if (!lastCalculationResults || !currentInputs || !currentAssumptions) {
