@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo) {
         let retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
-        let retorno AnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+        let retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
         let cdiBreakEven = '-';
 
         const tempoRestante = prazoLongo - prazoCurta;
