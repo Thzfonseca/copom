@@ -44,6 +44,7 @@ function getPremissas() {
 }
 
 function simular() {
+    console.log('Simulando...'); // Verificação se a função está sendo chamada corretamente
     try {
         const taxaCurta = parseFloat(document.getElementById('taxaCurto').value.replace(',', '.'));
         const prazoCurta = parseFloat(document.getElementById('prazoCurto').value.replace(',', '.'));
@@ -95,6 +96,7 @@ function simular() {
             rentabilidadeLonga.push((acumLongo - 1) * 100);
         }
 
+        console.log(anosGrafico, rentabilidadeCurta, rentabilidadeLonga); // Verificação dos dados
         plotarGrafico(anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
         mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo);
     } catch (e) {
@@ -133,52 +135,52 @@ function plotarGrafico(labels, serie1, serie2) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: { color: '#333', font: { size: 14 } }
-                },
-                tooltip: {
-                    backgroundColor: '#ffffff',
-                    titleColor: '#111',
-                    bodyColor: '#333',
-                    borderColor: '#ccc',
-                    borderWidth: 1,
-                    padding: 10,
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed.y !== null) {
-                                label += context.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
-                            }
-                            return label;
-                        }
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Rentabilidade Acumulada (%)',
-                    font: { size: 16 },
-                    color: '#0a2540'
-                }
-            },
-            scales: {
-                y: {
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: '#555'
-                    }
-                }
-            }
+            // plugins: {
+            //     legend: {
+            //         position: 'top',
+            //         labels: { color: '#333', font: { size: 14 } }
+            //     },
+            //     tooltip: {
+            //         backgroundColor: '#ffffff',
+            //         titleColor: '#111',
+            //         bodyColor: '#333',
+            //         borderColor: '#ccc',
+            //         borderWidth: 1,
+            //         padding: 10,
+            //         callbacks: {
+            //             label: function(context) {
+            //                 let label = context.dataset.label || '';
+            //                 if (label) {
+            //                     label += ': ';
+            //                 }
+            //                 if (context.parsed.y !== null) {
+            //                     label += context.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+            //                 }
+            //                 return label;
+            //             }
+            //         }
+            //     },
+            //     title: {
+            //         display: true,
+            //         text: 'Rentabilidade Acumulada (%)',
+            //         font: { size: 16 },
+            //         color: '#0a2540'
+            //     }
+            // },
+            // scales: {
+            //     y: {
+            //         ticks: {
+            //             callback: function(value) {
+            //                 return value + '%';
+            //             }
+            //         }
+            //     },
+            //     x: {
+            //         ticks: {
+            //             color: '#555'
+            //         }
+            //     }
+            // }
         }
     });
 }
