@@ -1,90 +1,83 @@
 /* styles.css */
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #f4f7fb 0%, #e1e6f0 100%); /* Gradiente suave */
-    color: #333; /* Cor de texto mais suave */
+    font-family: Georgia, serif; /* Substituindo 'FinancierDisplayWeb' por Georgia */
+    background-color: #f7f7f7;
+    color: #333;
     margin: 0;
     padding: 2rem;
-    transition: background-color 0.3s ease;
+    line-height: 1.6;
 }
 
 h1, h2 {
-    color: #2b6cb0; /* Cor primária para títulos */
+    font-family: Georgia, serif; /* Substituindo 'FinancierDisplayWeb' por Georgia */
+    color: #222;
     margin-bottom: 1.5rem;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1); /* Sombra suave no texto */
+    line-height: 1.2;
 }
 
 .container {
     max-width: 1200px;
-    margin: auto;
-    background: rgba(255, 255, 255, 0.85); /* Fundo branco translúcido */
+    margin: 2rem auto;
+    background-color: #fff;
     padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .cards-opcoes {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     flex-wrap: wrap;
     margin-bottom: 2rem;
     justify-content: space-between;
 }
 
 .card-input {
-    background: #fff;
-    padding: 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    background-color: #f9f9f9;
+    padding: 1.2rem;
+    border-radius: 6px;
+    border: 1px solid #ddd;
     flex: 1;
     min-width: 280px;
-    max-width: 420px;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Transições suaves */
-}
-
-.card-input:hover {
-    transform: translateY(-4px); /* Leve elevação ao passar o mouse */
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
 }
 
 .card-input label {
     display: block;
-    margin-bottom: 0.8rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #333;
+    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
 }
 
 .card-input input,
 .card-input select {
     width: 100%;
-    padding: 0.6rem;
+    padding: 0.5rem;
     font-size: 0.9rem;
-    margin-top: 0.3rem;
+    margin-top: 0.2rem;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 4px;
     box-sizing: border-box;
 }
 
 button#simular {
-    background-color: #2b6cb0;
+    background-color: #222;
     color: white;
     border: none;
-    padding: 0.8rem 1.8rem;
-    font-size: 1.05rem;
-    border-radius: 8px;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
     cursor: pointer;
     margin-top: 1.5rem;
-    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    transition: background-color 0.2s ease;
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
 
 button#simular:hover {
-    background-color: #234e89;
-    transform: scale(1.05); /* Leve aumento ao passar o mouse */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #444;
 }
 
 canvas#grafico {
@@ -92,6 +85,9 @@ canvas#grafico {
     max-width: 1000px;
     margin: 2rem auto;
     display: block;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #fff;
 }
 
 .resumo-cards {
@@ -103,63 +99,91 @@ canvas#grafico {
 }
 
 .card {
-    background: #ffffff;
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    background-color: #fff;
+    padding: 1rem 1.2rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     flex: 1;
     min-width: 200px;
-    max-width: 300px;
-    text-align: center;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    max-width: 280px;
+    text-align: left;
+    border-left: 3px solid #2b6cb0;
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: #222;
+}
+
+.card p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0;
 }
 
 .card i {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     color: #0a2540;
-    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
 }
 
 .narrativa-box {
-    background: #fdfdfd;
+    background-color: #f9f9f9;
     border-left: 4px solid #2b6cb0;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    border-radius: 4px;
     max-width: 900px;
-    margin: 1rem auto 2rem auto;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    margin: 1.5rem auto 2rem auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.narrativa-box strong {
+    font-weight: bold;
+    color: #222;
+}
+
+.narrativa-box ul {
+    padding-left: 1.2rem;
+}
+
+.narrativa-box li {
+    margin-bottom: 0.3rem;
 }
 
 .slider-bloco {
-    background: white;
+    background-color: #fff;
     padding: 1rem;
     margin-bottom: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
 }
 
 .slider-bloco label {
     display: block;
-    margin: 0.8rem 0;
+    margin: 0.6rem 0;
+    font-size: 0.85rem;
+    color: #555;
 }
 
 .slider-ano {
     font-weight: bold;
-    font-size: 1.1rem;
-    margin-bottom: 0.4rem;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+    color: #222;
 }
 
 .premissas-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
@@ -170,10 +194,14 @@ canvas#grafico {
     .cards-opcoes {
         flex-direction: column;
     }
+    .card {
+        min-width: 100%;
+        text-align: left;
+    }
 }
 
 @media (max-width: 576px) {
-    .card {
+    .card-input {
         min-width: 100%;
     }
 }
