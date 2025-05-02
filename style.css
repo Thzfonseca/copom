@@ -1,20 +1,26 @@
+/* styles.css */
 body {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #f4f7fb;
-    color: #0a2540;
+    background: linear-gradient(135deg, #f4f7fb 0%, #e1e6f0 100%); /* Gradiente suave */
+    color: #333; /* Cor de texto mais suave */
     margin: 0;
     padding: 2rem;
-    transition: background-color 0.3s ease; /* Adicionada transição suave no background */
+    transition: background-color 0.3s ease;
 }
 
 h1, h2 {
-    color: #0a2540;
-    margin-bottom: 1rem;
+    color: #2b6cb0; /* Cor primária para títulos */
+    margin-bottom: 1.5rem;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1); /* Sombra suave no texto */
 }
 
 .container {
     max-width: 1200px;
     margin: auto;
+    background: rgba(255, 255, 255, 0.85); /* Fundo branco translúcido */
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
 }
 
 .cards-opcoes {
@@ -29,35 +35,145 @@ h1, h2 {
     background: #fff;
     padding: 1.5rem;
     border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     flex: 1;
     min-width: 280px;
     max-width: 420px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Transições suaves */
+}
+
+.card-input:hover {
+    transform: translateY(-4px); /* Leve elevação ao passar o mouse */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .card-input label {
     display: block;
-    margin-bottom: 0.8rem; /* Reduzida um pouco a margem */
+    margin-bottom: 0.8rem;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #333; /* Adicionada cor ao label */
+    color: #333;
 }
 
 .card-input input,
 .card-input select {
     width: 100%;
-    padding: 0.6rem; /* Aumentado um pouco o padding */
+    padding: 0.6rem;
     font-size: 0.9rem;
     margin-top: 0.3rem;
     border: 1px solid #ccc;
     border-radius: 8px;
-    box-sizing: border-box; /* Garante que padding e border não aumentem a largura */
+    box-sizing: border-box;
 }
 
 button#simular {
     background-color: #2b6cb0;
     color: white;
     border: none;
-    padding: 0.8rem 1.8rem; /* Aumentado um pouco o padding */
-    font-size: 1.05rem; /* Ligeiramente maior */
-    border-radius:
+    padding: 0.8rem 1.8rem;
+    font-size: 1.05rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+button#simular:hover {
+    background-color: #234e89;
+    transform: scale(1.05); /* Leve aumento ao passar o mouse */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+canvas#grafico {
+    width: 100%;
+    max-width: 1000px;
+    margin: 2rem auto;
+    display: block;
+}
+
+.resumo-cards {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background: #ffffff;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+    text-align: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card i {
+    width: 24px;
+    height: 24px;
+    color: #0a2540;
+    margin-bottom: 0.5rem;
+}
+
+.narrativa-box {
+    background: #fdfdfd;
+    border-left: 4px solid #2b6cb0;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: 1rem auto 2rem auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.slider-bloco {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.slider-bloco label {
+    display: block;
+    margin: 0.8rem 0;
+}
+
+.slider-ano {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+}
+
+.premissas-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Media Queries para Responsividade */
+@media (max-width: 768px) {
+    .cards-opcoes {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 576px) {
+    .card {
+        min-width: 100%;
+    }
+}
