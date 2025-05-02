@@ -1,56 +1,55 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Simulador de Rolagem IPCA+</title>
-    <link rel="stylesheet" href="style.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Rentabilidade IPCA+</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Simulador de Rolagem IPCA+</h1>
+        <h1>Simulador de Rentabilidade IPCA+</h1>
 
-        <div class="cards-opcoes">
+        <section class="cards-opcoes">
             <div class="card-input">
-                <h2>Opção Curta</h2>
-                <label for="indexadorCurto">Indexador:</label>
-                <select id="indexadorCurto">
-                    <option value="IPCA+">IPCA+</option>
-                </select>
-                <label for="taxaCurto">Taxa (% a.a.):</label>
-                <input type="number" id="taxaCurto" value="9" step="0.1" placeholder="Ex: 9.0"/>
-                <label for="prazoCurto">Prazo (anos):</label>
-                <input type="number" id="prazoCurto" value="2" step="0.5" placeholder="Ex: 2.0"/>
+                <label for="taxaCurto">Taxa IPCA+ (Curta % a.a.):</label>
+                <input type="number" id="taxaCurto" value="7.00">
             </div>
-
             <div class="card-input">
-                <h2>Opção Longa</h2>
-                <label for="indexadorLongo">Indexador:</label>
-                <select id="indexadorLongo">
-                    <option value="IPCA+">IPCA+</option>
-                </select>
-                <label for="taxaLongo">Taxa (% a.a.):</label>
-                <input type="number" id="taxaLongo" value="7" step="0.1" placeholder="Ex: 7.0"/>
-                <label for="prazoLongo">Prazo (anos):</label>
-                <input type="number" id="prazoLongo" value="9" step="0.5" placeholder="Ex: 9.0"/>
+                <label for="prazoCurta">Prazo (Curta - anos):</label>
+                <input type="number" id="prazoCurta" value="2">
             </div>
-        </div>
+            <div class="card-input">
+                <label for="taxaLongo">Taxa IPCA+ (Longa % a.a.):</label>
+                <input type="number" id="taxaLongo" value="6.00">
+            </div>
+            <div class="card-input">
+                <label for="prazoLongo">Prazo (Longa - anos):</label>
+                <input type="number" id="prazoLongo" value="9">
+            </div>
+        </section>
 
-        <h2>Premissas por Ano</h2>
-        <div id="sliders-premissas" class="premissas-container"></div>
+        <section class="premissas-container" id="sliders-premissas">
+            <h2>Premissas de Mercado (% a.a.)</h2>
+            </section>
 
         <button id="simular">Simular</button>
 
-        <canvas id="grafico" height="150" style="width: 100%;"></canvas>
+        <section>
+            <h2>Resultado da Simulação</h2>
+            <canvas id="grafico" width="1000" height="150"></canvas>
+        </section>
 
-        <div id="resumo" class="resumo-cards"></div>
+        <section class="resumo-cards" id="resumo">
+            </section>
 
-        <div id="narrativa" class="narrativa-box"></div>
+        <section class="narrativa-box" id="narrativa">
+            </section>
 
-        <div id="relatorio-erros" style="color: red; margin-top: 20px;"></div>
+        <section id="relatorio-erros" style="color: red; margin-top: 1rem; font-size: 0.9rem;">
+            </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
