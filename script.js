@@ -3,7 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const simularBotao = document.getElementById('simular');
     if (simularBotao) {
-        simularBotao.addEventListener('click', simular);
+        simularBotao.addEventListener('click', () => {
+            console.log('Botão "Simular" foi clicado!'); // ADICIONE ESTE LOG
+            simular();
+        });
     } else {
         registrarErro("Erro: Botão 'simular' não encontrado no DOM.");
     }
@@ -210,12 +213,12 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
             <p><strong>Análise da Simulação:</strong></p>
 
             <ul>
-                <li><strong>Retorno Anualizado (Opção Curta):</strong> Visualizamos um retorno médio anual de <strong>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong> ao longo do período simulado. Este resultado incorpora a rentabilidade do IPCA+ inicial e a performance estimada do CDI na fase de reinvestimento.</li>
-                <li><strong>Retorno Anualizado (Opção Longa):</strong> A estratégia de longo prazo projeta um retorno médio anual de <strong>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong>, refletindo a taxa fixa de IPCA+ durante todo o período.</li>
-                <li><strong>Ponto de Equilíbrio do CDI:</strong> Para que a estratégia de curto prazo iguale o retorno da opção de longo prazo, o CDI médio no período de reinvestimento precisaria ser de aproximadamente <strong>${cdiBreakEven}</strong>. Este é um indicador importante para avaliar a atratividade relativa das duas abordagens.</li>
+                <li><strong>Retorno Anualizado (Opção Curta):** Visualizamos um retorno médio anual de <strong>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong> ao longo do período simulado. Este resultado incorpora a rentabilidade do IPCA+ inicial e a performance estimada do CDI na fase de reinvestimento.</li>
+                <li><strong>Retorno Anualizado (Opção Longa):** A estratégia de longo prazo projeta um retorno médio anual de <strong>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong>, refletindo a taxa fixa de IPCA+ durante todo o período.</li>
+                <li><strong>Ponto de Equilíbrio do CDI:** Para que a estratégia de curto prazo iguale o retorno da opção de longo prazo, o CDI médio no período de reinvestimento precisaria ser de aproximadamente <strong>${cdiBreakEven}</strong>. Este é um indicador importante para avaliar a atratividade relativa das duas abordagens.</li>
             </ul>
 
-            <p><strong>Considerações Estratégicas:</strong> A escolha entre estas estratégias dependerá da sua visão sobre a trajetória futura das taxas de juros (CDI) após o período inicial do investimento de curto prazo. A opção de longo prazo oferece uma previsibilidade maior, enquanto a de curto prazo pode se beneficiar de um cenário de taxas de juros crescentes após o vencimento inicial.</p>
+            <p><strong>Considerações Estratégicas:** A escolha entre estas estratégias dependerá da sua visão sobre a trajetória futura das taxas de juros (CDI) após o período inicial do investimento de curto prazo. A opção de longo prazo oferece uma previsibilidade maior, enquanto a de curto prazo pode se beneficiar de um cenário de taxas de juros crescentes após o vencimento inicial.</p>
         `;
     } else {
         registrarErro("Erro: Elemento 'narrativa' não encontrado.");
