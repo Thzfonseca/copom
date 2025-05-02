@@ -58,184 +58,178 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function simular() {
-        console.log('Simulando...');
-        try {
-            const taxaCurtaElement = document.getElementById('taxaCurto');
-            const prazoCurtaElement = document.getElementById('prazoCurta');
-            const taxaLongoElement = document.getElementById('taxaLongo');
-            const prazoLongoElement = document.getElementById('prazoLongo');
+        console.log('Função simular() foi chamada.'); // Primeiro log
 
-            if (!taxaCurtaElement || !prazoCurtaElement || !taxaLongoElement || !prazoLongoElement) {
-                registrarErro("Erro: Um ou mais campos de entrada não foram encontrados.");
-                return;
+        const taxaCurtaElement = document.getElementById('taxaCurto');
+        console.log('taxaCurtaElement:', taxaCurtaElement);
+        const prazoCurtaElement = document.getElementById('prazoCurta');
+        console.log('prazoCurtaElement:', prazoCurtaElement);
+        const taxaLongoElement = document.getElementById('taxaLongo');
+        console.log('taxaLongoElement:', taxaLongoElement);
+        const prazoLongoElement = document.getElementById('prazoLongo');
+        console.log('prazoLongoElement:', prazoLongoElement);
+
+        if (!taxaCurtaElement || !prazoCurtaElement || !taxaLongoElement || !prazoLongoElement) {
+            registrarErro("Erro: Um ou mais campos de entrada não foram encontrados.");
+            return;
+        }
+
+        const taxaCurta = parseFloat(taxaCurtaElement.value.replace(',', '.'));
+        const prazoCurta = parseFloat(prazoCurtaElement.value.replace(',', '.'));
+        const taxaLongo = parseFloat(taxaLongoElement.value.replace(',', '.'));
+        const prazoLongo = parseFloat(prazoLongoElement.value.replace(',', '.'));
+
+        console.log('Valores lidos:', { taxaCurta, prazoCurta, taxaLongo, prazoLongo }); // Log dos valores
+
+        const premissas = getPremissas();
+
+        const anosGrafico = [];
+        const rentabilidadeCurta = [];
+        const rentabilidadeLonga = [];
+        const intervalos = Math.ceil(prazoLongo * 2);
+
+        let acumCurtoFinal = 1;
+        let acumCurtoAteVencimento = 1;
+        let acumLongo = 1;
+
+        for (let i = 0; i <= intervalos; i++) {
+            const t = i * 0.5;
+            const ano = 2025 + Math.floor(t);
+            anosGrafico.push(t.toFixed(1));
+
+            const ipca = premissas[ano]?.ipca ?? premissas[anosPremissas[anosPremissas.length - 1]].ipca;
+            const cdi = premissas[ano]?.cdi ?? premissas[anosPremissas[anosPremissas.length - 1]].cdi;
+
+            const taxaRealCurta = taxaCurta + ipca;
+            const taxaRealLonga = taxaLongo + ipca;
+
+            if (t < prazoCurta) {
+                acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
+                acumCurtoFinal *= 1 + taxaRealCurta / 100 / 2;
+            } else {
+                acumCurtoFinal *= 1 + cdi / 100 / 2;
             }
 
-            const taxaCurta = parseFloat(taxaCurtaElement.value.replace(',', '.'));
-            const prazoCurta = parseFloat(prazoCurtaElement.value.replace(',', '.'));
-            const taxaLongo = parseFloat(taxaLongoElement.value.replace(',', '.'));
-            const prazoLongo = parseFloat(prazoLongoElement.value.replace(',', '.'));
+            acumLongo *= 1 + taxaRealLonga / 100 / 2;
 
-            console.log('Valores lidos:', { taxaCurta, prazoCurta, taxaLongo, prazoLongo });
+            rentabilidadeCurta.push((acumCurtoFinal - 1) * 100);
+            rentabilidadeLonga.push((acumLongo - 1) * 100);
+        }
 
-            if (
-                isNaN(taxaCurta) || isNaN(prazoCurta) ||
-                isNaN(taxaLongo) || isNaN(prazoLongo) ||
-                taxaCurta <= 0 || prazoCurta <= 0 ||
-                taxaLongo <= 0 || prazoLongo <= 0
-            ) {
-                registrarErro("Preencha corretamente todas as taxas e prazos com valores positivos.");
-                return;
+        console.log('Dados do gráfico:', anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
+        plotarGrafico(anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
+        mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo);
+    } catch (e) {
+        registrarErro(e.message);
+    }
+}
+
+function plotarGrafico(labels, serie1, serie2) {
+    console.log('plotarGrafico chamado');
+    if (window.graficoRentab) {
+        window.graficoRentab.destroy();
+        window.graficoRentab = null;
+    }
+    const graficoCanvas = document.getElementById('grafico');
+    if (graficoCanvas) {
+        graficoCanvas.width = graficoCanvas.offsetWidth;
+        graficoCanvas.height = 150;
+        const ctx = graficoCanvas.getContext('2d');
+        window.graficoRentab = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Opção Curta',
+                        data: serie1,
+                        fill: true,
+                        backgroundColor: 'rgba(33, 150, 243, 0.08)',
+                        borderColor: '#2196f3',
+                        tension: 0.3,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Opção Longa',
+                        data: serie2,
+                        fill: true,
+                        backgroundColor: 'rgba(233, 30, 99, 0.08)',
+                        borderColor: '#e91e63',
+                        tension: 0.3,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: false
             }
+        });
+        window.graficoRentab.resize();
+    } else {
+        registrarErro("Erro: Elemento canvas 'grafico' não encontrado.");
+    }
+}
 
-            const premissas = getPremissas();
+function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo) {
+    let retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
+    let retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
+    let cdiBreakEven = '-';
 
-            const anosGrafico = [];
-            const rentabilidadeCurta = [];
-            const rentabilidadeLonga = [];
-            const intervalos = Math.ceil(prazoLongo * 2);
+    const tempoRestante = prazoLongo - prazoCurta;
+    const n = tempoRestante * 2;
 
-            let acumCurtoFinal = 1;
-            let acumCurtoAteVencimento = 1;
-            let acumLongo = 1;
-
-            for (let i = 0; i <= intervalos; i++) {
-                const t = i * 0.5;
-                const ano = 2025 + Math.floor(t);
-                anosGrafico.push(t.toFixed(1));
-
-                const ipca = premissas[ano]?.ipca ?? premissas[anosPremissas[anosPremissas.length - 1]].ipca;
-                const cdi = premissas[ano]?.cdi ?? premissas[anosPremissas[anosPremissas.length - 1]].cdi;
-
-                const taxaRealCurta = taxaCurta + ipca;
-                const taxaRealLonga = taxaLongo + ipca;
-
-                if (t < prazoCurta) {
-                    acumCurtoAteVencimento *= 1 + taxaRealCurta / 100 / 2;
-                    acumCurtoFinal *= 1 + taxaRealCurta / 100 / 2;
-                } else {
-                    acumCurtoFinal *= 1 + cdi / 100 / 2;
-                }
-
-                acumLongo *= 1 + taxaRealLonga / 100 / 2;
-
-                rentabilidadeCurta.push((acumCurtoFinal - 1) * 100);
-                rentabilidadeLonga.push((acumLongo - 1) * 100);
-            }
-
-            console.log('Dados do gráfico:', anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
-            plotarGrafico(anosGrafico, rentabilidadeCurta, rentabilidadeLonga);
-            mostrarResumo(acumCurtoFinal, acumLongo, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo);
-        } catch (e) {
-            registrarErro(e.message);
-        }
+    if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
+        const fator = acumLongoFinal / acumCurtoAteVencimento;
+        const taxaSemestral = Math.pow(fator, 1 / n) - 1;
+        const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
+        cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
     }
 
-    function plotarGrafico(labels, serie1, serie2) {
-        console.log('plotarGrafico chamado');
-        if (window.graficoRentab) {
-            window.graficoRentab.destroy();
-            window.graficoRentab = null;
-        }
-        const graficoCanvas = document.getElementById('grafico');
-        if (graficoCanvas) {
-            graficoCanvas.width = graficoCanvas.offsetWidth;
-            graficoCanvas.height = 150;
-            const ctx = graficoCanvas.getContext('2d');
-            window.graficoRentab = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [
-                        {
-                            label: 'Opção Curta',
-                            data: serie1,
-                            fill: true,
-                            backgroundColor: 'rgba(33, 150, 243, 0.08)',
-                            borderColor: '#2196f3',
-                            tension: 0.3,
-                            borderWidth: 2
-                        },
-                        {
-                            label: 'Opção Longa',
-                            data: serie2,
-                            fill: true,
-                            backgroundColor: 'rgba(233, 30, 99, 0.08)',
-                            borderColor: '#e91e63',
-                            tension: 0.3,
-                            borderWidth: 2
-                        }
-                    ]
-                },
-                options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
-                    animation: false
-                }
-            });
-            window.graficoRentab.resize();
-        } else {
-            registrarErro("Erro: Elemento canvas 'grafico' não encontrado.");
-        }
+    const resumoDiv = document.getElementById('resumo');
+    if (resumoDiv) {
+        resumoDiv.innerHTML = `
+            <div class="card"><h3>Retorno Anualizado Curto</h3><p>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p></div>
+            <div class="card"><h3>Retorno Anualizado Longo</h3><p>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p></div>
+            <div class="card"><h3>CDI Break-even</h3><p>${cdiBreakEven}</p></div>
+        `;
+    } else {
+        registrarErro("Erro: Elemento 'resumo' não encontrado.");
     }
 
-    function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, prazoCurta, prazoLongo, taxaCurta, taxaLongo) {
-        let retornoAnualCurto = Math.pow(acumCurtoFinal, 1 / prazoLongo) - 1;
-        let retornoAnualLongo = Math.pow(acumLongoFinal, 1 / prazoLongo) - 1;
-        let cdiBreakEven = '-';
+    const narrativaDiv = document.getElementById('narrativa');
+    if (narrativaDiv) {
+        narrativaDiv.innerHTML = `
+            <p>Prezado cliente, esta simulação ilustra duas estratégias de investimento indexadas à inflação (IPCA+), considerando suas expectativas de mercado para os próximos anos.</p>
 
-        const tempoRestante = prazoLongo - prazoCurta;
-        const n = tempoRestante * 2;
+            <p><strong>Estratégia de Curto Prazo (Opção Azul):</strong> Inicialmente, alocamos em um título IPCA+ com uma taxa de retorno de <strong>${taxaCurta}% ao ano</strong> e prazo de <strong>${prazoCurta} anos</strong>. Ao vencimento, simulamos uma realocação para um investimento atrelado à taxa CDI.</p>
 
-        if (n > 0 && acumCurtoAteVencimento > 0 && acumLongoFinal > 0) {
-            const fator = acumLongoFinal / acumCurtoAteVencimento;
-            const taxaSemestral = Math.pow(fator, 1 / n) - 1;
-            const taxaAnual = Math.pow(1 + taxaSemestral, 2) - 1;
-            cdiBreakEven = (taxaAnual * 100).toFixed(2) + '%';
-        }
+            <p><strong>Estratégia de Longo Prazo (Opção Rosa):</strong> Mantemos a alocação em um título IPCA+ com uma taxa de retorno de <strong>${taxaLongo}% ao ano</strong> durante todo o horizonte de <strong>${prazoLongo} anos</strong>.</p>
 
-        const resumoDiv = document.getElementById('resumo');
-        if (resumoDiv) {
-            resumoDiv.innerHTML = `
-                <div class="card"><h3>Retorno Anualizado Curto</h3><p>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p></div>
-                <div class="card"><h3>Retorno Anualizado Longo</h3><p>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</p></div>
-                <div class="card"><h3>CDI Break-even</h3><p>${cdiBreakEven}</p></div>
-            `;
-        } else {
-            registrarErro("Erro: Elemento 'resumo' não encontrado.");
-        }
+            <p><strong>Análise da Simulação:</strong></p>
 
-        const narrativaDiv = document.getElementById('narrativa');
-        if (narrativaDiv) {
-            narrativaDiv.innerHTML = `
-                <p>Prezado cliente, esta simulação ilustra duas estratégias de investimento indexadas à inflação (IPCA+), considerando suas expectativas de mercado para os próximos anos.</p>
+            <ul>
+                <li><strong>Retorno Anualizado (Opção Curta):</strong> Visualizamos um retorno médio anual de <strong>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong> ao longo do período simulado. Este resultado incorpora a rentabilidade do IPCA+ inicial e a performance estimada do CDI na fase de reinvestimento.</li>
+                <li><strong>Retorno Anualizado (Opção Longa):</strong> A estratégia de longo prazo projeta um retorno médio anual de <strong>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong>, refletindo a taxa fixa de IPCA+ durante todo o período.</li>
+                <li><strong>Ponto de Equilíbrio do CDI:</strong> Para que a estratégia de curto prazo iguale o retorno da opção de longo prazo, o CDI médio no período de reinvestimento precisaria ser de aproximadamente <strong>${cdiBreakEven}</strong>. Este é um indicador importante para avaliar a atratividade relativa das duas abordagens.</li>
+            </ul>
 
-                <p><strong>Estratégia de Curto Prazo (Opção Azul):</strong> Inicialmente, alocamos em um título IPCA+ com uma taxa de retorno de <strong>${taxaCurta}% ao ano</strong> e prazo de <strong>${prazoCurta} anos</strong>. Ao vencimento, simulamos uma realocação para um investimento atrelado à taxa CDI.</p>
-
-                <p><strong>Estratégia de Longo Prazo (Opção Rosa):</strong> Mantemos a alocação em um título IPCA+ com uma taxa de retorno de <strong>${taxaLongo}% ao ano</strong> durante todo o horizonte de <strong>${prazoLongo} anos</strong>.</p>
-
-                <p><strong>Análise da Simulação:</strong></p>
-
-                <ul>
-                    <li><strong>Retorno Anualizado (Opção Curta):</strong> Visualizamos um retorno médio anual de <strong>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong> ao longo do período simulado. Este resultado incorpora a rentabilidade do IPCA+ inicial e a performance estimada do CDI na fase de reinvestimento.</li>
-                    <li><strong>Retorno Anualizado (Opção Longa):</strong> A estratégia de longo prazo projeta um retorno médio anual de <strong>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong>, refletindo a taxa fixa de IPCA+ durante todo o período.</li>
-                    <li><strong>Ponto de Equilíbrio do CDI:</strong> Para que a estratégia de curto prazo iguale o retorno da opção de longo prazo, o CDI médio no período de reinvestimento precisaria ser de aproximadamente <strong>${cdiBreakEven}</strong>. Este é um indicador importante para avaliar a atratividade relativa das duas abordagens.</li>
-                </ul>
-
-                <p><strong>Considerações Estratégicas:</strong> A escolha entre estas estratégias dependerá da sua visão sobre a trajetória futura das taxas de juros (CDI) após o período inicial do investimento de curto prazo. A opção de longo prazo oferece uma previsibilidade maior, enquanto a de curto prazo pode se beneficiar de um cenário de taxas de juros crescentes após o vencimento inicial.</p>
-            `;
-        } else {
-            registrarErro("Erro: Elemento 'narrativa' não encontrado.");
-        }
+            <p><strong>Considerações Estratégicas:</strong> A escolha entre estas estratégias dependerá da sua visão sobre a trajetória futura das taxas de juros (CDI) após o período inicial do investimento de curto prazo. A opção de longo prazo oferece uma previsibilidade maior, enquanto a de curto prazo pode se beneficiar de um cenário de taxas de juros crescentes após o vencimento inicial.</p>
+        `;
+    } else {
+        registrarErro("Erro: Elemento 'narrativa' não encontrado.");
     }
+}
 
-    function registrarErro(msg) {
-        console.error("[SIMULADOR-ERRO]", msg);
-        window.__errosDebug = window.__errosDebug || [];
-        window.__errosDebug.push(msg);
-        const div = document.getElementById("relatorio-erros");
-        if (div) {
-            div.innerHTML += `<div>[!] ${msg}</div>`;
-            div.scrollTop = div.scrollHeight;
-        }
+function registrarErro(msg) {
+    console.error("[SIMULADOR-ERRO]", msg);
+    window.__errosDebug = window.__errosDebug || [];
+    window.__errosDebug.push(msg);
+    const div = document.getElementById("relatorio-erros");
+    if (div) {
+        div.innerHTML += `<div>[!] ${msg}</div>`;
+        div.scrollTop = div.scrollHeight;
     }
+}
 });
