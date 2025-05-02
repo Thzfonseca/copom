@@ -204,14 +204,21 @@ function mostrarResumo(acumCurtoFinal, acumLongoFinal, acumCurtoAteVencimento, p
     `;
 
     const narrativa = `
-        <p><strong>Simulação:</strong> Esta comparação avalia dois caminhos de investimento indexado ao IPCA+: uma opção curta com vencimento em ${prazoCurta} anos e uma opção longa com vencimento em ${prazoLongo} anos.</p>
-        <p>A Opção Curta oferece <strong>IPCA+${document.getElementById('taxaCurto').value}%</strong> e, ao final do prazo, assume reinvestimento em CDI. A Opção Longa entrega <strong>IPCA+${document.getElementById('taxaLongo').value}%</strong> por todo o período.</p>
-        <p>Considerando suas premissas para inflação e juros, a rentabilidade anualizada até ${prazoLongo} anos foi de:</p>
+        <p>Prezado cliente, esta simulação ilustra duas estratégias de investimento indexadas à inflação (IPCA+), considerando suas expectativas de mercado para os próximos anos.</p>
+
+        <p><strong>Estratégia de Curto Prazo (Opção Azul):</strong> Inicialmente, alocamos em um título IPCA+ com uma taxa de retorno de <strong>${document.getElementById('taxaCurto').value}% ao ano</strong> e prazo de <strong>${document.getElementById('prazoCurta').value} anos</strong>. Ao vencimento, simulamos uma realocação para um investimento atrelado à taxa CDI.</p>
+
+        <p><strong>Estratégia de Longo Prazo (Opção Rosa):</strong> Mantemos a alocação em um título IPCA+ com uma taxa de retorno de <strong>${document.getElementById('taxaLongo').value}% ao ano</strong> durante todo o horizonte de <strong>${document.getElementById('prazoLongo').value} anos</strong>.</p>
+
+        <p><strong>Análise da Simulação:</strong></p>
+
         <ul>
-            <li><strong>Opção Curta:</strong> ${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% ao ano</li>
-            <li><strong>Opção Longa:</strong> ${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% ao ano</li>
-            <li><strong>CDI Break-even:</strong> ${cdiBreakEven}</li>
+            <li><strong>Retorno Anualizado (Opção Curta):</strong> Visualizamos um retorno médio anual de <strong>${(retornoAnualCurto * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong> ao longo do período simulado. Este resultado incorpora a rentabilidade do IPCA+ inicial e a performance estimada do CDI na fase de reinvestimento.</li>
+            <li><strong>Retorno Anualizado (Opção Longa):</strong> A estratégia de longo prazo projeta um retorno médio anual de <strong>${(retornoAnualLongo * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</strong>, refletindo a taxa fixa de IPCA+ durante todo o período.</li>
+            <li><strong>Ponto de Equilíbrio do CDI:</strong> Para que a estratégia de curto prazo iguale o retorno da opção de longo prazo, o CDI médio no período de reinvestimento precisaria ser de aproximadamente <strong>${cdiBreakEven}</strong>. Este é um indicador importante para avaliar a atratividade relativa das duas abordagens.</li>
         </ul>
+
+        <p><strong>Considerações Estratégicas:</strong> A escolha entre estas estratégias dependerá da sua visão sobre a trajetória futura das taxas de juros (CDI) após o período inicial do investimento de curto prazo. A opção de longo prazo oferece uma previsibilidade maior, enquanto a de curto prazo pode se beneficiar de um cenário de taxas de juros crescentes após o vencimento inicial.</p>
     `;
     document.getElementById('narrativa').innerHTML = narrativa;
 }
